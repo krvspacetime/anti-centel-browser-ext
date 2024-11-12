@@ -75,6 +75,10 @@ function styleTargetTweets(isInTargetList, tweet) {
       tweetContent.style.filter = "none"; // Remove blur from content
       tweet.style.filter = "none"; // Remove blur from tweet
       overlay.removeChild(button); // Remove the overlay
+      tweet.style.pointerEvents = "auto";
+      tweet.style.position = "static";
+      overlay.style.display = "none";
+      // overlay.remove(); // Whenever I add this line it reaaplies the blur because the if condition becomes true again
     });
   }
 }
@@ -93,17 +97,17 @@ function createWatchListButtons(tweet, handleElement, handle, isInTargetList) {
     watchListButton.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      handleButtonClick(handle);
+      handleWatchlistAction(handle);
     });
 
     handleElement.parentElement.appendChild(watchListButton);
   }
 
   // Update button text and style based on target list status
+  watchListButton.disabled = false;
   watchListButton.textContent = isInTargetList
-    ? "ON WATCHLIST"
+    ? "REMOVE FROM WATCHLIST"
     : "ADD TO WATCHLIST";
-  watchListButton.disabled = isInTargetList;
   watchListButton.style.backgroundColor = isInTargetList
     ? "green"
     : "whitesmoke";
@@ -111,7 +115,7 @@ function createWatchListButtons(tweet, handleElement, handle, isInTargetList) {
 }
 
 // Function to handle button click to add/remove handles from the list
-function handleButtonClick(handle) {
+function handleWatchlistAction(handle) {
   // eslint-disable-next-line no-undef
   chrome.storage.sync.get("targetHandles", (data) => {
     const targetHandles = data.targetHandles || [];
@@ -123,6 +127,24 @@ function handleButtonClick(handle) {
       // eslint-disable-next-line no-undef
       chrome.storage.sync.set({ targetHandles }, () => {
         console.log(`${handle} added to target list.`);
+        // Notify the React app to update
+        // eslint-disable-next-line no-undef
+        chrome.runtime.sendMessage({
+          type: "updateHandles",
+          data: targetHandles,
+        });
+        // Refresh the UI to show the updated button states
+        highlightParodyAccounts();
+      });
+    } else {
+      // Remove the handle directly from the targetHandles array
+      const index = targetHandles.indexOf(handle);
+      if (index > -1) {
+        targetHandles.splice(index, 1); // Modify targetHandles directly
+      }
+      // eslint-disable-next-line no-undef
+      chrome.storage.sync.set({ targetHandles }, () => {
+        console.log(`${handle} removed from target list.`);
         // Notify the React app to update
         // eslint-disable-next-line no-undef
         chrome.runtime.sendMessage({
