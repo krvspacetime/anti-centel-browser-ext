@@ -19,40 +19,95 @@ function highlightParodyAccounts() {
         const isInTargetList = targetHandles.includes(handle);
 
         // Style the tweet if the handle is in targetHandles
-        if (isInTargetList) {
-          tweet.style.outline = "1px solid lightblue";
-        }
+        styleTargetTweets(isInTargetList, tweet);
 
         // Add or update the button next to the handle
-        let button = tweet.querySelector(".add-to-target-button");
-        if (!button) {
-          button = document.createElement("button");
-          button.className = "add-to-target-button";
-          button.style.marginLeft = "8px";
-          button.style.padding = "2px 6px";
-          button.style.fontSize = "12px";
-          button.style.cursor = "pointer";
-
-          // Prevent navigation to profile on button click
-          button.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleButtonClick(handle);
-          });
-
-          handleElement.parentElement.appendChild(button);
-        }
-
-        // Update button text and style based on target list status
-        button.textContent = isInTargetList
-          ? "ON WATCHLIST"
-          : "ADD TO WATCHLIST";
-        button.disabled = isInTargetList;
-        button.style.backgroundColor = isInTargetList ? "green" : "whitesmoke";
-        button.style.color = isInTargetList ? "white" : "black";
+        createWatchListButtons(tweet, handleElement, handle, isInTargetList);
       }
     });
   });
+}
+
+function styleTargetTweets(isInTargetList, tweet) {
+  if (isInTargetList && !tweet.querySelector(".parody-overlay")) {
+    tweet.style.position = "relative";
+    tweet.style.filter = "blur(8px)";
+    tweet.style.pointerEvents = "none";
+
+    const tweetContent = tweet.querySelector('[data-testid="tweetText"]');
+    if (tweetContent) {
+      tweetContent.style.filter = "blur(2px)";
+    }
+
+    // Create an overlay for the tweet
+    const overlay = document.createElement("div");
+    overlay.className = "parody-overlay";
+    overlay.style.position = "absolute";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+    overlay.style.display = "flex";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.pointerEvents = "auto";
+    overlay.style.zIndex = "10";
+
+    // Create a button to remove blur
+    const button = document.createElement("button");
+    button.textContent = "Show Tweet";
+    button.style.padding = "8px 16px";
+    button.style.backgroundColor = "#1DA1F2";
+    button.style.color = "white";
+    button.style.border = "none";
+    button.style.borderRadius = "4px";
+    button.style.cursor = "pointer";
+    button.style.fontSize = "14px";
+    button.style.zIndex = "11";
+
+    // Append button to the overlay and overlay to tweet
+    overlay.appendChild(button);
+    tweet.appendChild(overlay);
+
+    // Add click event to remove blur and overlay
+    button.addEventListener("click", () => {
+      tweetContent.style.filter = "none"; // Remove blur from content
+      tweet.style.filter = "none"; // Remove blur from tweet
+      overlay.removeChild(button); // Remove the overlay
+    });
+  }
+}
+
+function createWatchListButtons(tweet, handleElement, handle, isInTargetList) {
+  let watchListButton = tweet.querySelector(".add-to-target-button");
+  if (!watchListButton) {
+    watchListButton = document.createElement("button");
+    watchListButton.className = "add-to-target-button";
+    watchListButton.style.marginLeft = "8px";
+    watchListButton.style.padding = "2px 6px";
+    watchListButton.style.fontSize = "12px";
+    watchListButton.style.cursor = "pointer";
+
+    // Prevent navigation to profile on button click
+    watchListButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleButtonClick(handle);
+    });
+
+    handleElement.parentElement.appendChild(watchListButton);
+  }
+
+  // Update button text and style based on target list status
+  watchListButton.textContent = isInTargetList
+    ? "ON WATCHLIST"
+    : "ADD TO WATCHLIST";
+  watchListButton.disabled = isInTargetList;
+  watchListButton.style.backgroundColor = isInTargetList
+    ? "green"
+    : "whitesmoke";
+  watchListButton.style.color = isInTargetList ? "white" : "black";
 }
 
 // Function to handle button click to add/remove handles from the list

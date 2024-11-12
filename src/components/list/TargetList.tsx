@@ -1,23 +1,14 @@
 import { useEffect, useState } from "react";
 import { TargetInput } from "./TargetInput";
-import { IconBrandX, IconX } from "@tabler/icons-react";
-import { targetHandlesAtom } from "../../atoms/targetAtom";
-import { useAtom } from "jotai";
-import { RESET } from "jotai/utils";
 
 export const TargetList = () => {
   const [inputVal, setInputVal] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [targetHandles, setTargetHandles] = useAtom(targetHandlesAtom);
+  // const [targetHandles, setTargetHandles] = useAtom(targetHandlesAtom);
+  const [targetHandles, setTargetHandles] = useState<string[]>([]);
 
   // Define the message handler function separately
-  const handleMessage = (message: {
-    type: string;
-    data:
-      | string[]
-      | typeof RESET
-      | ((prev: string[]) => string[] | typeof RESET);
-  }) => {
+  const handleMessage = (message: { type: string; data: string[] }) => {
     if (message.type === "updateHandles") {
       setTargetHandles(message.data);
     }
@@ -76,7 +67,7 @@ export const TargetList = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full h-full">
       <TargetInput
         inputVal={inputVal}
         setInputVal={(value) => setInputVal(value)}
@@ -90,7 +81,7 @@ export const TargetList = () => {
             <div key={idx} className="flex text-white">
               <div className="flex gap-2 justify-between w-full px-2 overflow-x-hidden">
                 <div className="flex items-center gap-2 max-w-[200px] flex-grow flex-shrink">
-                  <IconBrandX />
+                  {/* <IconBrandX /> */}
                   <span>
                     {item.length > 35 && !isExpanded
                       ? item.slice(0, 35) + "..."
@@ -109,7 +100,7 @@ export const TargetList = () => {
                   className="cursor-pointer flex-none"
                   onClick={(e) => removeFromList(e, idx)}
                 >
-                  <IconX />
+                  {/* <IconX /> */}X
                 </div>
               </div>
             </div>

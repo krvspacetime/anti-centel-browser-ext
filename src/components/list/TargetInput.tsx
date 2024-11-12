@@ -1,5 +1,3 @@
-import { IconAt } from "@tabler/icons-react";
-
 interface TargetInputProps {
   inputVal: string;
   setInputVal: (value: string) => void;
@@ -16,12 +14,12 @@ export const TargetInput = ({
   return (
     <div>
       <section className="flex items-center w-full justify-center h-[30px]">
-        <IconAt
+        {/* <IconAt
           className="mr-1"
           size={20}
           color="rgb(244 244 245 / var(--tw-bg-opacity))"
           type=""
-        />
+        /> */}
         <input
           id="handleInput"
           type="search"
