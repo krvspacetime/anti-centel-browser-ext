@@ -1,33 +1,19 @@
 import { useEffect, useState } from "react";
 import { TargetInput } from "./TargetInput";
+import { TargetCategorySelect } from "./TargetCategorySelect";
+
+type CategoryType = "fake_news" | "parody" | "satire" | "default";
+
+interface TargetHandle {
+  handle: string;
+  category: CategoryType;
+}
 
 export const TargetList = () => {
   const [inputVal, setInputVal] = useState("");
-  const [isExpanded, setIsExpanded] = useState(false);
-  // const [targetHandles, setTargetHandles] = useAtom(targetHandlesAtom);
-  const [targetHandles, setTargetHandles] = useState<string[]>([]);
-
-  // Define the message handler function separately
-  const handleMessage = (message: { type: string; data: string[] }) => {
-    if (message.type === "updateHandles") {
-      setTargetHandles(message.data);
-    }
-  };
-
-  useEffect(() => {
-    // Fetch the latest targetHandles from storage on mount
-    chrome.storage.sync.get("targetHandles", (data) => {
-      setTargetHandles(data.targetHandles || []);
-    });
-
-    // Listen for changes to targetHandles from the content script
-    chrome.runtime.onMessage.addListener(handleMessage);
-
-    // Clean up listener when component unmounts
-    return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage);
-    };
-  }, []);
+  const [targetHandles, setTargetHandles] = useState<TargetHandle[]>([]);
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryType>("default");
 
   const removeFromList = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -46,10 +32,20 @@ export const TargetList = () => {
     });
   };
 
+  const handleMessage = (message: { type: string; data: TargetHandle[] }) => {
+    if (message.type === "updateHandles") {
+      setTargetHandles(message.data);
+    }
+  };
+
   const addToList = () => {
     setTargetHandles((prev) => {
-      if (!prev.includes(inputVal) && inputVal !== "") {
-        const updatedHandles = [...prev, inputVal];
+      if (!prev.some((item) => item.handle === inputVal) && inputVal !== "") {
+        const newHandle: TargetHandle = {
+          handle: inputVal,
+          category: selectedCategory,
+        };
+        const updatedHandles = [...prev, newHandle];
         setInputVal("");
 
         // Update storage and notify content script
@@ -65,48 +61,62 @@ export const TargetList = () => {
       return prev;
     });
   };
+  useEffect(() => {
+    // Fetch the latest targetHandles from storage on mount
+    chrome.storage.sync.get("targetHandles", (data) => {
+      setTargetHandles(data.targetHandles || []);
+    });
 
+    // Listen for changes to targetHandles from the content script
+    chrome.runtime.onMessage.addListener(handleMessage);
+
+    // Clean up listener when component unmounts
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleMessage);
+    };
+  }, []);
   return (
-    <div className="w-full h-full">
-      <TargetInput
-        inputVal={inputVal}
-        setInputVal={(value) => setInputVal(value)}
-        addToList={addToList}
-        list={targetHandles}
-      />
-      <section className="w-full flex justify-center flex-col items-center mt-3">
-        <div className="text-lg font-bold text-white">TARGET LIST</div>
-        <div className="h-[320px] w-full overflow-y-auto self-center">
-          {targetHandles.map((item, idx) => (
-            <div key={idx} className="flex text-white">
-              <div className="flex gap-2 justify-between w-full px-2 overflow-x-hidden">
-                <div className="flex items-center gap-2 max-w-[200px] flex-grow flex-shrink">
-                  {/* <IconBrandX /> */}
-                  <span>
-                    {item.length > 35 && !isExpanded
-                      ? item.slice(0, 35) + "..."
-                      : item}
-                    {item.length > 35 && (
-                      <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="text-blue-500 ml-1"
-                      >
-                        {isExpanded ? "See less" : "See more"}
-                      </button>
-                    )}
-                  </span>
+    <div className="w-full h-full bg-gray-800">
+      {" "}
+      {/* Added bg color for visibility */}
+      <h1 className="text-white text-xl mb-4">Target List</h1>
+      <div className="flex gap-2 mb-2">
+        <TargetInput
+          inputVal={inputVal}
+          setInputVal={(value) => setInputVal(value)}
+          addToList={addToList}
+          list={targetHandles.map((th) => th.handle)}
+        />
+        <TargetCategorySelect
+          selectedCategory={selectedCategory}
+          onCategoryChange={(category) => setSelectedCategory(category)}
+        />
+      </div>
+      <div className="text-white">
+        {targetHandles.length === 0 ? (
+          <p>No targets added yet</p>
+        ) : (
+          <section className="w-full flex justify-center flex-col items-center mt-3">
+            <div className="text-lg font-bold text-white">TARGET LIST</div>
+            <div className="h-[320px] w-full overflow-y-auto self-center">
+              {targetHandles.map((item, idx) => (
+                <div key={idx} className="flex text-white">
+                  <div className="flex gap-2 justify-between w-full px-2 overflow-x-hidden">
+                    <div>{item.handle}</div>
+                    <div>{item.category}</div>
+                    <div
+                      className="cursor-pointer flex-none"
+                      onClick={(e) => removeFromList(e, idx)}
+                    >
+                      X
+                    </div>
+                  </div>
                 </div>
-                <div
-                  className="cursor-pointer flex-none"
-                  onClick={(e) => removeFromList(e, idx)}
-                >
-                  {/* <IconX /> */}X
-                </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
+        )}
+      </div>
     </div>
   );
 };
