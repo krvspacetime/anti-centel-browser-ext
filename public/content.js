@@ -58,7 +58,7 @@ function styleTargetTweets(isInTargetList, tweet) {
         },
         satire: {
           tweetBlur: "1px",
-          contentBlur: "1px",
+          contentBlur: "px",
           // overlayColor: "rgba(255, 255, 0, 0.3)", // Yellow tint
           overlayColor: "none",
           buttonColor: "#4da057",

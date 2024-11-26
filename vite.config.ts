@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import { resolve } from "path";
 
 export default defineConfig({
   plugins: [
@@ -13,38 +14,16 @@ export default defineConfig({
     outDir: "build",
     rollupOptions: {
       input: {
-        main: "./index.html", // Main popup entry
-        content: "./public/content.js", // Content script entry
+        popup: resolve(__dirname, "index.html"),
+        content: resolve(__dirname, "src/content.tsx"),
       },
       output: {
-        entryFileNames: "output.js", // Output named files for easier reference
+        entryFileNames: (chunkInfo) => {
+          return chunkInfo.name === "content" ? "content.js" : "[name].js";
+        },
+        chunkFileNames: "[name].js",
+        assetFileNames: "[name].[ext]",
       },
     },
   },
 });
-
-// import { defineConfig } from "vite";
-// import react from "@vitejs/plugin-react";
-// import { viteStaticCopy } from "vite-plugin-static-copy";
-
-// export default defineConfig({
-//   plugins: [
-//     react(),
-//     viteStaticCopy({
-//       targets: [
-//         {
-//           src: "public/manifest.json",
-//           dest: ".",
-//         },
-//       ],
-//     }),
-//   ],
-//   build: {
-//     outDir: "build",
-//     rollupOptions: {
-//       input: {
-//         main: "./index.html",
-//       },
-//     },
-//   },
-// });
