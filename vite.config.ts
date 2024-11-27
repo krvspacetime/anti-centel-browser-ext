@@ -7,7 +7,10 @@ export default defineConfig({
   plugins: [
     react(),
     viteStaticCopy({
-      targets: [{ src: "public/manifest.json", dest: "." }],
+      targets: [
+        { src: "public/manifest.json", dest: "." },
+        { src: "public/options.html", dest: "." },
+      ],
     }),
   ],
   build: {
@@ -15,11 +18,16 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, "index.html"),
+        options: resolve(__dirname, "src/components/options/OptionsMenu.tsx"),
         content: resolve(__dirname, "src/content.tsx"),
+        background: resolve(__dirname, "src/background.ts"),
       },
       output: {
         entryFileNames: (chunkInfo) => {
-          return chunkInfo.name === "content" ? "content.js" : "[name].js";
+          if (chunkInfo.name === "content") return "content.js";
+          if (chunkInfo.name === "options") return "options.js";
+          if (chunkInfo.name === "background") return "background.js";
+          return "[name].js";
         },
         chunkFileNames: "[name].js",
         assetFileNames: "[name].[ext]",

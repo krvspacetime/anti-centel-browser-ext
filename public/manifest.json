@@ -12,5 +12,12 @@
       "js": ["content.js"]
     }
   ],
-  "host_permissions": ["*://x.com/*"]
+  "host_permissions": ["*://x.com/*"],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
 }
