@@ -18,7 +18,7 @@ export const TargetCategorySelect = ({
     <select
       value={selectedCategory}
       onChange={(e) => onCategoryChange(e.target.value as CategoryType)}
-      className="bg-gray-700 text-white rounded px-2"
+      className="bg-gray-700 text-white rounded px-2 h-full"
     >
       <option value="default">Default</option>
       <option value="fake_news">Fake News</option>

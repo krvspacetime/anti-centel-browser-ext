@@ -12,23 +12,17 @@ export const TargetInput = ({
   list,
 }: TargetInputProps) => {
   return (
-    <div>
-      <section className="flex items-center w-full justify-center h-[30px]">
-        {/* <IconAt
-          className="mr-1"
-          size={20}
-          color="rgb(244 244 245 / var(--tw-bg-opacity))"
-          type=""
-        /> */}
+    <div className="size-full">
+      <section className="flex items-center w-full h-full justify-center">
         <input
           id="handleInput"
           type="search"
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
-          className="indent-2 outline outline-[1px] h-full"
+          className="indent-2 h-full rounded-r-none rounded-l-md bg-gray-700 text-white"
         />
         <button
-          className="px-1 border-black h-full bg-zinc-400 disabled:bg-zinc-600"
+          className="px-2 h-full bg-sky-600/50 disabled:bg-gray-600/50 rounded rounded-l-none text-white"
           onClick={addToList}
           disabled={inputVal === "" || list.includes(inputVal)}
         >

@@ -75,45 +75,67 @@ export const TargetList = () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
     };
   }, []);
+
+  const categoryColors = (category: CategoryType) => {
+    switch (category) {
+      case "fake_news":
+        return "bg-red-500";
+      case "parody":
+        return "bg-blue-500";
+      case "satire":
+        return "bg-green-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
   return (
-    <div className="w-full h-full bg-gray-800">
-      {" "}
-      {/* Added bg color for visibility */}
-      <h1 className="text-white text-xl mb-4">Target List</h1>
-      <div className="flex gap-2 mb-2">
-        <TargetInput
-          inputVal={inputVal}
-          setInputVal={(value) => setInputVal(value)}
-          addToList={addToList}
-          list={targetHandles.map((th) => th.handle)}
-        />
-        <TargetCategorySelect
-          selectedCategory={selectedCategory}
-          onCategoryChange={(category) => setSelectedCategory(category)}
-        />
+    <div className="w-full h-full ">
+      <div
+        className="flex gap-1 justify-between mb-2"
+        style={{
+          height: "35px",
+        }}
+      >
+        <div className="w-[70%]">
+          <TargetInput
+            inputVal={inputVal}
+            setInputVal={(value) => setInputVal(value)}
+            addToList={addToList}
+            list={targetHandles.map((th) => th.handle)}
+          />
+        </div>
+        <div className="w-[30%]">
+          <TargetCategorySelect
+            selectedCategory={selectedCategory}
+            onCategoryChange={(category) => setSelectedCategory(category)}
+          />
+        </div>
       </div>
       <div className="text-white">
         {targetHandles.length === 0 ? (
           <p>No targets added yet</p>
         ) : (
           <section className="w-full flex justify-center flex-col items-center mt-3">
-            <div className="text-lg font-bold text-white">TARGET LIST</div>
-            <div className="h-[320px] w-full overflow-y-auto self-center">
-              {targetHandles.map((item, idx) => (
-                <div key={idx} className="flex text-white">
-                  <div className="flex gap-2 justify-between w-full px-2 overflow-x-hidden">
-                    <div>{item.handle}</div>
-                    <div>{item.category}</div>
-                    <div
-                      className="cursor-pointer flex-none"
-                      onClick={(e) => removeFromList(e, idx)}
-                    >
-                      X
-                    </div>
-                  </div>
+            <p className="text-lg font-bold text-white">TARGET LIST</p>
+            {targetHandles.map((item, idx) => (
+              <div className="flex gap-2  w-full px-2 overflow-x-hidden my-1">
+                <div className="w-[45%]">@{item.handle}</div>
+                <div className="w-[45%]">
+                  <p
+                    className={`${categoryColors(item.category)} rounded w-fit`}
+                  >
+                    {item.category.charAt(0).toUpperCase() +
+                      item.category.slice(1).replace("_", " ")}
+                  </p>
                 </div>
-              ))}
-            </div>
+                <div
+                  className="cursor-pointer flex-none w-[10%] text-end"
+                  onClick={(e) => removeFromList(e, idx)}
+                >
+                  X
+                </div>
+              </div>
+            ))}
           </section>
         )}
       </div>

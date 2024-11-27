@@ -11,5 +11,6 @@
       "matches": ["*://x.com/*"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "host_permissions": ["*://x.com/*"]
 }

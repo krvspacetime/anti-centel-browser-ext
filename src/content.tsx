@@ -57,17 +57,18 @@ function createCategoryModal(handle: string): Promise<CategoryType | null> {
 
     const modalContent = document.createElement("div");
     modalContent.style.cssText = `
-      background: white;
+      background: black;
+      color: white;
       padding: 20px;
       border-radius: 8px;
       min-width: 300px;
+      outline: 1px solid white;
     `;
 
-    const title = document.createElement("h3");
-    title.textContent = `Select category for @${handle}`;
+    const title = document.createElement("h4");
+    title.textContent = `Select category for ${handle}`;
     title.style.cssText = `
       font-size: 18px;
-      font-weight: bold;
       margin-bottom: 16px;
     `;
 
@@ -85,10 +86,13 @@ function createCategoryModal(handle: string): Promise<CategoryType | null> {
         width: 100%;
         padding: 8px;
         margin: 4px 0;
-        background: #eee;
+        background: black;
+        color: white;
+        outline: 1px solid white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        font-size: 14px;
       `;
 
       button.addEventListener("click", () => {
@@ -105,7 +109,8 @@ function createCategoryModal(handle: string): Promise<CategoryType | null> {
       width: 100%;
       padding: 8px;
       margin-top: 16px;
-      background: #ff4444;
+      background: red;
+      outline: 1px solid white;
       color: white;
       border: none;
       border-radius: 4px;
@@ -125,7 +130,7 @@ function createCategoryModal(handle: string): Promise<CategoryType | null> {
   });
 }
 
-async function handleWatchlistAction(handle: string): Promise<void> {
+export async function handleWatchlistAction(handle: string): Promise<void> {
   chrome.storage.sync.get("targetHandles", async (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
 
@@ -210,7 +215,7 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
       categoryLabel.style.fontWeight = "bold";
       categoryLabel.style.padding = "4px 8px";
       categoryLabel.style.borderRadius = "4px";
-      categoryLabel.style.backgroundColor = "black";
+      categoryLabel.style.backgroundColor = style.buttonColor;
       overlay.appendChild(categoryLabel);
 
       const button = document.createElement("button");
@@ -263,9 +268,25 @@ function createWatchListButtons(
 
   const button = document.createElement("button");
   button.className = "watchlist-button";
-  button.textContent = isInTargetList
-    ? "Remove from Watchlist"
-    : "Add to Watchlist";
+  button.dataset.handle = handle;
+  updateButtonState(button, isInTargetList);
+
+  button.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleWatchlistAction(handle);
+  });
+
+  buttonContainer.appendChild(button);
+
+  const usernameContainer = handleElement.closest('[data-testid="User-Name"]');
+  if (usernameContainer) {
+    usernameContainer.appendChild(buttonContainer);
+  }
+}
+
+function updateButtonState(button: HTMLElement, isInTargetList: boolean): void {
+  button.textContent = isInTargetList ? "Remove" : "Add";
   button.style.cssText = `
     padding: 2px 8px;
     border-radius: 16px;
@@ -278,20 +299,6 @@ function createWatchListButtons(
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     white-space: nowrap;
   `;
-
-  button.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleWatchlistAction(handle);
-  });
-
-  buttonContainer.appendChild(button);
-
-  // Find the correct parent element (username container)
-  const usernameContainer = handleElement.closest('[data-testid="User-Name"]');
-  if (usernameContainer) {
-    usernameContainer.appendChild(buttonContainer);
-  }
 }
 
 function highlightParodyAccounts(): void {
@@ -324,4 +331,24 @@ document.addEventListener("DOMContentLoaded", highlightParodyAccounts);
 new MutationObserver(highlightParodyAccounts).observe(document, {
   subtree: true,
   childList: true,
+});
+
+// Add storage change listener
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.targetHandles) {
+    const targetHandles = changes.targetHandles.newValue || [];
+
+    // Update all watchlist buttons
+    document
+      .querySelectorAll<HTMLElement>(".watchlist-button")
+      .forEach((button) => {
+        const handle = button.dataset.handle;
+        if (handle) {
+          const isInTargetList = targetHandles.some(
+            (th: TargetHandle) => th.handle === handle
+          );
+          updateButtonState(button, isInTargetList);
+        }
+      });
+  }
 });
