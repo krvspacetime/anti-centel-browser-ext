@@ -3,9 +3,9 @@ import { AppLayout } from "./components/layout/AppLayout";
 function App() {
   return (
     <>
-      <div>
-        <AppLayout />
-      </div>
+      {/* <MantineProvider forceColorScheme="dark"> */}
+      <AppLayout />
+      {/* </MantineProvider> */}
     </>
   );
 }

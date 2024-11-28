@@ -18,7 +18,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, "index.html"),
-        options: resolve(__dirname, "src/components/options/OptionsMenu.tsx"),
+        options: resolve(__dirname, "src/components/options/Options.tsx"),
         content: resolve(__dirname, "src/content.tsx"),
         background: resolve(__dirname, "src/background.ts"),
       },
@@ -28,6 +28,12 @@ export default defineConfig({
           if (chunkInfo.name === "options") return "options.js";
           if (chunkInfo.name === "background") return "background.js";
           return "[name].js";
+        },
+        // Add this to prevent code splitting for options page
+        manualChunks: (id) => {
+          if (id.includes("options")) {
+            return "options";
+          }
         },
         chunkFileNames: "[name].js",
         assetFileNames: "[name].[ext]",
