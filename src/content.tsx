@@ -286,18 +286,25 @@ function createWatchListButtons(
 }
 
 function updateButtonState(button: HTMLElement, isInTargetList: boolean): void {
-  button.textContent = isInTargetList ? "Remove" : "Add";
+  button.textContent = isInTargetList ? "REMOVE" : "ADD";
   button.style.cssText = `
     padding: 2px 8px;
-    border-radius: 16px;
+    border-radius: 8px;
     font-size: 13px;
     cursor: pointer;
-    background-color: ${isInTargetList ? "#ff4444" : "#1da1f2"};
+    background-color: ${isInTargetList ? "red" : "transparent"};
     color: white;
     border: none;
     line-height: 16px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    outline: 1px solid rgba(255, 255, 255, 0.3);
+    &:hover {
+      background-color: ${isInTargetList ? "#ff4444" : "#1da1f2"};
+    }
   `;
 }
 

@@ -23,5 +23,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "public/content.js"]
+  "include": ["src", "public/content.js", "notification"]
 }

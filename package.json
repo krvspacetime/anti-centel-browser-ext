@@ -13,11 +13,14 @@
     "@mantine/core": "^7.14.2",
     "@mantine/hooks": "^7.14.2",
     "jotai": "^2.10.2",
+    "lodash.debounce": "^4.0.8",
+    "motion": "^11.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.280",
+    "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^22.10.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

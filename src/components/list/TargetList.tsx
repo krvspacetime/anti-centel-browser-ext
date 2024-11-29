@@ -119,7 +119,7 @@ export const TargetList = () => {
             <p className="text-lg font-bold text-white">TARGET LIST</p>
             {targetHandles.map((item, idx) => (
               <div className="flex gap-2  w-full px-2 overflow-x-hidden my-1">
-                <div className="w-[45%]">@{item.handle}</div>
+                <div className="w-[45%]">{item.handle}</div>
                 <div className="w-[45%]">
                   <p
                     className={`${categoryColors(item.category)} rounded w-fit`}
