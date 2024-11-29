@@ -66,7 +66,7 @@ export const StyleSelect = ({
               value={styleConfig.borderRadius}
               onChange={(e) =>
                 onChangeStyleConfig(
-                  styleConfig.label,
+                  styleConfig.value,
                   "borderRadius",
                   e.target.value
                 )

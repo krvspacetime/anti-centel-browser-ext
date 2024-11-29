@@ -17,10 +17,14 @@ export function OptionsMenu() {
   const onChangeStyleConfig = useCallback(
     (configName: string, key: string, value: string) => {
       console.log(configName, key, value);
-      setStyleConfigs((prev) => ({
-        ...prev,
-        [configName]: { ...prev[configName], [key]: value },
-      }));
+      setStyleConfigs((prev) => {
+        const newConfigs = {
+          ...prev,
+          [configName]: { ...prev[configName], [key]: value },
+        };
+        chrome.storage.sync.set({ styleConfigs: newConfigs });
+        return newConfigs;
+      });
     },
     []
   );

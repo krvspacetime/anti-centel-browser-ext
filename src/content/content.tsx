@@ -184,7 +184,7 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
 
       const category = targetInfo?.category || "default";
       const style = styleConfig[category];
-      tweet.style.filter = `blur(${style.tweetBlur})`;
+      // tweet.style.filter = `blur(${style.tweetBlur})`;
 
       const tweetContent = tweet.querySelector('[data-testid="tweetText"]');
       if (tweetContent instanceof HTMLElement) {
@@ -199,45 +199,56 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
       overlay.style.width = "100%";
       overlay.style.height = "100%";
       overlay.style.backgroundColor = style.overlayColor;
-      overlay.style.display = "flex";
-      overlay.style.justifyContent = "center";
-      overlay.style.alignItems = "center";
       overlay.style.pointerEvents = "auto";
+      overlay.style.backdropFilter = "blur(10px)";
       overlay.style.zIndex = "10";
 
-      const categoryLabel = document.createElement("div");
-      categoryLabel.textContent = category.replace("_", " ").toUpperCase();
-      categoryLabel.style.position = "absolute";
-      categoryLabel.style.top = "10px";
-      categoryLabel.style.left = "10px";
-      categoryLabel.style.color = "white";
-      categoryLabel.style.fontSize = "12px";
-      categoryLabel.style.fontWeight = "bold";
-      categoryLabel.style.padding = "4px 8px";
-      categoryLabel.style.borderRadius = "4px";
-      categoryLabel.style.backgroundColor = style.buttonColor;
-      overlay.appendChild(categoryLabel);
+      const showTweetButton = document.createElement("button");
+      showTweetButton.style.position = "absolute";
+      showTweetButton.style.top = "50%";
+      showTweetButton.style.left = "50%";
+      showTweetButton.style.transform = "translate(-50%, -50%)";
+      showTweetButton.textContent = "Show Tweet";
+      showTweetButton.style.padding = "8px 16px";
+      showTweetButton.style.backgroundColor = style.buttonColor;
+      showTweetButton.style.color = "white";
+      showTweetButton.style.border = "none";
+      showTweetButton.style.borderRadius = "4px";
+      showTweetButton.style.cursor = "pointer";
+      showTweetButton.style.fontSize = "14px";
+      showTweetButton.style.pointerEvents = "auto";
+      showTweetButton.style.zIndex = "10000";
 
-      const button = document.createElement("button");
-      button.textContent = "Show Tweet";
-      button.style.padding = "8px 16px";
-      button.style.backgroundColor = style.buttonColor;
-      button.style.color = "white";
-      button.style.border = "none";
-      button.style.borderRadius = "4px";
-      button.style.cursor = "pointer";
-      button.style.fontSize = "14px";
-      button.style.zIndex = "11";
+      const hideTweetButton = document.createElement("button");
+      hideTweetButton.textContent = "Hide Tweet";
+      hideTweetButton.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 8px 16px;
+        background: red;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      `;
 
-      overlay.appendChild(button);
+      hideTweetButton.addEventListener("click", () => {
+        tweet.removeChild(hideTweetButton);
+        tweet.appendChild(showTweetButton);
+        tweet.appendChild(overlay);
+      });
+      tweet.appendChild(showTweetButton);
+      tweet.appendChild(hideTweetButton);
       tweet.appendChild(overlay);
 
-      button.addEventListener("click", () => {
+      showTweetButton.addEventListener("click", () => {
         if (tweetContent instanceof HTMLElement) {
           tweetContent.style.filter = "none";
         }
         tweet.style.filter = "none";
-        overlay.removeChild(button);
+        tweet.removeChild(showTweetButton);
         tweet.style.pointerEvents = "auto";
         tweet.style.position = "static";
         overlay.style.display = "none";
@@ -264,6 +275,7 @@ function createWatchListButtons(
     margin-left: 8px;
     position: relative;
     top: -2px;
+    z-index: 1000;
   `;
 
   const button = document.createElement("button");
