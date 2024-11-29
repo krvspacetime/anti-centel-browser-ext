@@ -3,7 +3,7 @@ import { TargetAdderView } from "./TargetAdderView";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useNotification } from "../../hooks/useNotification";
-import { CustomNotiication } from "../../../notification/CustomNotification";
+import { CustomNotiication } from "../notification/CustomNotification";
 
 export interface TargetItem {
   handle: string;

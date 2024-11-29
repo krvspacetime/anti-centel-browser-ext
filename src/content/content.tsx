@@ -1,3 +1,10 @@
+import {
+  createHideTweetButton,
+  createShowTweetButton,
+  createTweetBadge,
+  createTweetOverlay,
+} from "./utils/styleTweetUtils";
+
 type CategoryType = "fake_news" | "parody" | "satire" | "default";
 
 interface TargetHandle {
@@ -178,7 +185,7 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
     const targetInfo = targetHandles.find((th) => th.handle === handle);
 
-    if (isInTargetList && !tweet.querySelector(".parody-overlay")) {
+    if (isInTargetList && !tweet.querySelector(".tweet-overlay")) {
       tweet.style.position = "relative";
       tweet.style.pointerEvents = "none";
 
@@ -190,60 +197,8 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
       if (tweetContent instanceof HTMLElement) {
         tweetContent.style.filter = `blur(${style.contentBlur})`;
       }
-
-      const overlay = document.createElement("div");
-      overlay.className = "parody-overlay";
-      overlay.style.position = "absolute";
-      overlay.style.top = "0";
-      overlay.style.left = "0";
-      overlay.style.width = "100%";
-      overlay.style.height = "100%";
-      overlay.style.backgroundColor = style.overlayColor;
-      overlay.style.pointerEvents = "auto";
-      overlay.style.backdropFilter = "blur(10px)";
-      overlay.style.zIndex = "10";
-
-      const showTweetButton = document.createElement("button");
-      showTweetButton.style.position = "absolute";
-      showTweetButton.style.top = "50%";
-      showTweetButton.style.left = "50%";
-      showTweetButton.style.transform = "translate(-50%, -50%)";
-      showTweetButton.textContent = "Show Tweet";
-      showTweetButton.style.padding = "8px 16px";
-      showTweetButton.style.backgroundColor = style.buttonColor;
-      showTweetButton.style.color = "white";
-      showTweetButton.style.border = "none";
-      showTweetButton.style.borderRadius = "4px";
-      showTweetButton.style.cursor = "pointer";
-      showTweetButton.style.fontSize = "14px";
-      showTweetButton.style.pointerEvents = "auto";
-      showTweetButton.style.zIndex = "10000";
-
-      const hideTweetButton = document.createElement("button");
-      hideTweetButton.textContent = "Hide Tweet";
-      hideTweetButton.style.cssText = `
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 8px 16px;
-        background: red;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      `;
-
-      hideTweetButton.addEventListener("click", () => {
-        tweet.removeChild(hideTweetButton);
-        tweet.appendChild(showTweetButton);
-        tweet.appendChild(overlay);
-      });
-      tweet.appendChild(showTweetButton);
-      tweet.appendChild(hideTweetButton);
-      tweet.appendChild(overlay);
-
-      showTweetButton.addEventListener("click", () => {
+      const overlay = createTweetOverlay(style);
+      const showTweetButton = createShowTweetButton(style, () => {
         if (tweetContent instanceof HTMLElement) {
           tweetContent.style.filter = "none";
         }
@@ -253,6 +208,37 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
         tweet.style.position = "static";
         overlay.style.display = "none";
       });
+      const hideTweetButton = createHideTweetButton(() => {
+        tweet.removeChild(hideTweetButton);
+        tweet.appendChild(showTweetButton);
+        tweet.appendChild(overlay);
+      });
+
+      const tweetBadge = createTweetBadge(targetInfo?.handle || "", category);
+
+      // hideTweetButton.addEventListener("click", () => {
+      //   tweet.removeChild(hideTweetButton);
+      //   tweet.appendChild(showTweetButton);
+      //   tweet.appendChild(overlay);
+      // });
+      // tweet.appendChild(showTweetButton);
+      // tweet.appendChild(hideTweetButton);
+      // tweet.appendChild(overlay);
+
+      // showTweetButton.addEventListener("click", () => {
+      //   if (tweetContent instanceof HTMLElement) {
+      //     tweetContent.style.filter = "none";
+      //   }
+      //   tweet.style.filter = "none";
+      //   tweet.removeChild(showTweetButton);
+      //   tweet.style.pointerEvents = "auto";
+      //   tweet.style.position = "static";
+      //   overlay.style.display = "none";
+      // });
+      tweet.appendChild(showTweetButton);
+      tweet.appendChild(hideTweetButton);
+      tweet.appendChild(overlay);
+      tweet.appendChild(tweetBadge);
     }
   });
 }
