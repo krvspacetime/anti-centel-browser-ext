@@ -2,7 +2,7 @@ export type CategoryType =
   | "fake_news"
   | "parody"
   | "satire"
-  | "default"
+  | "on_watchlist"
   | "bot"
   | "conspiracy"
   | "spam";
@@ -16,23 +16,25 @@ export interface StyleConfig {
   borderWidth?: number;
   borderRadius?: number;
   buttonColor?: string;
-  contentBlur?: number | string;
-  tweetBlur?: number | string;
+  contentBlur?: string;
+  tweetBlur?: string;
+  backdropFilter?: string;
 }
 
 // Make a default style config for each value of the value enum
 export const DEFAULT_STYLE_CONFIGS: { [key in CategoryType]: StyleConfig } = {
-  default: {
+  on_watchlist: {
     label: "Default",
-    value: "default",
-    overlayColor: "#729b1f50",
+    value: "on_watchlist",
+    overlayColor: "none",
     overlayOpacity: 5,
-    borderColor: "#000000",
+    borderColor: "none",
     borderWidth: 1,
     borderRadius: 3,
-    buttonColor: "#0c0c0c00",
-    contentBlur: "8px",
-    tweetBlur: "8px",
+    buttonColor: "transparent",
+    contentBlur: "0px",
+    tweetBlur: "0px",
+    backdropFilter: "none",
   },
   fake_news: {
     label: "Fake News",
@@ -45,6 +47,7 @@ export const DEFAULT_STYLE_CONFIGS: { [key in CategoryType]: StyleConfig } = {
     buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
+    backdropFilter: "blur(8px)",
   },
   parody: {
     label: "Parody",
@@ -57,6 +60,7 @@ export const DEFAULT_STYLE_CONFIGS: { [key in CategoryType]: StyleConfig } = {
     buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
+    backdropFilter: "blur(8px)",
   },
   satire: {
     label: "Satire",
@@ -69,11 +73,12 @@ export const DEFAULT_STYLE_CONFIGS: { [key in CategoryType]: StyleConfig } = {
     buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
+    backdropFilter: "blur(8px)",
   },
   conspiracy: {
     label: "Conspiracy",
     value: "conspiracy",
-    overlayColor: "#FF0000",
+    overlayColor: "#ff008450",
     overlayOpacity: 0.5,
     borderColor: "#FF0000",
     borderWidth: 2,
@@ -81,11 +86,12 @@ export const DEFAULT_STYLE_CONFIGS: { [key in CategoryType]: StyleConfig } = {
     buttonColor: "##0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
+    backdropFilter: "blur(8px)",
   },
   spam: {
     label: "Spam",
     value: "spam",
-    overlayColor: "#FF0000",
+    overlayColor: "#6200ff50",
     overlayOpacity: 0.5,
     borderColor: "#FF0000",
     borderWidth: 2,
@@ -93,11 +99,12 @@ export const DEFAULT_STYLE_CONFIGS: { [key in CategoryType]: StyleConfig } = {
     buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
+    backdropFilter: "blur(8px)",
   },
   bot: {
     label: "Bot",
     value: "bot",
-    overlayColor: "#FF0000",
+    overlayColor: "#24ea1950",
     overlayOpacity: 0.5,
     borderColor: "#FF0000",
     borderWidth: 2,
@@ -105,5 +112,6 @@ export const DEFAULT_STYLE_CONFIGS: { [key in CategoryType]: StyleConfig } = {
     buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
+    backdropFilter: "blur(8px)",
   },
 };

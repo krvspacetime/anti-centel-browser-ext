@@ -2,20 +2,17 @@ import { useEffect, useState } from "react";
 import { TargetInput } from "./TargetInput";
 import { TargetCategorySelect } from "./TargetCategorySelect";
 import { Accordion, Button } from "@mantine/core";
-import { DEFAULT_STYLE_CONFIGS } from "../options/styleConfig";
+import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/styleConfig";
+import { TargetHandle } from "../../content";
+import { toProperCase } from "../../utils/utils";
 
-type CategoryType = "fake_news" | "parody" | "satire" | "default";
-
-interface TargetHandle {
-  handle: string;
-  category: CategoryType;
-}
+type CategoryType = "fake_news" | "parody" | "satire" | "on_watchlist";
 
 export const TargetList = () => {
   const [inputVal, setInputVal] = useState("");
   const [targetHandles, setTargetHandles] = useState<TargetHandle[]>([]);
   const [selectedCategory, setSelectedCategory] =
-    useState<CategoryType>("default");
+    useState<CategoryType>("on_watchlist");
 
   const removeFromList = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -45,7 +42,7 @@ export const TargetList = () => {
       if (!prev.some((item) => item.handle === inputVal) && inputVal !== "") {
         const newHandle: TargetHandle = {
           handle: inputVal,
-          category: selectedCategory,
+          tag: selectedCategory,
         };
         const updatedHandles = [...prev, newHandle];
         setInputVal("");
@@ -94,14 +91,14 @@ export const TargetList = () => {
   const list = targetHandles.map((item, idx) => (
     <div className="my-1 flex w-full gap-2 overflow-x-hidden px-2">
       <p className="w-[45%] text-xs">{item.handle}</p>
+      <p className="w-[45%] text-center text-xs">{item.action}</p>
       <div className="w-[45%]">
         <p
           className={`${categoryColors(
-            item.category,
-          )} w-fit rounded px-2 text-xs`}
+            item.tag as CategoryType,
+          )} w-fit rounded px-2 text-center text-xs`}
         >
-          {item.category.charAt(0).toUpperCase() +
-            item.category.slice(1).replace("_", " ")}
+          {toProperCase(item.tag as CategoryType)}
         </p>
       </div>
       <div
@@ -144,6 +141,14 @@ export const TargetList = () => {
               <Accordion.Item value="list" className="w-full">
                 <Accordion.Control>Show/Hide List</Accordion.Control>
                 <Accordion.Panel className="max-h-[200px] overflow-y-auto">
+                  <div className="my-1 flex w-full gap-2 overflow-x-hidden px-2 text-sm font-bold">
+                    <p className="w-[45%]">User</p>
+                    <p className="w-[45%] indent-8">Action</p>
+                    <div className="w-[45%] indent-6">
+                      <p>Tag</p>
+                    </div>
+                    <div className="flex-none">Remove</div>
+                  </div>
                   {list}
                 </Accordion.Panel>
               </Accordion.Item>

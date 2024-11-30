@@ -1,4 +1,6 @@
-export function createTweetOverlay(style: any) {
+import { StyleConfig } from "./styleConfig";
+
+export function createTweetOverlay(style: StyleConfig) {
   const overlay = document.createElement("div");
   overlay.className = "tweet-overlay";
   overlay.style.position = "absolute";
@@ -6,24 +8,28 @@ export function createTweetOverlay(style: any) {
   overlay.style.left = "0";
   overlay.style.width = "100%";
   overlay.style.height = "100%";
-  overlay.style.backgroundColor = style.overlayColor;
+  overlay.style.backgroundColor = style.overlayColor ?? "none";
   overlay.style.pointerEvents = "auto";
-  overlay.style.backdropFilter = "blur(10px)";
+  overlay.style.backdropFilter = style.backdropFilter ?? "none";
   overlay.style.outline = "1px solid gold";
   overlay.style.zIndex = "10";
 
   return overlay;
 }
 
-export const createShowTweetButton = (style: any, onClick: () => void) => {
+export const createShowTweetButton = (
+  style: StyleConfig,
+  onClick: () => void,
+) => {
   const showTweetButton = document.createElement("button");
+  showTweetButton.className = "show-tweet-button";
+  showTweetButton.textContent = "Show Tweet";
   showTweetButton.style.position = "absolute";
   showTweetButton.style.top = "50%";
   showTweetButton.style.left = "50%";
   showTweetButton.style.transform = "translate(-50%, -50%)";
-  showTweetButton.textContent = "Show Tweet";
-  showTweetButton.style.padding = "8px 16px";
-  showTweetButton.style.backgroundColor = style.buttonColor;
+  showTweetButton.style.padding = "4px 8px";
+  showTweetButton.style.backgroundColor = style.buttonColor ?? "transparent";
   showTweetButton.style.color = "white";
   showTweetButton.style.border = "none";
   showTweetButton.style.borderRadius = "4px";
@@ -39,6 +45,7 @@ export const createShowTweetButton = (style: any, onClick: () => void) => {
 
 export const createHideTweetButton = (onClick: () => void) => {
   const hideTweetButton = document.createElement("button");
+  hideTweetButton.className = "hide-tweet-button";
   hideTweetButton.textContent = "Hide Tweet";
   hideTweetButton.style.cssText = `
     position: absolute;

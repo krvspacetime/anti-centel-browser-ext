@@ -1,4 +1,4 @@
-export type CategoryType = "fake_news" | "parody" | "satire" | "default";
+export type CategoryType = "fake_news" | "parody" | "satire" | "on_watchlist";
 
 export interface TargetHandle {
   handle: string;
@@ -28,7 +28,7 @@ export const TargetCategorySelect = ({
     <select
       value={selectedCategory}
       onChange={(e) => onCategoryChange(e.target.value as CategoryType)}
-      className="bg-tertiary h-full w-full rounded px-2 text-white"
+      className="h-full w-full rounded bg-tertiary px-2 text-white"
     >
       {categoryOptions.map((category) => {
         return <option key={category}>{category}</option>;

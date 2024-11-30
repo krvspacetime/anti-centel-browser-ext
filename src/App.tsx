@@ -1,5 +1,5 @@
 import { MantineProvider } from "@mantine/core";
-import { AppLayout } from "./components/layout/AppLayout";
+import { AppLayout } from "./content/components/layout/AppLayout";
 
 function App() {
   return (

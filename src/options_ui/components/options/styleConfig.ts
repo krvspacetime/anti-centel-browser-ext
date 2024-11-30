@@ -8,7 +8,7 @@ export interface StyleConfig {
     | "rumor"
     | "junk"
     | "other"
-    | "default"
+    | "on_watchlist"
     | "spam"
     | "bot";
   overlayColor?: string;
@@ -23,9 +23,9 @@ export interface StyleConfig {
 
 // Make a default style config for each value of the value enum
 export const DEFAULT_STYLE_CONFIGS: { [key: string]: StyleConfig } = {
-  default: {
+  on_watchlist: {
     label: "Default",
-    value: "default",
+    value: "on_watchlist",
     overlayColor: "#000000",
     overlayOpacity: 5,
     borderColor: "#000000",

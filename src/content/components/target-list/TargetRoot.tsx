@@ -2,8 +2,13 @@ import { Button, Table } from "@mantine/core";
 import { TargetAdderView } from "./TargetAdderView";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { useNotification } from "../../hooks/useNotification";
+import { useNotification } from "../../../hooks/useNotification";
 import { CustomNotiication } from "../notification/CustomNotification";
+
+const API_BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:8000"
+    : "your_production_api_url";
 
 export interface TargetItem {
   handle: string;
@@ -28,10 +33,12 @@ export function TargetRoot() {
 
   const onAddToTargetList = async (target: TargetItem) => {
     try {
-      const response = await fetch("http://localhost:8000/add", {
+      const response = await fetch(`${API_BASE_URL}/add`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(target),
       });
@@ -53,10 +60,12 @@ export function TargetRoot() {
 
   const removeFromTargetList = async (handle: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/delete/${handle}`, {
+      const response = await fetch(`${API_BASE_URL}/delete/${handle}`, {
         method: "DELETE",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({ handle }),
       });
@@ -86,7 +95,12 @@ export function TargetRoot() {
 
   const getAllTargetItems = async () => {
     try {
-      const response = await fetch("http://localhost:8000/collect");
+      const response = await fetch(`${API_BASE_URL}/collect`, {
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+        },
+      });
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }

@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { SegmentedControl } from "@mantine/core";
-import { TargetRoot } from "../target-list/TargetRoot";
+import { TargetRoot } from "../../../content/components/target-list/TargetRoot";
 import { StyleSelect } from "./StyleSelect";
 import { DEFAULT_STYLE_CONFIGS } from "./styleConfig";
 
@@ -26,7 +26,7 @@ export function OptionsMenu() {
         return newConfigs;
       });
     },
-    []
+    [],
   );
 
   return (

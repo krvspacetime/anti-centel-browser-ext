@@ -1,5 +1,5 @@
 {
-  "name": "Your Extension",
+  "name": "Anti Centel",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
@@ -12,7 +12,7 @@
       "js": ["content.js"]
     }
   ],
-  "host_permissions": ["*://x.com/*"],
+  "host_permissions": ["http://localhost:8000/*"],
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true

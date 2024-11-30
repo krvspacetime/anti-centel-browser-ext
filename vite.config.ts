@@ -18,9 +18,12 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, "index.html"),
-        options: resolve(__dirname, "src/components/options/Options.tsx"),
+        options: resolve(
+          __dirname,
+          "src/options_ui/components/options/Options.tsx",
+        ),
         content: resolve(__dirname, "src/content/content.tsx"),
-        background: resolve(__dirname, "src/background.ts"),
+        background: resolve(__dirname, "src/background/background.ts"),
       },
       output: {
         entryFileNames: (chunkInfo) => {
@@ -39,5 +42,15 @@ export default defineConfig({
         assetFileNames: "[name].[ext]",
       },
     },
+  },
+  server: {
+    port: 3000,
+    strictPort: true,
+    hmr: {
+      port: 3000,
+    },
+  },
+  define: {
+    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
   },
 });
