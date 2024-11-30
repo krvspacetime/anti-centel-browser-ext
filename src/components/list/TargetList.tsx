@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { TargetInput } from "./TargetInput";
 import { TargetCategorySelect } from "./TargetCategorySelect";
+import { Accordion, Button } from "@mantine/core";
+import { DEFAULT_STYLE_CONFIGS } from "../options/styleConfig";
 
 type CategoryType = "fake_news" | "parody" | "satire" | "default";
 
@@ -17,7 +19,7 @@ export const TargetList = () => {
 
   const removeFromList = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    index: number
+    index: number,
   ) => {
     event.stopPropagation();
     const updatedHandles = targetHandles.filter((_, i) => i !== index);
@@ -88,57 +90,78 @@ export const TargetList = () => {
         return "bg-gray-500";
     }
   };
-  return (
-    <div className="w-full h-full ">
+
+  const list = targetHandles.map((item, idx) => (
+    <div className="my-1 flex w-full gap-2 overflow-x-hidden px-2">
+      <p className="w-[45%] text-xs">{item.handle}</p>
+      <div className="w-[45%]">
+        <p
+          className={`${categoryColors(
+            item.category,
+          )} w-fit rounded px-2 text-xs`}
+        >
+          {item.category.charAt(0).toUpperCase() +
+            item.category.slice(1).replace("_", " ")}
+        </p>
+      </div>
       <div
-        className="flex gap-1 justify-between mb-2"
-        style={{
-          height: "35px",
-        }}
+        className="w-[10%] flex-none cursor-pointer text-end text-xs"
+        onClick={(e) => removeFromList(e, idx)}
       >
-        <div className="w-[70%]">
-          <TargetInput
-            inputVal={inputVal}
-            setInputVal={(value) => setInputVal(value)}
-            addToList={addToList}
-            list={targetHandles.map((th) => th.handle)}
-          />
-        </div>
-        <div className="w-[30%]">
-          <TargetCategorySelect
-            selectedCategory={selectedCategory}
-            onCategoryChange={(category) => setSelectedCategory(category)}
-          />
-        </div>
+        X
       </div>
-      <div className="text-white">
-        {targetHandles.length === 0 ? (
-          <p>No targets added yet</p>
-        ) : (
-          <section className="w-full flex justify-center flex-col items-center mt-3">
-            <p className="text-lg font-bold text-white">TARGET LIST</p>
-            {targetHandles.map((item, idx) => (
-              <div className="flex gap-2  w-full px-2 overflow-x-hidden my-1">
-                <div className="w-[45%]">{item.handle}</div>
-                <div className="w-[45%]">
-                  <p
-                    className={`${categoryColors(item.category)} rounded w-fit`}
-                  >
-                    {item.category.charAt(0).toUpperCase() +
-                      item.category.slice(1).replace("_", " ")}
-                  </p>
-                </div>
-                <div
-                  className="cursor-pointer flex-none w-[10%] text-end"
-                  onClick={(e) => removeFromList(e, idx)}
-                >
-                  X
-                </div>
-              </div>
-            ))}
+    </div>
+  ));
+  return (
+    <div
+      className="flex w-full flex-col justify-between"
+      style={{
+        height: "400px",
+        backgroundColor: "var(--color-secondary)",
+      }}
+    >
+      <section>
+        <div className="mb-2 flex w-full flex-col items-center justify-center gap-1 p-8">
+          <div className="h-[35px] w-full">
+            <TargetCategorySelect
+              categories={Object.keys(DEFAULT_STYLE_CONFIGS)}
+              selectedCategory={selectedCategory}
+              onCategoryChange={(category) => setSelectedCategory(category)}
+            />
+          </div>
+          <div className="h-[35px] w-full">
+            <TargetInput
+              inputVal={inputVal}
+              setInputVal={(value) => setInputVal(value)}
+              addToList={addToList}
+              list={targetHandles.map((th) => th.handle)}
+            />
+          </div>
+        </div>
+        <div className="text-white">
+          <section className="mt-3 flex w-full flex-col items-center justify-center">
+            <Accordion className="w-full" defaultValue={"list"}>
+              <Accordion.Item value="list" className="w-full">
+                <Accordion.Control>Show/Hide List</Accordion.Control>
+                <Accordion.Panel className="max-h-[200px] overflow-y-auto">
+                  {list}
+                </Accordion.Panel>
+              </Accordion.Item>
+            </Accordion>
           </section>
-        )}
-      </div>
+        </div>
+      </section>
+      <section className="my-2 flex justify-center">
+        <Button
+          size="xs"
+          color="var(--color-tertiary)"
+          style={{
+            width: "200px",
+          }}
+        >
+          SETTINGS
+        </Button>
+      </section>
     </div>
   );
 };

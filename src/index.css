@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  input {
+    @apply outline-none;
+  }
+
+  :root {
+    --color-primary: #222831;
+    --color-secondary: #31363f;
+    --color-tertiary: #76abae;
+    --color-quaternary: #eeeeee;
+  }
+}

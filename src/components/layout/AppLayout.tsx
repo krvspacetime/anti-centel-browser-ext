@@ -1,12 +1,12 @@
 import { TargetList } from "../list/TargetList";
 
-const POPUP_WIDTH = "400px";
-const POPUP_HEIGHT = "500px";
+const POPUP_WIDTH = "360px";
+const POPUP_HEIGHT = "420px";
 
 export const AppLayout = () => {
   return (
     <div
-      className="p-1 bg-zinc-800"
+      className="bg-zinc-800 p-1"
       style={{
         width: POPUP_WIDTH,
         height: POPUP_HEIGHT,

@@ -1,139 +1,47 @@
 import {
+  Modal,
+  ModalButtons,
+  ModalCancelButton,
+  ModalContent,
+  ModalTitle,
+} from "./modal/Modal";
+import {
   createHideTweetButton,
   createShowTweetButton,
   createTweetBadge,
   createTweetOverlay,
-} from "./utils/styleTweetUtils";
+} from "./utils/StyleTweetUtils";
 
-type CategoryType = "fake_news" | "parody" | "satire" | "default";
+import { DEFAULT_STYLE_CONFIGS, CategoryType } from "./utils/styleConfig";
 
 interface TargetHandle {
   handle: string;
   category: CategoryType;
 }
 
-interface StyleConfig {
-  tweetBlur: string;
-  contentBlur: string;
-  overlayColor: string;
-  buttonColor: string;
-}
-
-const styleConfig: Record<CategoryType, StyleConfig> = {
-  fake_news: {
-    tweetBlur: "8px",
-    contentBlur: "2px",
-    overlayColor: "rgba(255, 0, 0, 0.3)",
-    buttonColor: "red",
-  },
-  parody: {
-    tweetBlur: "5px",
-    contentBlur: "1px",
-    overlayColor: "rgba(255, 165, 0, 0.3)",
-    buttonColor: "orange",
-  },
-  satire: {
-    tweetBlur: "3px",
-    contentBlur: "1px",
-    overlayColor: "rgba(255, 255, 0, 0.3)",
-    buttonColor: "gray",
-  },
-  default: {
-    tweetBlur: "8px",
-    contentBlur: "2px",
-    overlayColor: "rgba(0, 0, 0, 0.3)",
-    buttonColor: "#skyblue",
-  },
-};
-
 function createCategoryModal(handle: string): Promise<CategoryType | null> {
   return new Promise((resolve) => {
-    const modal = document.createElement("div");
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-    `;
-
-    const modalContent = document.createElement("div");
-    modalContent.style.cssText = `
-      background: black;
-      color: white;
-      padding: 20px;
-      border-radius: 8px;
-      min-width: 300px;
-      outline: 1px solid white;
-    `;
-
-    const title = document.createElement("h4");
-    title.textContent = `Select category for ${handle}`;
-    title.style.cssText = `
-      font-size: 18px;
-      margin-bottom: 16px;
-    `;
-
-    const categories: CategoryType[] = [
-      "default",
-      "fake_news",
-      "parody",
-      "satire",
-    ];
-    const buttons = categories.map((category) => {
-      const button = document.createElement("button");
-      button.textContent =
-        category.charAt(0).toUpperCase() + category.slice(1).replace("_", " ");
-      button.style.cssText = `
-        width: 100%;
-        padding: 8px;
-        margin: 4px 0;
-        background: black;
-        color: white;
-        outline: 1px solid white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-      `;
-
-      button.addEventListener("click", () => {
-        document.body.removeChild(modal);
-        resolve(category);
-      });
-
-      return button;
-    });
-
-    const cancelButton = document.createElement("button");
-    cancelButton.textContent = "Cancel";
-    cancelButton.style.cssText = `
-      width: 100%;
-      padding: 8px;
-      margin-top: 16px;
-      background: red;
-      outline: 1px solid white;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    `;
-
-    cancelButton.addEventListener("click", () => {
+    const modal = Modal();
+    const modalContent = ModalContent();
+    const title = ModalTitle(`Select category for ${handle}`);
+    const categories = Object.keys(DEFAULT_STYLE_CONFIGS);
+    const buttons = ModalButtons(categories, (category) => {
+      resolve(category as CategoryType);
       document.body.removeChild(modal);
-      resolve(null);
+    });
+    const cancelButton = ModalCancelButton({
+      label: "Cancel",
+      onClick: () => {
+        resolve(null);
+        document.body.removeChild(modal);
+      },
     });
 
+    document.body.appendChild(modal);
+    modal.appendChild(modalContent);
     modalContent.appendChild(title);
     buttons.forEach((button) => modalContent.appendChild(button));
     modalContent.appendChild(cancelButton);
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
   });
 }
 
@@ -153,13 +61,13 @@ export async function handleWatchlistAction(handle: string): Promise<void> {
         const newHandles = [...targetHandles, newHandle];
         chrome.storage.sync.set({ targetHandles: newHandles }, () => {
           console.log(
-            `${handle} added to target list with category: ${category}`
+            `${handle} added to target list with category: ${category}`,
           );
           chrome.runtime.sendMessage({
             type: "updateHandles",
             data: newHandles,
           });
-          highlightParodyAccounts();
+          highlightTargetAccounts();
         });
       }
     } else {
@@ -171,7 +79,7 @@ export async function handleWatchlistAction(handle: string): Promise<void> {
           type: "updateHandles",
           data: newHandles,
         });
-        highlightParodyAccounts();
+        highlightTargetAccounts();
       });
     }
   });
@@ -190,7 +98,7 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
       tweet.style.pointerEvents = "none";
 
       const category = targetInfo?.category || "default";
-      const style = styleConfig[category];
+      const style = DEFAULT_STYLE_CONFIGS[category];
       // tweet.style.filter = `blur(${style.tweetBlur})`;
 
       const tweetContent = tweet.querySelector('[data-testid="tweetText"]');
@@ -203,38 +111,21 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
           tweetContent.style.filter = "none";
         }
         tweet.style.filter = "none";
-        tweet.removeChild(showTweetButton);
+        // tweet.removeChild(showTweetButton);
+        showTweetButton.style.display = "none";
         tweet.style.pointerEvents = "auto";
         tweet.style.position = "static";
         overlay.style.display = "none";
+        tweetBadge.style.display = "none";
       });
       const hideTweetButton = createHideTweetButton(() => {
-        tweet.removeChild(hideTweetButton);
-        tweet.appendChild(showTweetButton);
-        tweet.appendChild(overlay);
+        overlay.style.display = "block";
+        showTweetButton.style.display = "block";
+        tweetBadge.style.display = "block";
       });
 
       const tweetBadge = createTweetBadge(targetInfo?.handle || "", category);
 
-      // hideTweetButton.addEventListener("click", () => {
-      //   tweet.removeChild(hideTweetButton);
-      //   tweet.appendChild(showTweetButton);
-      //   tweet.appendChild(overlay);
-      // });
-      // tweet.appendChild(showTweetButton);
-      // tweet.appendChild(hideTweetButton);
-      // tweet.appendChild(overlay);
-
-      // showTweetButton.addEventListener("click", () => {
-      //   if (tweetContent instanceof HTMLElement) {
-      //     tweetContent.style.filter = "none";
-      //   }
-      //   tweet.style.filter = "none";
-      //   tweet.removeChild(showTweetButton);
-      //   tweet.style.pointerEvents = "auto";
-      //   tweet.style.position = "static";
-      //   overlay.style.display = "none";
-      // });
       tweet.appendChild(showTweetButton);
       tweet.appendChild(hideTweetButton);
       tweet.appendChild(overlay);
@@ -247,7 +138,7 @@ function createWatchListButtons(
   tweet: HTMLElement,
   handleElement: Element,
   handle: string | null,
-  isInTargetList: boolean
+  isInTargetList: boolean,
 ): void {
   if (!handle) return;
 
@@ -306,13 +197,13 @@ function updateButtonState(button: HTMLElement, isInTargetList: boolean): void {
   `;
 }
 
-function highlightParodyAccounts(): void {
+function highlightTargetAccounts(): void {
   chrome.storage.sync.get("targetHandles", (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
     console.log("Initial targetHandles from storage:", targetHandles);
 
     const tweetArticles = document.querySelectorAll<HTMLElement>(
-      'article[data-testid="tweet"]'
+      'article[data-testid="tweet"]',
     );
 
     tweetArticles.forEach((tweet) => {
@@ -321,7 +212,7 @@ function highlightParodyAccounts(): void {
         const handle = handleElement.textContent;
         if (handle) {
           const isInTargetList = targetHandles.some(
-            (th) => th.handle === handle
+            (th) => th.handle === handle,
           );
           styleTargetTweets(isInTargetList, tweet);
           createWatchListButtons(tweet, handleElement, handle, isInTargetList);
@@ -332,8 +223,8 @@ function highlightParodyAccounts(): void {
 }
 
 // Initial setup and mutation observer
-document.addEventListener("DOMContentLoaded", highlightParodyAccounts);
-new MutationObserver(highlightParodyAccounts).observe(document, {
+document.addEventListener("DOMContentLoaded", highlightTargetAccounts);
+new MutationObserver(highlightTargetAccounts).observe(document, {
   subtree: true,
   childList: true,
 });
@@ -350,7 +241,7 @@ chrome.storage.onChanged.addListener((changes) => {
         const handle = button.dataset.handle;
         if (handle) {
           const isInTargetList = targetHandles.some(
-            (th: TargetHandle) => th.handle === handle
+            (th: TargetHandle) => th.handle === handle,
           );
           updateButtonState(button, isInTargetList);
         }

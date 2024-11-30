@@ -1,16 +1,15 @@
+export type CategoryType =
+  | "fake_news"
+  | "parody"
+  | "satire"
+  | "default"
+  | "bot"
+  | "conspiracy"
+  | "spam";
+
 export interface StyleConfig {
   label: string;
-  value:
-    | "fake_news"
-    | "satire"
-    | "parody"
-    | "conspiracy"
-    | "rumor"
-    | "junk"
-    | "other"
-    | "default"
-    | "spam"
-    | "bot";
+  value: CategoryType;
   overlayColor?: string;
   overlayOpacity?: number;
   borderColor?: string;
@@ -22,52 +21,52 @@ export interface StyleConfig {
 }
 
 // Make a default style config for each value of the value enum
-export const DEFAULT_STYLE_CONFIGS: { [key: string]: StyleConfig } = {
+export const DEFAULT_STYLE_CONFIGS: { [key in CategoryType]: StyleConfig } = {
   default: {
     label: "Default",
     value: "default",
-    overlayColor: "#000000",
+    overlayColor: "#729b1f50",
     overlayOpacity: 5,
     borderColor: "#000000",
     borderWidth: 1,
     borderRadius: 3,
-    buttonColor: "green",
+    buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
   },
   fake_news: {
     label: "Fake News",
     value: "fake_news",
-    overlayColor: "#6714b9",
+    overlayColor: "#6714b950",
     overlayOpacity: 0.5,
     borderColor: "#FF0000",
     borderWidth: 2,
     borderRadius: 5,
-    buttonColor: "green",
+    buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
   },
   parody: {
     label: "Parody",
     value: "parody",
-    overlayColor: "#19ce55",
+    overlayColor: "#5d8c6d50",
     overlayOpacity: 0.5,
     borderColor: "#28c11a",
     borderWidth: 2,
     borderRadius: 5,
-    buttonColor: "green",
+    buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
   },
   satire: {
     label: "Satire",
     value: "satire",
-    overlayColor: "#FF0000",
+    overlayColor: "#FF000050",
     overlayOpacity: 0.5,
     borderColor: "#FF0000",
     borderWidth: 2,
     borderRadius: 5,
-    buttonColor: "green",
+    buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
   },
@@ -79,7 +78,7 @@ export const DEFAULT_STYLE_CONFIGS: { [key: string]: StyleConfig } = {
     borderColor: "#FF0000",
     borderWidth: 2,
     borderRadius: 5,
-    buttonColor: "green",
+    buttonColor: "##0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
   },
@@ -91,7 +90,7 @@ export const DEFAULT_STYLE_CONFIGS: { [key: string]: StyleConfig } = {
     borderColor: "#FF0000",
     borderWidth: 2,
     borderRadius: 5,
-    buttonColor: "green",
+    buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
   },
@@ -103,7 +102,7 @@ export const DEFAULT_STYLE_CONFIGS: { [key: string]: StyleConfig } = {
     borderColor: "#FF0000",
     borderWidth: 2,
     borderRadius: 5,
-    buttonColor: "green",
+    buttonColor: "#0c0c0c00",
     contentBlur: "8px",
     tweetBlur: "8px",
   },

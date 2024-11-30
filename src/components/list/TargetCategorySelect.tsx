@@ -6,24 +6,33 @@ export interface TargetHandle {
 }
 
 interface TargetCategorySelectProps {
+  categories: string[];
   selectedCategory: CategoryType;
   onCategoryChange: (category: CategoryType) => void;
 }
 
 export const TargetCategorySelect = ({
+  categories,
   selectedCategory,
   onCategoryChange,
 }: TargetCategorySelectProps) => {
+  const categoryOptions = categories.map((category) => {
+    const categoryLabel = category.replace("_", " ").split(" ");
+    // Turn every word into uppercase
+    const upperCaseCategoryLabel = categoryLabel.map((word) => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+    return upperCaseCategoryLabel.join(" ");
+  });
   return (
     <select
       value={selectedCategory}
       onChange={(e) => onCategoryChange(e.target.value as CategoryType)}
-      className="bg-gray-700 text-white rounded px-2 h-full"
+      className="bg-tertiary h-full w-full rounded px-2 text-white"
     >
-      <option value="default">Default</option>
-      <option value="fake_news">Fake News</option>
-      <option value="parody">Parody</option>
-      <option value="satire">Satire</option>
+      {categoryOptions.map((category) => {
+        return <option key={category}>{category}</option>;
+      })}
     </select>
   );
 };
