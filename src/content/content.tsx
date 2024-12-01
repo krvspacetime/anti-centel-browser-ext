@@ -14,7 +14,7 @@ import {
 
 import { DEFAULT_STYLE_CONFIGS, CategoryType } from "./utils/styleConfig";
 import {
-  WatchlistButton,
+  // WatchlistButton,
   WatchlistButtonContainer,
 } from "./watchlist/WatchlistButton";
 
@@ -116,6 +116,8 @@ export async function handleWatchlistAction(handle: string): Promise<void> {
 }
 
 function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
+  const tweetContent = tweet.querySelector('[data-testid="tweetText"]');
+
   const handleElement = tweet.querySelectorAll('a[role="link"] span')[3];
   const handle = handleElement ? handleElement.textContent : null;
 
@@ -128,13 +130,14 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
       tweet.style.pointerEvents = "none";
 
       const tag = targetInfo?.tag || "on_watchlist";
+      const action = targetInfo?.action || "monitor";
       const style = DEFAULT_STYLE_CONFIGS[tag];
 
-      const tweetContent = tweet.querySelector('[data-testid="tweetText"]');
-      if (tweetContent instanceof HTMLElement) {
-        tweetContent.style.filter = `blur(${style.contentBlur})`;
-      }
+      // if (tweetContent instanceof HTMLElement) {
+      //   tweetContent.style.filter = `blur(${style.contentBlur})`;
+      // }
 
+      // Actual styles to apply to the tweet
       const overlay = createTweetOverlay(style);
       const showTweetButton = createShowTweetButton(style, () => {
         if (tweetContent instanceof HTMLElement) {
@@ -151,9 +154,9 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
       });
 
       const hideTweetButton = createHideTweetButton(() => {
-        if (tweetContent instanceof HTMLElement) {
-          tweetContent.style.filter = `blur(${style.contentBlur})`;
-        }
+        // if (tweetContent instanceof HTMLElement) {
+        //   tweetContent.style.filter = `blur(${style.contentBlur})`;
+        // }
         tweet.style.pointerEvents = "none";
         tweet.style.position = "relative";
 
@@ -165,14 +168,56 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
 
       const tweetBadge = createTweetBadge(targetInfo?.handle || "", tag);
 
-      // Initial state
-      hideTweetButton.style.display = "none";
+      // If the action is hide or blur, apply the styles
+      if (action === "hide" || action === "blur") {
+        if (action === "hide") {
+          // Instead of removing, collapse the tweet
+          const tweetHeight = tweet.offsetHeight;
+          tweet.style.height = "0px";
+          tweet.style.overflow = "hidden";
+          tweet.style.transition = "height 0.3s ease";
 
-      tweet.appendChild(overlay);
-      if (style.overlayColor !== "none") {
-        tweet.appendChild(showTweetButton);
-        tweet.appendChild(hideTweetButton);
-        tweet.appendChild(tweetBadge);
+          // Create collapse indicator
+          const collapseIndicator = document.createElement("div");
+          collapseIndicator.className = "collapse-indicator"; // Add class for debugging
+          collapseIndicator.style.cssText = `
+            padding: 8px;
+            color: #71767b;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+          `;
+          collapseIndicator.textContent = `Hidden tweet from ${handle}`;
+
+          // Add expand/collapse functionality
+          let isExpanded = false;
+          collapseIndicator.addEventListener("click", () => {
+            isExpanded = !isExpanded;
+            tweet.style.height = isExpanded ? `${tweetHeight}px` : "0px";
+            collapseIndicator.textContent = isExpanded
+              ? `Collapse tweet from ${handle}`
+              : `Hidden tweet from ${handle}`;
+          });
+
+          // Find the tweet's article container and insert before it
+          const tweetArticle = tweet.closest('article[data-testid="tweet"]');
+          if (tweetArticle && tweetArticle.parentElement) {
+            tweetArticle.parentElement.insertBefore(
+              collapseIndicator,
+              tweetArticle,
+            );
+          } else {
+            console.error("Tweet article or parent element not found");
+          }
+        }
+
+        tweet.appendChild(overlay);
+        // if (style.overlayColor !== "none") {
+        //   tweet.appendChild(showTweetButton);
+        //   tweet.appendChild(hideTweetButton);
+        //   tweet.appendChild(tweetBadge);
+        // }
       }
     }
   });
@@ -218,7 +263,7 @@ function updateButtonState(
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
-  button.textContent = isInTargetList ? categoryUpper : "MONITOR";
+  button.textContent = isInTargetList ? `👁️ ${categoryUpper}` : "👁️ MONITOR";
   button.style.cssText = `
     padding: 2px 8px;
     border-radius: 8px;
@@ -291,3 +336,36 @@ chrome.storage.onChanged.addListener((changes) => {
       });
   }
 });
+
+// Add this SVG helper near the top of the file
+const EyeIcon = () => {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 576 512");
+  svg.setAttribute("width", "14");
+  svg.setAttribute("height", "14");
+  svg.style.marginRight = "4px";
+  svg.innerHTML = `<path fill="currentColor" d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>`;
+  return svg;
+};
+
+// Then in your WatchlistButton function, you can add the icon:
+function WatchlistButton({
+  handle,
+  onClick,
+}: {
+  handle: string;
+  onClick: () => void;
+}): HTMLElement {
+  const button = document.createElement("button");
+  button.className = "watchlist-button";
+  button.dataset.handle = handle;
+
+  // Add the eye icon
+  button.appendChild(EyeIcon());
+
+  // Add a text node for the button text
+  button.appendChild(document.createTextNode("MONITOR"));
+
+  button.addEventListener("click", onClick);
+  return button;
+}

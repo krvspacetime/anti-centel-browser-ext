@@ -5,6 +5,7 @@ import { Accordion, Button } from "@mantine/core";
 import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/styleConfig";
 import { TargetHandle } from "../../content";
 import { toProperCase } from "../../utils/utils";
+import { POPUP_HEIGHT } from "../layout/AppLayout";
 
 type CategoryType = "fake_news" | "parody" | "satire" | "on_watchlist";
 
@@ -113,7 +114,7 @@ export const TargetList = () => {
     <div
       className="flex w-full flex-col justify-between"
       style={{
-        height: "400px",
+        height: POPUP_HEIGHT,
         backgroundColor: "var(--color-secondary)",
       }}
     >
