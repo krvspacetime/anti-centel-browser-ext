@@ -3,40 +3,44 @@ import react from "@vitejs/plugin-react";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { resolve } from "path";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     viteStaticCopy({
       targets: [
-        { src: "public/manifest.json", dest: "." },
-        { src: "public/options.html", dest: "." },
+        {
+          src:
+            mode === "production"
+              ? "public/manifest.prod.json"
+              : "public/manifest.dev.json",
+          dest: ".",
+          rename: "manifest.json",
+        },
+        {
+          src: "build/popup.css",
+          dest: ".",
+        },
       ],
     }),
   ],
+  css: {
+    postcss: {
+      plugins: [],
+    },
+  },
   build: {
     outDir: "build",
     rollupOptions: {
       input: {
-        popup: resolve(__dirname, "index.html"),
-        options: resolve(
-          __dirname,
-          "src/options_ui/components/options/Options.tsx",
-        ),
+        popup: resolve(__dirname, "popup.html"),
         content: resolve(__dirname, "src/content/content.tsx"),
         background: resolve(__dirname, "src/background/background.ts"),
       },
       output: {
         entryFileNames: (chunkInfo) => {
           if (chunkInfo.name === "content") return "content.js";
-          if (chunkInfo.name === "options") return "options.js";
           if (chunkInfo.name === "background") return "background.js";
           return "[name].js";
-        },
-        // Add this to prevent code splitting for options page
-        manualChunks: (id) => {
-          if (id.includes("options")) {
-            return "options";
-          }
         },
         chunkFileNames: "[name].js",
         assetFileNames: "[name].[ext]",
@@ -48,9 +52,11 @@ export default defineConfig({
     strictPort: true,
     hmr: {
       port: 3000,
+      host: "localhost",
     },
+    watch: {
+      usePolling: true,
+    },
+    open: "/popup.html",
   },
-  define: {
-    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
-  },
-});
+}));

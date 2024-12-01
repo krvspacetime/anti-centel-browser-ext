@@ -1,0 +1,23 @@
+{
+  "name": "Anti Centel",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "http://localhost:3000/popup.html"
+  },
+  "permissions": ["storage", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["*://x.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "host_permissions": ["http://localhost:8000/*"],
+  "options_ui": {
+    "page": "http://localhost:3000/options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
