@@ -1,3 +1,5 @@
+import { DEFAULT_WATCHLIST_MONITOR_TEXT } from "../data";
+
 // Then in your WatchlistButton function, you can add the icon:
 export function WatchlistButton({
   handle,
@@ -9,10 +11,7 @@ export function WatchlistButton({
   const button = document.createElement("button");
   button.className = "watchlist-button";
   button.dataset.handle = handle;
-  button.textContent = "MONITOR 👁️";
-
-  // Add a text node for the button text
-  // button.appendChild(document.createTextNode("MONITOR"));
+  button.innerHTML = DEFAULT_WATCHLIST_MONITOR_TEXT;
 
   button.addEventListener("click", onClick);
   return button;

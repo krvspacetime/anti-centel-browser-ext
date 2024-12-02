@@ -1,25 +1,9 @@
 import { TargetHandle } from "../types";
-
-const tagIconMapper = (tag: string) => {
-  switch (tag) {
-    case "on_watchlist":
-      return "👁️";
-    case "fake_news":
-      return "🔍";
-    case "spam":
-      return "🙈";
-    case "parody":
-      return "🤡";
-    case "satire":
-      return "🤣";
-    case "bot":
-      return "🤖";
-    case "conspiracy":
-      return "🔗";
-    default:
-      return "👁️";
-  }
-};
+import {
+  tagIconMapper,
+  DEFAULT_WATCHLIST_MONITOR_TEXT,
+  removeSvg,
+} from "../data";
 
 export function updateButtonState(
   button: HTMLElement,
@@ -35,7 +19,7 @@ export function updateButtonState(
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-  // Remove existing event listeners
+  // Remove existing event listeners first
   const oldMouseEnter = button.onmouseenter;
   const oldMouseLeave = button.onmouseleave;
   if (oldMouseEnter) button.removeEventListener("mouseenter", oldMouseEnter);
@@ -43,22 +27,36 @@ export function updateButtonState(
 
   button.dataset.originalText = isInTargetList
     ? tagIconMapper(tag) + " " + tagUpper
-    : "👁️ MONITOR";
-  button.textContent = button.dataset.originalText;
+    : DEFAULT_WATCHLIST_MONITOR_TEXT;
+  button.innerHTML =
+    button.dataset.originalText ?? DEFAULT_WATCHLIST_MONITOR_TEXT;
 
   // Set up hover states
   if (isInTargetList) {
-    button.addEventListener("mouseenter", () => {
-      button.textContent = "❌ REMOVE";
+    // Set initial state directly
+    button.innerHTML = `${tagIconMapper(tag)} ${tagUpper}`;
+
+    const handleMouseEnter = () => {
+      button.innerHTML = removeSvg + " REMOVE";
       button.style.backgroundColor = "#ff4444";
       button.style.color = "white";
-    });
+    };
 
-    button.addEventListener("mouseleave", () => {
-      button.textContent = button.dataset.originalText ?? "";
+    const handleMouseLeave = () => {
+      button.innerHTML = `${tagIconMapper(tag)} ${tagUpper}`;
       button.style.backgroundColor = "transparent";
       button.style.color = "white";
-    });
+    };
+
+    button.addEventListener("mouseenter", handleMouseEnter);
+    button.addEventListener("mouseleave", handleMouseLeave);
+
+    button.onmouseenter = handleMouseEnter;
+    button.onmouseleave = handleMouseLeave;
+  } else {
+    button.onmouseenter = null;
+    button.onmouseleave = null;
+    button.innerHTML = DEFAULT_WATCHLIST_MONITOR_TEXT;
   }
 
   button.style.cssText = `

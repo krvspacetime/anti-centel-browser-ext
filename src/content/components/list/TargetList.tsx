@@ -44,6 +44,7 @@ export const TargetList = () => {
         const newHandle: TargetHandle = {
           handle: inputVal,
           tag: selectedCategory,
+          action: "monitor",
         };
         const updatedHandles = [...prev, newHandle];
         setInputVal("");

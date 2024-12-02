@@ -7,8 +7,6 @@ import {
   ModalTitle,
 } from "./modal/Modal";
 
-import { DEFAULT_STYLE_CONFIGS, CategoryType } from "./utils/styleConfig";
-
 import {
   WatchlistButton,
   WatchlistButtonContainer,
@@ -16,18 +14,19 @@ import {
 
 import { updateButtonState } from "./watchlist/WatchlistButtonUpdate";
 
-import { TargetHandle } from "./types";
+import { Tags, TargetHandle } from "./types";
 
 // Update the createCategoryModal function to include action selection
 function createCategoryModal(
   handle: string,
-): Promise<{ tag: CategoryType; action: TargetHandle["action"] } | null> {
+): Promise<{ tag: Tags; action: TargetHandle["action"] } | null> {
   return new Promise((resolve) => {
     const modal = Modal();
     const modalContent = ModalContent();
     const title = ModalTitle(`Configure monitoring for ${handle}`);
 
-    const tags = Object.keys(DEFAULT_STYLE_CONFIGS);
+    // const tags = Object.keys(DEFAULT_STYLE_CONFIGS);
+    const tags = Object.values(Tags);
     const actions: TargetHandle["action"][] = [
       "monitor",
       "hide",
@@ -40,7 +39,7 @@ function createCategoryModal(
       // Then select the tag
       const tagButtons = ModalButtons(tags, (tag) => {
         resolve({
-          tag: tag as CategoryType,
+          tag: tag as Tags,
           action: action as TargetHandle["action"],
         });
         document.body.removeChild(modal);
@@ -97,9 +96,9 @@ export async function handleWatchlistAction(handle: string): Promise<void> {
 
         const newHandles = [...targetHandles, newHandle];
         chrome.storage.sync.set({ targetHandles: newHandles }, () => {
-          console.log(
-            `${handle} added to target list with category: ${targetInfo.tag} and action: ${targetInfo.action}`,
-          );
+          // console.log(
+          //   `${handle} added to target list with category: ${targetInfo.tag} and action: ${targetInfo.action}`,
+          // );
           chrome.runtime.sendMessage({
             type: "updateHandles",
             data: newHandles,
@@ -111,7 +110,7 @@ export async function handleWatchlistAction(handle: string): Promise<void> {
       const newHandles = targetHandles.filter((th) => th.handle !== handle);
 
       chrome.storage.sync.set({ targetHandles: newHandles }, () => {
-        console.log(`${handle} removed from target list.`);
+        // console.log(`${handle} removed from target list.`);
         chrome.runtime.sendMessage({
           type: "updateHandles",
           data: newHandles,
@@ -197,7 +196,7 @@ function createWatchListButtons(
 function highlightTargetAccounts(): void {
   chrome.storage.sync.get("targetHandles", (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
-    console.log("Initial targetHandles from storage:", targetHandles);
+    // console.log("Initial targetHandles from storage:", targetHandles);
 
     const tweetArticles = document.querySelectorAll<HTMLElement>(
       'article[data-testid="tweet"]',
