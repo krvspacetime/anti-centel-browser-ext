@@ -1,28 +1,28 @@
-interface WatchlistButtonProps {
+// Then in your WatchlistButton function, you can add the icon:
+export function WatchlistButton({
+  handle,
+  onClick,
+}: {
   handle: string;
   onClick: () => void;
-}
-
-export const WatchlistButton = ({ handle, onClick }: WatchlistButtonProps) => {
+}): HTMLElement {
   const button = document.createElement("button");
   button.className = "watchlist-button";
   button.dataset.handle = handle;
+  button.textContent = "MONITOR 👁️";
+
+  // Add a text node for the button text
+  // button.appendChild(document.createTextNode("MONITOR"));
 
   button.addEventListener("click", onClick);
   return button;
-};
+}
 
-export const WatchlistButtonContainer = () => {
-  const buttonContainer = document.createElement("div");
-  buttonContainer.style.cssText = `
-      classname: watchlist-button-container;
-      display: inline-flex;
-      align-items: center;
-      margin-left: 8px;
-      position: relative;
-      top: -2px;
-      z-index: 1000;
+export function WatchlistButtonContainer(): HTMLElement {
+  const container = document.createElement("div");
+  container.className = "watchlist-button-container";
+  container.style.cssText = `
+    margin-left: 4px;
   `;
-
-  return buttonContainer;
-};
+  return container;
+}

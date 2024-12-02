@@ -1,10 +1,5 @@
 export type CategoryType = "fake_news" | "parody" | "satire" | "on_watchlist";
 
-export interface TargetHandle {
-  handle: string;
-  category: CategoryType;
-}
-
 interface TargetCategorySelectProps {
   categories: string[];
   selectedCategory: CategoryType;
