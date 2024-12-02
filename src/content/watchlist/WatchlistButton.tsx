@@ -1,17 +1,24 @@
-import { DEFAULT_WATCHLIST_MONITOR_TEXT } from "../data";
+import { TargetHandle } from "../types";
+// import { DEFAULT_WATCHLIST_MONITOR_TEXT } from "../data";
+import { updateButtonState } from "./WatchlistButtonUpdate";
 
-// Then in your WatchlistButton function, you can add the icon:
 export function WatchlistButton({
   handle,
   onClick,
+  targetHandles,
 }: {
   handle: string;
   onClick: () => void;
+  targetHandles: TargetHandle[];
 }): HTMLElement {
   const button = document.createElement("button");
   button.className = "watchlist-button";
   button.dataset.handle = handle;
-  button.innerHTML = DEFAULT_WATCHLIST_MONITOR_TEXT;
+
+  const isInTargetList = targetHandles.some((th) => th.handle === handle);
+
+  // Initialize the button with the correct state
+  updateButtonState(button, isInTargetList, targetHandles);
 
   button.addEventListener("click", onClick);
   return button;

@@ -170,7 +170,7 @@ function createWatchListButtons(
   tweet: HTMLElement,
   handleElement: Element,
   handle: string | null,
-  isInTargetList: boolean,
+  targetHandles: TargetHandle[],
 ): void {
   if (!handle) return;
 
@@ -182,8 +182,8 @@ function createWatchListButtons(
   const button = WatchlistButton({
     handle,
     onClick: () => handleWatchlistAction(handle),
+    targetHandles,
   });
-  updateButtonState(button, isInTargetList);
 
   buttonContainer.appendChild(button);
 
@@ -196,7 +196,6 @@ function createWatchListButtons(
 function highlightTargetAccounts(): void {
   chrome.storage.sync.get("targetHandles", (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
-    // console.log("Initial targetHandles from storage:", targetHandles);
 
     const tweetArticles = document.querySelectorAll<HTMLElement>(
       'article[data-testid="tweet"]',
@@ -211,7 +210,7 @@ function highlightTargetAccounts(): void {
             (th) => th.handle === handle,
           );
           styleTargetTweets(isInTargetList, tweet);
-          createWatchListButtons(tweet, handleElement, handle, isInTargetList);
+          createWatchListButtons(tweet, handleElement, handle, targetHandles);
         }
       }
     });

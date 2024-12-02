@@ -1,10 +1,7 @@
 import { TargetHandle } from "../types";
-import {
-  tagIconMapper,
-  DEFAULT_WATCHLIST_MONITOR_TEXT,
-  removeSvg,
-} from "../data";
+import { tagIconMapper, DEFAULT_WATCHLIST_MONITOR_TEXT } from "../data";
 
+import { eyeOffSvg } from "../../icons/icons";
 export function updateButtonState(
   button: HTMLElement,
   isInTargetList: boolean,
@@ -12,7 +9,7 @@ export function updateButtonState(
 ): void {
   const handle = button.dataset.handle;
   const targetInfo = targetHandles?.find((th) => th.handle === handle);
-  const tag = targetInfo?.tag || "on_watchlist";
+  const tag = targetInfo?.tag ?? "on_watchlist";
   const tagLabel = tag.split("_").join(" ");
   const tagUpper = tagLabel
     .split(" ")
@@ -37,7 +34,7 @@ export function updateButtonState(
     button.innerHTML = `${tagIconMapper(tag)} ${tagUpper}`;
 
     const handleMouseEnter = () => {
-      button.innerHTML = removeSvg + " REMOVE";
+      button.innerHTML = eyeOffSvg + " REMOVE";
       button.style.backgroundColor = "#ff4444";
       button.style.color = "white";
     };
