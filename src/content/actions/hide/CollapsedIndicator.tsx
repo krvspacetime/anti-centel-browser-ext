@@ -1,3 +1,6 @@
+import { settings } from "../../../icons/icons";
+import { SettingsDialog } from "./SettingsDialog";
+
 interface CollapsedIndicatorProps {
   action: "hide" | "blur";
   tweet: HTMLElement;
@@ -33,7 +36,7 @@ export const CollapsedIndicator = ({
 
     // Create options button
     const optionsButton = document.createElement("button");
-    optionsButton.textContent = "⚙️";
+    optionsButton.innerHTML = settings;
     optionsButton.style.cssText = `
         background: none;
         border: none;
@@ -41,6 +44,23 @@ export const CollapsedIndicator = ({
         cursor: pointer;
         padding: 0 8px;
     `;
+
+    const dialog = SettingsDialog(handle, tag);
+
+    // Modify options button click handler
+    optionsButton.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent collapse indicator click
+      dialog.showModal();
+    });
+
+    // Modify dialog click handlers
+    dialog.addEventListener("click", (e) => {
+      e.stopPropagation(); // Add this to prevent bubbling
+      if (e.target === dialog) {
+        e.preventDefault(); // Prevent default dialog behavior
+        dialog.close();
+      }
+    });
 
     // Add click handlers
     collapseIndicator.addEventListener("click", (e) => {
@@ -59,6 +79,7 @@ export const CollapsedIndicator = ({
     // Append elements
     collapseIndicator.appendChild(textContainer);
     collapseIndicator.appendChild(optionsButton);
+    collapseIndicator.appendChild(dialog);
 
     return collapseIndicator;
   }

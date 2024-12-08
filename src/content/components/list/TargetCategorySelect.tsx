@@ -1,9 +1,9 @@
-export type CategoryType = "fake_news" | "parody" | "satire" | "on_watchlist";
+import { Tags } from "../types";
 
 interface TargetCategorySelectProps {
   categories: string[];
-  selectedCategory: CategoryType;
-  onCategoryChange: (category: CategoryType) => void;
+  selectedCategory: Tags;
+  onCategoryChange: (category: Tags) => void;
 }
 
 export const TargetCategorySelect = ({
@@ -22,7 +22,7 @@ export const TargetCategorySelect = ({
   return (
     <select
       value={selectedCategory}
-      onChange={(e) => onCategoryChange(e.target.value as CategoryType)}
+      onChange={(e) => onCategoryChange(e.target.value as Tags)}
       className="h-full w-full rounded bg-tertiary px-2 text-white"
     >
       {categoryOptions.map((category) => {

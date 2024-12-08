@@ -6,14 +6,14 @@ import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/st
 import { TargetHandle } from "../../../content/types";
 import { toProperCase } from "../../utils/utils";
 import { POPUP_HEIGHT } from "../layout/AppLayout";
-
-type CategoryType = "fake_news" | "parody" | "satire" | "on_watchlist";
+import { Tags } from "../types";
 
 export const TargetList = () => {
   const [inputVal, setInputVal] = useState("");
   const [targetHandles, setTargetHandles] = useState<TargetHandle[]>([]);
-  const [selectedCategory, setSelectedCategory] =
-    useState<CategoryType>("on_watchlist");
+  const [selectedCategory, setSelectedCategory] = useState<Tags>(
+    Tags.ON_WATCHLIST,
+  );
 
   const removeFromList = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -77,9 +77,9 @@ export const TargetList = () => {
     };
   }, []);
 
-  const categoryColors = (category: CategoryType) => {
+  const categoryColors = (category: Tags) => {
     switch (category) {
-      case "fake_news":
+      case Tags.FAKE_NEWS:
         return "bg-red-500";
       case "parody":
         return "bg-blue-500";
@@ -97,10 +97,10 @@ export const TargetList = () => {
       <div className="w-[45%]">
         <p
           className={`${categoryColors(
-            item.tag as CategoryType,
+            item.tag as Tags,
           )} w-fit rounded px-2 text-center text-xs`}
         >
-          {toProperCase(item.tag as CategoryType)}
+          {toProperCase(item.tag as Tags)}
         </p>
       </div>
       <div
