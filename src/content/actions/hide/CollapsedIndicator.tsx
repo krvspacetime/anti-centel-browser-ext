@@ -1,12 +1,42 @@
 import { settings } from "../../../icons/icons";
+import { Tags } from "../../types";
 import { SettingsDialog } from "./SettingsDialog";
 
 interface CollapsedIndicatorProps {
   action: "hide" | "blur";
   tweet: HTMLElement;
   handle: string;
-  tag: string;
+  tag: Tags;
 }
+
+const tagColor = (tag: Tags) => {
+  // Log the incoming tag and enum value to debug
+  console.log("Tag:", tag);
+  console.log("Enum:", Tags.ON_WATCHLIST);
+
+  switch (tag) {
+    case Tags.ON_WATCHLIST:
+      return "red";
+    case Tags.FAKE_NEWS:
+      return "yellow";
+    case Tags.SPAM:
+      return "red";
+    case Tags.BOT:
+      return "blue";
+    case Tags.CONSPIRACY:
+      return "orange";
+    case Tags.SEXUALLY_EXPLICIT:
+      return "purple";
+    case Tags.PARODY:
+      return "green";
+    case Tags.SATIRE:
+      return "brown";
+    case Tags.FAN_PAGE:
+      return "scarlet";
+    default:
+      return "blue";
+  }
+};
 
 export const CollapsedIndicator = ({
   tweet,
@@ -30,9 +60,33 @@ export const CollapsedIndicator = ({
         cursor: pointer;
       `;
 
-    // Create text container
+    // Create text container with styled handle and tag
     const textContainer = document.createElement("span");
-    textContainer.textContent = `Hidden tweet from ${handle} - ${tag}`;
+
+    const handleSpan = document.createElement("span");
+    handleSpan.textContent = handle;
+    handleSpan.style.cssText = `
+        color: #1d9bf0;
+        font-weight: 600;
+    `;
+
+    const tagSpan = document.createElement("span");
+    tagSpan.textContent = tag;
+    const color = tagColor(tag);
+    tagSpan.style.cssText = `
+        color: white;
+        font-weight: 500;
+        font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 13px;
+        background-color: ${color};
+        padding: 2px 4px;
+        border-radius: 4px;
+    `;
+
+    textContainer.appendChild(document.createTextNode("Hidden tweet from "));
+    textContainer.appendChild(handleSpan);
+    textContainer.appendChild(document.createTextNode(" - "));
+    textContainer.appendChild(tagSpan);
 
     // Create options button
     const optionsButton = document.createElement("button");
@@ -62,16 +116,28 @@ export const CollapsedIndicator = ({
       }
     });
 
-    // Add click handlers
+    // Update the click handler to modify text properly
     collapseIndicator.addEventListener("click", (e) => {
       if (e.target !== optionsButton) {
         const currentHeight = tweet.style.height;
         if (currentHeight === "0px") {
           tweet.style.height = `${tweet.scrollHeight}px`;
-          textContainer.textContent = `Showing tweet from ${handle} - ${tag}`;
+          textContainer.textContent = ""; // Clear existing content
+          textContainer.appendChild(
+            document.createTextNode("Showing tweet from "),
+          );
+          textContainer.appendChild(handleSpan.cloneNode(true));
+          textContainer.appendChild(document.createTextNode(" - "));
+          textContainer.appendChild(tagSpan.cloneNode(true));
         } else {
           tweet.style.height = "0px";
-          textContainer.textContent = `Hidden tweet from ${handle} - ${tag}`;
+          textContainer.textContent = ""; // Clear existing content
+          textContainer.appendChild(
+            document.createTextNode("Hidden tweet from "),
+          );
+          textContainer.appendChild(handleSpan.cloneNode(true));
+          textContainer.appendChild(document.createTextNode(" - "));
+          textContainer.appendChild(tagSpan.cloneNode(true));
         }
       }
     });

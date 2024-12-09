@@ -153,7 +153,7 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
               tweet,
               handle: handle || "",
               action,
-              tag,
+              tag: tag as Tags,
             });
             tweetArticle.parentElement.insertBefore(
               collapseIndicator as Node,
@@ -161,6 +161,10 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
             );
           }
         }
+      } else if (action === "blur") {
+        tweet.style.filter = "blur(10px)";
+      } else if (action === "highlight") {
+        tweet.style.outline = "2px solid gold";
       }
     }
   });

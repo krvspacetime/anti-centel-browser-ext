@@ -14,4 +14,5 @@ export enum Tags {
   BOT = "bot",
   CONSPIRACY = "conspiracy",
   FAN_PAGE = "fan_page",
+  SEXUALLY_EXPLICIT = "sexually_explicit",
 }
