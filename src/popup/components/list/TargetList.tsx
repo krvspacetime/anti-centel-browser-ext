@@ -4,7 +4,7 @@ import { TargetInput } from "./TargetInput";
 import { TargetCategorySelect } from "./TargetCategorySelect";
 import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/styleConfig";
 import { TargetHandle } from "../../../content/types";
-import { toProperCase } from "../../utils/utils";
+import { toProperCase } from "../../../content/utils/utils";
 import { POPUP_HEIGHT } from "../layout/AppLayout";
 import { Tags } from "../types";
 

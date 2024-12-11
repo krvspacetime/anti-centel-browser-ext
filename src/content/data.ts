@@ -5,6 +5,7 @@ import {
   eyeOffSvg,
   eyeSvg,
   fan,
+  forbid,
   horseShoeSvg,
   robotSvg,
   trashSvg,
@@ -29,6 +30,8 @@ export const tagIconMapper = (tag: string): string => {
       return circusSvg;
     case "fan_page":
       return fan;
+    case "sexually_explicit":
+      return forbid;
     default:
       return eyeBoltSvg;
   }

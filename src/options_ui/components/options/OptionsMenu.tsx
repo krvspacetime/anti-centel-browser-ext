@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { SegmentedControl } from "@mantine/core";
-import { TargetRoot } from "../../../content/components/target-list/TargetRoot";
+import { TargetRoot } from "../../../popup/components/target-list/TargetRoot";
 import { StyleSelect } from "./StyleSelect";
 import { DEFAULT_STYLE_CONFIGS } from "./styleConfig";
 
@@ -52,6 +52,7 @@ export function OptionsMenu() {
           ))}
         </div>
       )}
+      {activeTab === "rules" && <div>Rules</div>}
     </div>
   );
 }
