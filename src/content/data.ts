@@ -4,6 +4,7 @@ import {
   eyeBoltSvg,
   eyeOffSvg,
   eyeSvg,
+  fan,
   horseShoeSvg,
   robotSvg,
   trashSvg,
@@ -26,6 +27,8 @@ export const tagIconMapper = (tag: string): string => {
       return windminllSvg;
     case "parody":
       return circusSvg;
+    case "fan_page":
+      return fan;
     default:
       return eyeBoltSvg;
   }

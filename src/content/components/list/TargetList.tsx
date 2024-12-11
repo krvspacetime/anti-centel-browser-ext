@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { Accordion, Button } from "@mantine/core";
 import { TargetInput } from "./TargetInput";
 import { TargetCategorySelect } from "./TargetCategorySelect";
-import { Accordion, Button } from "@mantine/core";
 import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/styleConfig";
 import { TargetHandle } from "../../../content/types";
 import { toProperCase } from "../../utils/utils";

@@ -15,7 +15,11 @@ import {
 import { updateButtonState } from "./watchlist/WatchlistButtonUpdate";
 
 import { Tags, TargetHandle } from "./types";
+import { OverlayWithRemoveButton } from "./utils/StyleTweetUtils";
 
+const TWEET_ARTICLE_QUERY_SELECTOR = 'article[data-testid="tweet"]';
+const TWEET_HANDLE_QUERY_SELECTOR = 'a[role="link"] span';
+// const TWEET_CONTENT_QUERY_SELECTOR = '[data-testid="tweetText"]';
 // Update the createCategoryModal function to include action selection
 function createCategoryModal(
   handle: string,
@@ -69,9 +73,9 @@ function createCategoryModal(
 
 function refreshTweetStyles(handle: string): void {
   document
-    .querySelectorAll<HTMLElement>('article[data-testid="tweet"]')
+    .querySelectorAll<HTMLElement>(TWEET_ARTICLE_QUERY_SELECTOR)
     .forEach((tweet) => {
-      const tweetHandle = tweet.querySelectorAll('a[role="link"] span')[3]
+      const tweetHandle = tweet.querySelectorAll(TWEET_HANDLE_QUERY_SELECTOR)[3]
         ?.textContent;
       if (tweetHandle === handle) {
         tweet.dataset.processed = "false"; // Reset processed state
@@ -96,9 +100,6 @@ export async function handleWatchlistAction(handle: string): Promise<void> {
 
         const newHandles = [...targetHandles, newHandle];
         chrome.storage.sync.set({ targetHandles: newHandles }, () => {
-          // console.log(
-          //   `${handle} added to target list with category: ${targetInfo.tag} and action: ${targetInfo.action}`,
-          // );
           chrome.runtime.sendMessage({
             type: "updateHandles",
             data: newHandles,
@@ -122,8 +123,8 @@ export async function handleWatchlistAction(handle: string): Promise<void> {
 }
 
 function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
-  // const tweetContent = tweet.querySelector('[data-testid="tweetText"]');
-  const handleElement = tweet.querySelectorAll('a[role="link"] span')[3];
+  // const tweetContent = tweet.querySelector(TWEET_CONTENT_QUERY_SELECTOR);
+  const handleElement = tweet.querySelectorAll(TWEET_HANDLE_QUERY_SELECTOR)[3];
   const handle = handleElement ? handleElement.textContent : null;
 
   if (tweet.dataset.processed === "true") return;
@@ -132,7 +133,7 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
   chrome.storage.sync.get("targetHandles", (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
     const targetInfo = targetHandles.find((th) => th.handle === handle);
-
+    const tweetArticle = tweet.closest('article[data-testid="tweet"]');
     if (isInTargetList) {
       const tag = targetInfo?.tag || "on_watchlist";
       const action = targetInfo?.action || "monitor";
@@ -162,7 +163,9 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
           }
         }
       } else if (action === "blur") {
-        tweet.style.filter = "blur(10px)";
+        // tweet.style.filter = "blur(10px)";
+        const tweetOverlay = OverlayWithRemoveButton(handle ?? "", tag);
+        tweetArticle?.appendChild(tweetOverlay);
       } else if (action === "highlight") {
         tweet.style.outline = "2px solid gold";
       }
@@ -202,11 +205,13 @@ function highlightTargetAccounts(): void {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
 
     const tweetArticles = document.querySelectorAll<HTMLElement>(
-      'article[data-testid="tweet"]',
+      TWEET_ARTICLE_QUERY_SELECTOR,
     );
 
     tweetArticles.forEach((tweet) => {
-      const handleElement = tweet.querySelectorAll('a[role="link"] span')[3];
+      const handleElement = tweet.querySelectorAll(
+        TWEET_HANDLE_QUERY_SELECTOR,
+      )[3];
       if (handleElement) {
         const handle = handleElement.textContent;
         if (handle) {
