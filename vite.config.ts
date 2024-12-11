@@ -9,7 +9,7 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         { src: "public/manifest.json", dest: "." },
-        { src: "public/options.html", dest: "." },
+        { src: "src/options_ui/options.html", dest: "." },
       ],
     }),
   ],

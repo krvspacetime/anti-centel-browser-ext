@@ -1,4 +1,4 @@
-import { TargetHandle } from "../content";
+import { TargetHandle } from "../../content/types";
 
 export function highlitTargetAccounts(
   styleTargetTweets: (isInTargetList: boolean, tweet: HTMLElement) => void,

@@ -1,3 +1,4 @@
+import { CollapsedIndicator } from "./actions/hide/CollapsedIndicator";
 import {
   Modal,
   ModalButtons,
@@ -5,35 +6,31 @@ import {
   ModalContent,
   ModalTitle,
 } from "./modal/Modal";
-import {
-  createHideTweetButton,
-  createShowTweetButton,
-  createTweetBadge,
-  createTweetOverlay,
-} from "./utils/StyleTweetUtils";
 
-import { DEFAULT_STYLE_CONFIGS, CategoryType } from "./utils/styleConfig";
 import {
   WatchlistButton,
   WatchlistButtonContainer,
 } from "./watchlist/WatchlistButton";
 
-export interface TargetHandle {
-  handle: string;
-  tag: CategoryType;
-  action?: "monitor" | "hide" | "blur" | "highlight";
-}
+import { updateButtonState } from "./watchlist/WatchlistButtonUpdate";
 
+import { Tags, TargetHandle } from "./types";
+import { OverlayWithRemoveButton } from "./utils/StyleTweetUtils";
+
+const TWEET_ARTICLE_QUERY_SELECTOR = 'article[data-testid="tweet"]';
+const TWEET_HANDLE_QUERY_SELECTOR = 'a[role="link"] span';
+// const TWEET_CONTENT_QUERY_SELECTOR = '[data-testid="tweetText"]';
 // Update the createCategoryModal function to include action selection
 function createCategoryModal(
   handle: string,
-): Promise<{ tag: CategoryType; action: TargetHandle["action"] } | null> {
+): Promise<{ tag: Tags; action: TargetHandle["action"] } | null> {
   return new Promise((resolve) => {
     const modal = Modal();
     const modalContent = ModalContent();
     const title = ModalTitle(`Configure monitoring for ${handle}`);
 
-    const tags = Object.keys(DEFAULT_STYLE_CONFIGS);
+    // const tags = Object.keys(DEFAULT_STYLE_CONFIGS);
+    const tags = Object.values(Tags);
     const actions: TargetHandle["action"][] = [
       "monitor",
       "hide",
@@ -46,7 +43,7 @@ function createCategoryModal(
       // Then select the tag
       const tagButtons = ModalButtons(tags, (tag) => {
         resolve({
-          tag: tag as CategoryType,
+          tag: tag as Tags,
           action: action as TargetHandle["action"],
         });
         document.body.removeChild(modal);
@@ -74,6 +71,19 @@ function createCategoryModal(
   });
 }
 
+function refreshTweetStyles(handle: string): void {
+  document
+    .querySelectorAll<HTMLElement>(TWEET_ARTICLE_QUERY_SELECTOR)
+    .forEach((tweet) => {
+      const tweetHandle = tweet.querySelectorAll(TWEET_HANDLE_QUERY_SELECTOR)[3]
+        ?.textContent;
+      if (tweetHandle === handle) {
+        tweet.dataset.processed = "false"; // Reset processed state
+        styleTargetTweets(true, tweet);
+      }
+    });
+}
+
 export async function handleWatchlistAction(handle: string): Promise<void> {
   chrome.storage.sync.get("targetHandles", async (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
@@ -90,21 +100,18 @@ export async function handleWatchlistAction(handle: string): Promise<void> {
 
         const newHandles = [...targetHandles, newHandle];
         chrome.storage.sync.set({ targetHandles: newHandles }, () => {
-          console.log(
-            `${handle} added to target list with category: ${targetInfo.tag} and action: ${targetInfo.action}`,
-          );
           chrome.runtime.sendMessage({
             type: "updateHandles",
             data: newHandles,
           });
-          highlightTargetAccounts();
+          refreshTweetStyles(handle);
         });
       }
     } else {
       const newHandles = targetHandles.filter((th) => th.handle !== handle);
 
       chrome.storage.sync.set({ targetHandles: newHandles }, () => {
-        console.log(`${handle} removed from target list.`);
+        // console.log(`${handle} removed from target list.`);
         chrome.runtime.sendMessage({
           type: "updateHandles",
           data: newHandles,
@@ -116,63 +123,51 @@ export async function handleWatchlistAction(handle: string): Promise<void> {
 }
 
 function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
-  const handleElement = tweet.querySelectorAll('a[role="link"] span')[3];
+  // const tweetContent = tweet.querySelector(TWEET_CONTENT_QUERY_SELECTOR);
+  const handleElement = tweet.querySelectorAll(TWEET_HANDLE_QUERY_SELECTOR)[3];
   const handle = handleElement ? handleElement.textContent : null;
+
+  if (tweet.dataset.processed === "true") return;
+  tweet.dataset.processed = "true";
 
   chrome.storage.sync.get("targetHandles", (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
     const targetInfo = targetHandles.find((th) => th.handle === handle);
-
-    if (isInTargetList && !tweet.querySelector(".tweet-overlay")) {
-      tweet.style.position = "relative";
-      tweet.style.pointerEvents = "none";
-
+    const tweetArticle = tweet.closest('article[data-testid="tweet"]');
+    if (isInTargetList) {
       const tag = targetInfo?.tag || "on_watchlist";
-      const style = DEFAULT_STYLE_CONFIGS[tag];
+      const action = targetInfo?.action || "monitor";
 
-      const tweetContent = tweet.querySelector('[data-testid="tweetText"]');
-      if (tweetContent instanceof HTMLElement) {
-        tweetContent.style.filter = `blur(${style.contentBlur})`;
-      }
+      if (action === "hide") {
+        // const tweetHeight = tweet.offsetHeight;
+        tweet.style.height = "0px";
+        tweet.style.overflow = "hidden";
+        tweet.style.transition = "height 0.3s ease";
 
-      const overlay = createTweetOverlay(style);
-      const showTweetButton = createShowTweetButton(style, () => {
-        if (tweetContent instanceof HTMLElement) {
-          tweetContent.style.filter = "none";
+        const tweetArticle = tweet.closest('article[data-testid="tweet"]');
+        if (tweetArticle && tweetArticle.parentElement) {
+          const existingIndicator = tweetArticle.parentElement.querySelector(
+            ".collapse-indicator",
+          );
+          if (!existingIndicator) {
+            const collapseIndicator = CollapsedIndicator({
+              tweet,
+              handle: handle || "",
+              action,
+              tag: tag as Tags,
+            });
+            tweetArticle.parentElement.insertBefore(
+              collapseIndicator as Node,
+              tweetArticle,
+            );
+          }
         }
-        tweet.style.filter = "none";
-        tweet.style.pointerEvents = "auto";
-        tweet.style.position = "static";
-
-        overlay.style.display = "none";
-        showTweetButton.style.display = "none";
-        hideTweetButton.style.display = "block";
-        tweetBadge.style.display = "none";
-      });
-
-      const hideTweetButton = createHideTweetButton(() => {
-        if (tweetContent instanceof HTMLElement) {
-          tweetContent.style.filter = `blur(${style.contentBlur})`;
-        }
-        tweet.style.pointerEvents = "none";
-        tweet.style.position = "relative";
-
-        overlay.style.display = "block";
-        hideTweetButton.style.display = "none";
-        showTweetButton.style.display = "block";
-        tweetBadge.style.display = "block";
-      });
-
-      const tweetBadge = createTweetBadge(targetInfo?.handle || "", tag);
-
-      // Initial state
-      hideTweetButton.style.display = "none";
-
-      tweet.appendChild(overlay);
-      if (style.overlayColor !== "none") {
-        tweet.appendChild(showTweetButton);
-        tweet.appendChild(hideTweetButton);
-        tweet.appendChild(tweetBadge);
+      } else if (action === "blur") {
+        // tweet.style.filter = "blur(10px)";
+        const tweetOverlay = OverlayWithRemoveButton(handle ?? "", tag);
+        tweetArticle?.appendChild(tweetOverlay);
+      } else if (action === "highlight") {
+        tweet.style.outline = "2px solid gold";
       }
     }
   });
@@ -182,7 +177,7 @@ function createWatchListButtons(
   tweet: HTMLElement,
   handleElement: Element,
   handle: string | null,
-  isInTargetList: boolean,
+  targetHandles: TargetHandle[],
 ): void {
   if (!handle) return;
 
@@ -194,8 +189,8 @@ function createWatchListButtons(
   const button = WatchlistButton({
     handle,
     onClick: () => handleWatchlistAction(handle),
+    targetHandles,
   });
-  updateButtonState(button, isInTargetList);
 
   buttonContainer.appendChild(button);
 
@@ -205,52 +200,18 @@ function createWatchListButtons(
   }
 }
 
-function updateButtonState(
-  button: HTMLElement,
-  isInTargetList: boolean,
-  targetHandles?: TargetHandle[],
-): void {
-  const handle = button.dataset.handle;
-  const targetInfo = targetHandles?.find((th) => th.handle === handle);
-  const category = targetInfo?.tag || "on_watchlist";
-  const categoryLabel = category.split("_").join(" ");
-  const categoryUpper = categoryLabel
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-  button.textContent = isInTargetList ? categoryUpper : "MONITOR";
-  button.style.cssText = `
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-size: 13px;
-    cursor: pointer;
-    background-color: transparent;
-    color: white;
-    border: none;
-    line-height: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    white-space: nowrap;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    outline: 1px solid rgba(255, 255, 255, 0.3);
-    :hover {
-      background-color: ${isInTargetList ? "#ff4444" : "#1da1f2"};
-    }
-  `;
-}
-
 function highlightTargetAccounts(): void {
   chrome.storage.sync.get("targetHandles", (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
-    console.log("Initial targetHandles from storage:", targetHandles);
 
     const tweetArticles = document.querySelectorAll<HTMLElement>(
-      'article[data-testid="tweet"]',
+      TWEET_ARTICLE_QUERY_SELECTOR,
     );
 
     tweetArticles.forEach((tweet) => {
-      const handleElement = tweet.querySelectorAll('a[role="link"] span')[3];
+      const handleElement = tweet.querySelectorAll(
+        TWEET_HANDLE_QUERY_SELECTOR,
+      )[3];
       if (handleElement) {
         const handle = handleElement.textContent;
         if (handle) {
@@ -258,7 +219,7 @@ function highlightTargetAccounts(): void {
             (th) => th.handle === handle,
           );
           styleTargetTweets(isInTargetList, tweet);
-          createWatchListButtons(tweet, handleElement, handle, isInTargetList);
+          createWatchListButtons(tweet, handleElement, handle, targetHandles);
         }
       }
     });

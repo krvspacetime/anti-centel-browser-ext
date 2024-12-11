@@ -1,7 +1,7 @@
 import { TargetList } from "../list/TargetList";
 
-const POPUP_WIDTH = "420px";
-const POPUP_HEIGHT = "450px";
+export const POPUP_WIDTH = "420px";
+export const POPUP_HEIGHT = "450px";
 
 export const AppLayout = () => {
   return (
