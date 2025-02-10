@@ -6,7 +6,7 @@ import { StyleSettings } from "./styleDefaults";
 interface HideOptionsProps {
   styleSettings: StyleSettings;
   checked: boolean;
-  onSetChecked: () => void;
+  onSetChecked: (value: boolean) => void;
   valueLabelFormat: (value: number) => string;
   onChangeHiddenTweetBlurValue: (value: number) => void;
   onChangeCollapsedTweetUsernameColor: (value: string) => void;
@@ -57,7 +57,7 @@ export const HideOptions = ({
           onLabel={sunIcon}
           offLabel={moonIcon}
           checked={checked}
-          onChange={() => onSetChecked()}
+          onChange={(e) => onSetChecked(e.currentTarget.checked)}
         />
       </div>
       <StyleSlider

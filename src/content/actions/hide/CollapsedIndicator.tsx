@@ -1,5 +1,5 @@
 import { settings } from "../../../icons/icons";
-import { Tags } from "../../types";
+import { StyleSettings, Tags } from "../../types";
 import { SettingsDialog } from "./SettingsDialog";
 
 interface CollapsedIndicatorProps {
@@ -7,6 +7,7 @@ interface CollapsedIndicatorProps {
   tweet: HTMLElement;
   handle: string;
   tag: Tags;
+  styleSettings: StyleSettings;
 }
 
 const tagColor = (tag: Tags) => {
@@ -43,6 +44,7 @@ export const CollapsedIndicator = ({
   handle,
   action,
   tag,
+  styleSettings,
 }: CollapsedIndicatorProps) => {
   if (action === "hide") {
     // Create collapse indicator
@@ -66,7 +68,7 @@ export const CollapsedIndicator = ({
     const handleSpan = document.createElement("span");
     handleSpan.textContent = handle;
     handleSpan.style.cssText = `
-        color: #1d9bf0;
+        color: ${styleSettings.hide.collapsedTweetUsernameColor};
         font-weight: 600;
     `;
 

@@ -144,7 +144,11 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
         tweet.style.height = "0px";
         tweet.style.overflow = "hidden";
         tweet.style.transition = "height 0.3s ease";
-        tweet.style.outline = `${styleSettings.highlightThickness}px solid ${styleSettings.highlightColor}`;
+        tweet.style.outline = `${styleSettings.highlight.highlightThickness}px solid ${styleSettings.highlight.highlightColor}`;
+        tweet.style.backdropFilter = styleSettings.hide
+          .blurHiddenTweetsOnUncollpase
+          ? `blur(${styleSettings.blur.blurValue}px)`
+          : "blur(0px)";
 
         const tweetArticle = tweet.closest('article[data-testid="tweet"]');
         if (tweetArticle && tweetArticle.parentElement) {
@@ -157,6 +161,7 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
               handle: handle || "",
               action,
               tag: tag as Tags,
+              styleSettings,
             });
             tweetArticle.parentElement.insertBefore(
               collapseIndicator as Node,

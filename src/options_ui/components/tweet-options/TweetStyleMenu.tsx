@@ -45,8 +45,8 @@ export const TweetStyleMenu = () => {
     setStyleSettings((prev) => ({ ...prev, hiddenTweetBlurValue: 0 }));
   };
 
-  const onSetChecked = () => {
-    setChecked((prev) => !prev);
+  const onSetChecked = (value: boolean) => {
+    setChecked(value);
   };
 
   const onChangeBlurValue = (value: number) => {
@@ -111,7 +111,7 @@ export const TweetStyleMenu = () => {
                 valueLabelFormat={valueLabelFormat}
                 styleSettings={styleSettings}
                 checked={checked}
-                onSetChecked={onSetChecked}
+                onSetChecked={(value: boolean) => onSetChecked(value)}
                 onChangeHiddenTweetBlurValue={onChangeHiddenTweetBlurValue}
                 onChangeCollapsedTweetUsernameColor={
                   onChangeCollapsedTweetUsernameColor
