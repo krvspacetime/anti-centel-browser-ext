@@ -16,3 +16,20 @@ export enum Tags {
   FAN_PAGE = "fan_page",
   SEXUALLY_EXPLICIT = "sexually_explicit",
 }
+
+export interface StyleSettings {
+  blur: {
+    blurValue: number;
+  };
+  higlight: {
+    highlightColor: string;
+    highlighThickness: number;
+    highlightBorderRadius: number;
+    glowStrength: number;
+  };
+  hide: {
+    hiddenTweetBlurValue: number;
+    blurHiddenTweetsOnUncollpase: boolean;
+    collapsedTweetUsernameColor: string;
+  };
+}
