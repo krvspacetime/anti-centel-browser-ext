@@ -22,7 +22,7 @@ export default defineConfig({
           __dirname,
           "src/options_ui/components/options/Options.tsx",
         ),
-        content: resolve(__dirname, "src/content/content.tsx"),
+        content: resolve(__dirname, "src/content/content.ts"),
         background: resolve(__dirname, "src/background/background.ts"),
       },
       output: {

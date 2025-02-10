@@ -1,6 +1,7 @@
 import { tagIconMapper } from "../data";
+import { StyleSettings } from "../types";
 
-function createTweetOverlay() {
+function createTweetOverlay(blurValue: number) {
   const overlay = document.createElement("div");
   overlay.className = "tweet-overlay";
   overlay.style.cssText = `
@@ -11,7 +12,7 @@ function createTweetOverlay() {
     height: 100%;
     background: "none";
     pointer-events: auto;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(${blurValue}px);
     outline: 1px solid gold;
     pointer-events: none;
     z-index: 2
@@ -175,22 +176,24 @@ const createButtonContainer = () => {
 //   return removeButton;
 // };
 
-export const OverlayWithRemoveButton = (handle: string, category: string) => {
-  const overlay = createTweetOverlay();
+export const OverlayWithRemoveButton = (
+  handle: string,
+  category: string,
+  styleSettings: StyleSettings,
+) => {
+  const overlay = createTweetOverlay(styleSettings.blur.blurValue);
   const buttonContainer = createButtonContainer();
   const badge = createTweetBadge(handle, category);
 
   const showButton = createShowTweetButton(() => {
-    // Define the action for hideTweetButton click
-    overlay.style.backdropFilter = "blur(0px)";
+    overlay.style.backdropFilter = `blur(0px)`;
     showButton.style.display = "none";
     hideButton.style.display = "block";
     badge.style.display = "none";
   });
 
-  // Create the remove button with an updated onClick function
   const hideButton = createHideTweetButton(() => {
-    overlay.style.backdropFilter = "blur(8px)"; // Example action to hide the overlay
+    overlay.style.backdropFilter = `blur(${styleSettings.blur.blurValue}px)`; // Use blur value from styleSettings
     showButton.style.display = "block";
     hideButton.style.display = "none";
     badge.style.display = "block";

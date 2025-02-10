@@ -130,8 +130,10 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
   if (tweet.dataset.processed === "true") return;
   tweet.dataset.processed = "true";
 
-  chrome.storage.sync.get("targetHandles", (data) => {
+  chrome.storage.sync.get(["targetHandles", "styleSettings"], (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
+    const styleSettings = data.styleSettings;
+    console.log("Style Settings:", styleSettings);
     const targetInfo = targetHandles.find((th) => th.handle === handle);
     const tweetArticle = tweet.closest('article[data-testid="tweet"]');
     if (isInTargetList) {
@@ -139,10 +141,10 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
       const action = targetInfo?.action || "monitor";
 
       if (action === "hide") {
-        // const tweetHeight = tweet.offsetHeight;
         tweet.style.height = "0px";
         tweet.style.overflow = "hidden";
         tweet.style.transition = "height 0.3s ease";
+        tweet.style.outline = `${styleSettings.highlightThickness}px solid ${styleSettings.highlightColor}`;
 
         const tweetArticle = tweet.closest('article[data-testid="tweet"]');
         if (tweetArticle && tweetArticle.parentElement) {
@@ -163,11 +165,23 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
           }
         }
       } else if (action === "blur") {
-        // tweet.style.filter = "blur(10px)";
-        const tweetOverlay = OverlayWithRemoveButton(handle ?? "", tag);
+        const tweetOverlay = OverlayWithRemoveButton(
+          handle ?? "",
+          tag,
+          styleSettings,
+        );
         tweetArticle?.appendChild(tweetOverlay);
       } else if (action === "highlight") {
-        tweet.style.outline = "2px solid gold";
+        const highlighThickness = styleSettings.highlight.highlightThickness;
+        const highlightColor = styleSettings.highlight.highlightColor;
+        const highlightBorderRadius =
+          styleSettings.highlight.highlightBorderRadius;
+        const glowStrength = styleSettings.highlight.glowStrength;
+        tweet.style.cssText = `
+        outline: ${highlighThickness}px solid ${highlightColor};
+        border-radius: ${highlightBorderRadius}px;
+        box-shadow: 0 0 ${glowStrength}px ${highlightColor};
+        `;
       }
     }
   });
