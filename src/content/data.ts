@@ -30,7 +30,7 @@ export const tagIconMapper = (tag: string): string => {
       return circusSvg;
     case "fan_page":
       return fan;
-    case "sexually_explicit":
+    case "sexual":
       return forbid;
     default:
       return eyeBoltSvg;

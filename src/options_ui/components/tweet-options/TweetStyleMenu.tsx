@@ -32,7 +32,6 @@ export const TweetStyleMenu = () => {
   const [lastStyleValues, setLastStyleValues] = useState<
     StyleSettings | undefined
   >(undefined);
-  const [checked, setChecked] = useState(false);
 
   const valueLabelFormat = (value: number) => {
     const units = "px";
@@ -46,7 +45,10 @@ export const TweetStyleMenu = () => {
   };
 
   const onSetChecked = (value: boolean) => {
-    setChecked(value);
+    setStyleSettings((prev) => ({
+      ...prev,
+      hide: { ...prev.hide, blurHiddenTweetsOnUncollpase: value },
+    }));
   };
 
   const onChangeBlurValue = (value: number) => {
@@ -110,7 +112,6 @@ export const TweetStyleMenu = () => {
               <HideOptions
                 valueLabelFormat={valueLabelFormat}
                 styleSettings={styleSettings}
-                checked={checked}
                 onSetChecked={(value: boolean) => onSetChecked(value)}
                 onChangeHiddenTweetBlurValue={onChangeHiddenTweetBlurValue}
                 onChangeCollapsedTweetUsernameColor={
@@ -154,7 +155,7 @@ export const TweetStyleMenu = () => {
             <section>
               <p className="text-2xl font-bold">Hide Preview</p>
               <CollapsedTweet
-                blurTweet={checked}
+                blurTweet={styleSettings.hide.blurHiddenTweetsOnUncollpase}
                 collapsedTweetBlurValue={
                   styleSettings.hide.hiddenTweetBlurValue
                 }

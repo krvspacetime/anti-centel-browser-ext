@@ -21,7 +21,7 @@ export const TargetInput = ({
         type="search"
         value={inputVal}
         onChange={(e) => setInputVal(e.target.value)}
-        className="bg-tertiary w-full rounded-md indent-2 text-white placeholder:text-white/50"
+        className="w-full rounded-md bg-tertiary indent-2 text-white placeholder:text-white/50"
         style={{
           height: "35px",
         }}

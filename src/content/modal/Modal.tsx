@@ -8,13 +8,14 @@ export const Modal = () => {
       bottom: 0;
       height: 100vh;
       width: 100vw;
-      background: rgba(7, 23, 54, 0.57)
+      background: #33333357;
       display: flex;
       justify-content: center;
       align-items: center;
       backdrop-filter: blur(10px);
       pointer-events: auto;
       z-index: 10000;
+      overflow-y: auto;
   `;
 
   return modal;
@@ -23,18 +24,20 @@ export const Modal = () => {
 export const ModalContent = () => {
   const modalContent = document.createElement("div");
   modalContent.style.cssText = `
-      width: 100%;
-      height: 100%;
-      background: rgba(7, 23, 54, 0.57);
+      width: 50%;
+      height: 90%;
+      background: #33333357;
       color: white;
       padding: 20px;
+      margin: 30px 0px;
       border-radius: 8px;
       min-width: 300px;
-      outline: 1px solid white;
+      outline: 0.5px solid rgba(255,255,255,0.1);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      overflow-y: auto;
     `;
 
   return modalContent;
@@ -46,7 +49,7 @@ export const ModalTitle = (title: string) => {
   modalTitle.style.cssText = `
       font-size: 20px;
       font-weight: 600;
-      font-family: "Inter", sans-serif;
+      margin-top: 100px;
     `;
   return modalTitle;
 };
@@ -58,17 +61,18 @@ export const ModalButtons = (
   return categories.map((category) => {
     const button = document.createElement("button");
     button.style.cssText = `
-      width: 400px;
+      width: 220px;
       height: 40px;
       padding: 8px;
       margin: 4px 0;
-      background: rgba(92, 209, 198, 0.68);
+      background: #333;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       font-size: 14px;
       text-align: center;
+      border: 0.5px solid rgba(255,255,255,0.1)
     `;
     const categorySplit = category.split("_").join(" ");
     const categoryUpper =
@@ -91,14 +95,13 @@ export const ModalCancelButton = ({
   const cancelButton = document.createElement("button");
   cancelButton.textContent = label;
   cancelButton.style.cssText = `
-      width: 400px;
+      width: 220px;
       height: 40px;
       padding: 8px;
       margin-top: 16px;
-      background: rgba(215, 32, 46, 0.68);
-      outline: 2px solid red;
-      color: white;
-      border: none;
+      background: #333;
+      border: 0.5px solid rgba(255,255,255,0.1)
+      color: red;
       border-radius: 4px;
       cursor: pointer;
     `;

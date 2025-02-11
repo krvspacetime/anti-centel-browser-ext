@@ -26,7 +26,7 @@ const tagColor = (tag: Tags) => {
       return "blue";
     case Tags.CONSPIRACY:
       return "orange";
-    case Tags.SEXUALLY_EXPLICIT:
+    case Tags.SEXUAL:
       return "purple";
     case Tags.PARODY:
       return "green";

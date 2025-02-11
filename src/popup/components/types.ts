@@ -1,3 +1,5 @@
+// For popup.ts
+
 export interface TargetHandle {
   handle: string;
   tag: Tags;
@@ -14,5 +16,11 @@ export enum Tags {
   BOT = "bot",
   CONSPIRACY = "conspiracy",
   FAN_PAGE = "fan_page",
-  SEXUALLY_EXPLICIT = "sexually_explicit",
+  SEXUAL = "sexual",
+  TRUSTED = "trusted",
+  OFFICIAL = "official",
+  OTHER = "other",
+  JUNK = "junk",
+  WEIRDO = "weirdo",
+  JACKASS = "jackass",
 }

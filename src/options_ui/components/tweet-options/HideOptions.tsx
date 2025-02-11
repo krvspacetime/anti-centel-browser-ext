@@ -5,7 +5,6 @@ import { StyleSettings } from "./styleDefaults";
 
 interface HideOptionsProps {
   styleSettings: StyleSettings;
-  checked: boolean;
   onSetChecked: (value: boolean) => void;
   valueLabelFormat: (value: number) => string;
   onChangeHiddenTweetBlurValue: (value: number) => void;
@@ -15,7 +14,6 @@ interface HideOptionsProps {
 export const HideOptions = ({
   valueLabelFormat,
   styleSettings,
-  checked,
   onSetChecked,
   onChangeHiddenTweetBlurValue,
   onChangeCollapsedTweetUsernameColor,
@@ -56,7 +54,7 @@ export const HideOptions = ({
           color="dark.4"
           onLabel={sunIcon}
           offLabel={moonIcon}
-          checked={checked}
+          checked={styleSettings.hide.blurHiddenTweetsOnUncollpase}
           onChange={(e) => onSetChecked(e.currentTarget.checked)}
         />
       </div>
@@ -67,7 +65,7 @@ export const HideOptions = ({
         onChange={(value) => onChangeHiddenTweetBlurValue(value)}
         min={0}
         max={24}
-        disabled={!checked}
+        disabled={!styleSettings.hide.blurHiddenTweetsOnUncollpase}
       />
     </div>
   );

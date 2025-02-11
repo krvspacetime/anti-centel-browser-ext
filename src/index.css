@@ -9,8 +9,8 @@
 
   :root {
     --color-primary: #222831;
-    --color-secondary: #31363f;
-    --color-tertiary: #76abae;
+    --color-secondary: #333;
+    --color-tertiary: #242424;
     --color-quaternary: #eeeeee;
   }
 }

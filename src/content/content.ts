@@ -1,4 +1,3 @@
-import { CollapsedIndicator } from "./actions/hide/CollapsedIndicator";
 import {
   Modal,
   ModalButtons,
@@ -15,7 +14,8 @@ import {
 import { updateButtonState } from "./watchlist/WatchlistButtonUpdate";
 
 import { Tags, TargetHandle } from "./types";
-import { OverlayWithRemoveButton } from "./utils/StyleTweetUtils";
+import { CollapsedIndicator } from "./actions/hide/CollapsedIndicator";
+import { OverlayWithRemoveButton } from "./utils/styleTweetUtils";
 
 const TWEET_ARTICLE_QUERY_SELECTOR = 'article[data-testid="tweet"]';
 const TWEET_HANDLE_QUERY_SELECTOR = 'a[role="link"] span';
@@ -27,7 +27,7 @@ function createCategoryModal(
   return new Promise((resolve) => {
     const modal = Modal();
     const modalContent = ModalContent();
-    const title = ModalTitle(`Configure monitoring for ${handle}`);
+    const title = ModalTitle(`Monitor ${handle}`);
 
     // const tags = Object.keys(DEFAULT_STYLE_CONFIGS);
     const tags = Object.values(Tags);
@@ -145,12 +145,36 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
         tweet.style.overflow = "hidden";
         tweet.style.transition = "height 0.3s ease";
         tweet.style.outline = `${styleSettings.highlight.highlightThickness}px solid ${styleSettings.highlight.highlightColor}`;
-        tweet.style.backdropFilter = styleSettings.hide
-          .blurHiddenTweetsOnUncollpase
-          ? `blur(${styleSettings.blur.blurValue}px)`
-          : "blur(0px)";
+        // Create blur overlay
+        const blurOverlay = document.createElement("div");
+        blurOverlay.classList.add("tweet-blur-overlay");
+        blurOverlay.style.cssText = `
+             position: absolute;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background: rgba(0,0,0,0.1);
+             backdrop-filter: ${
+               styleSettings.hide.blurHiddenTweetsOnUncollpase
+                 ? `blur(${styleSettings.hide.hiddenTweetBlurValue}px)`
+                 : "none"
+             };
+             pointer-events: none;
+             z-index: 10;
+           `;
 
-        const tweetArticle = tweet.closest('article[data-testid="tweet"]');
+        if (tweet) {
+          // Remove any existing overlay first
+          const existingOverlay = tweet.querySelector(".tweet-blur-overlay");
+          existingOverlay?.remove();
+
+          // Position the overlay relatively to the tweet article
+          tweet.style.position = "relative";
+          tweet.appendChild(blurOverlay);
+        }
+
+        const tweetArticle = tweet.closest(TWEET_ARTICLE_QUERY_SELECTOR);
         if (tweetArticle && tweetArticle.parentElement) {
           const existingIndicator = tweetArticle.parentElement.querySelector(
             ".collapse-indicator",

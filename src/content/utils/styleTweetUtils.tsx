@@ -1,3 +1,4 @@
+import { eyeSvg } from "../../icons/icons";
 import { tagIconMapper } from "../data";
 import { StyleSettings } from "../types";
 
@@ -24,13 +25,13 @@ function createTweetOverlay(blurValue: number) {
 const createShowTweetButton = (onClick: () => void) => {
   const showTweetButton = document.createElement("button");
   showTweetButton.className = "show-tweet-button";
-  showTweetButton.textContent = "Show Tweet";
+  showTweetButton.innerHTML = `${eyeSvg}`;
   showTweetButton.style.cssText = `
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 8px 16px;
+    padding: 8px 8px 8px 8px;
     background: rgba(255,255,255,0.1);
     outline: rgba(255,255,255,0.3)
     color: black;
@@ -48,14 +49,14 @@ const createShowTweetButton = (onClick: () => void) => {
 const createHideTweetButton = (onClick: () => void) => {
   const hideTweetButton = document.createElement("button");
   hideTweetButton.className = "hide-tweet-button";
-  hideTweetButton.textContent = "Hide Tweet";
+  hideTweetButton.innerHTML = `${eyeSvg}`;
   hideTweetButton.style.cssText = `
     display: none;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 8px 16px;
+    padding: 8px 8px 8px 8px;
     background: rgba(255,255,255,0.1);
     outline: rgba(255,255,255,0.3)
     color: white;
@@ -81,8 +82,7 @@ const createTweetBadge = (handle: string, tag: string) => {
     padding: 4px 8px;
     border-radius: 4px;
     text-align: center;
-    font-size: 15px;
-    font-family: "Inter", sans-serif;
+    font-size: 11px;
     pointer-events: auto;
     z-index: 3;
   `;
@@ -104,7 +104,7 @@ const createTweetBadge = (handle: string, tag: string) => {
   tooltip.style.justifyContent = "center";
   tooltip.style.cssText = `
     visibility: visible;
-    font-size: 0.9 rem;
+    font-size: 0.4 rem;
     background-color: black;
     color: white;
     text-align: center;
@@ -159,22 +159,6 @@ const createButtonContainer = () => {
   `;
   return buttonContainer;
 };
-
-// export const createRemoveButton = (onClick: (e: MouseEvent) => void) => {
-//   const removeButton = document.createElement("button");
-//   removeButton.textContent = "X";
-//   removeButton.style.cssText = `
-//     display: none;
-//     color: white;
-//     border: none;
-//     border-radius: 4px;
-//     cursor: pointer;
-//   `;
-
-//   removeButton.addEventListener("click", onClick);
-
-//   return removeButton;
-// };
 
 export const OverlayWithRemoveButton = (
   handle: string,
