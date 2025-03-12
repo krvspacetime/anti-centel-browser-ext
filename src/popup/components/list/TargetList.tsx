@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Accordion, Button } from "@mantine/core";
+import { Accordion, Button, TextInput } from "@mantine/core";
 import { TargetInput } from "./TargetInput";
 import { TargetCategorySelect } from "./TargetCategorySelect";
 import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/styleConfig";
@@ -11,6 +11,7 @@ import { Tags } from "../types";
 export const TargetList = () => {
   const [inputVal, setInputVal] = useState("");
   const [targetHandles, setTargetHandles] = useState<TargetHandle[]>([]);
+  const [searchFilter, setSearchFilter] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Tags>(
     Tags.ON_WATCHLIST,
   );
@@ -81,36 +82,38 @@ export const TargetList = () => {
     switch (category) {
       case Tags.FAKE_NEWS:
         return "bg-red-500";
-      case "parody":
+      case Tags.PARODY:
         return "bg-blue-500";
-      case "satire":
-        return "bg-green-500";
       default:
         return "bg-gray-500";
     }
   };
 
-  const list = targetHandles.map((item, idx) => (
-    <div className="my-1 flex w-full gap-2 overflow-x-hidden px-2">
-      <p className="w-[45%] text-xs">{item.handle}</p>
-      <p className="w-[45%] text-center text-xs">{item.action}</p>
-      <div className="w-[45%]">
-        <p
-          className={`${categoryColors(
-            item.tag as Tags,
-          )} w-fit rounded px-2 text-center text-xs`}
+  const list = targetHandles
+    .filter((item) =>
+      item.handle.toLowerCase().includes(searchFilter.toLowerCase()),
+    )
+    .map((item, idx) => (
+      <div className="my-1 flex w-full gap-2 overflow-x-hidden px-2">
+        <p className="w-[45%] text-xs">{item.handle}</p>
+        <p className="w-[45%] text-center text-xs">{item.action}</p>
+        <div className="w-[45%]">
+          <p
+            className={`${categoryColors(
+              item.tag as Tags,
+            )} w-fit rounded px-2 text-center text-xs`}
+          >
+            {toProperCase(item.tag as Tags)}
+          </p>
+        </div>
+        <div
+          className="w-[10%] flex-none cursor-pointer text-end text-xs"
+          onClick={(e) => removeFromList(e, idx)}
         >
-          {toProperCase(item.tag as Tags)}
-        </p>
+          X
+        </div>
       </div>
-      <div
-        className="w-[10%] flex-none cursor-pointer text-end text-xs"
-        onClick={(e) => removeFromList(e, idx)}
-      >
-        X
-      </div>
-    </div>
-  ));
+    ));
   return (
     <div
       className="flex w-full flex-col justify-between"
@@ -136,6 +139,13 @@ export const TargetList = () => {
               list={targetHandles.map((th) => th.handle)}
             />
           </div>
+        </div>
+        <div className="mt-1 px-6">
+          <TextInput
+            placeholder="Filter list"
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}
+          />
         </div>
         <div className="text-white">
           <section className="mt-3 flex w-full flex-col items-center justify-center">

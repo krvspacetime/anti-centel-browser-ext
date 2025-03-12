@@ -30,8 +30,6 @@ const tagColor = (tag: Tags) => {
       return "purple";
     case Tags.PARODY:
       return "green";
-    case Tags.SATIRE:
-      return "brown";
     case Tags.FAN_PAGE:
       return "scarlet";
     default:

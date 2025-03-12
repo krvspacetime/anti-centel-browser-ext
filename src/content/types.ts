@@ -12,17 +12,13 @@ export enum Tags {
   FAKE_NEWS = "fake_news",
   SPAM = "spam",
   PARODY = "parody",
-  SATIRE = "satire",
   BOT = "bot",
   CONSPIRACY = "conspiracy",
   FAN_PAGE = "fan_page",
   SEXUAL = "sexual",
-  TRUSTED = "trusted",
   OFFICIAL = "official",
+  AD = "ad",
   OTHER = "other",
-  JUNK = "junk",
-  WEIRDO = "weirdo",
-  JACKASS = "jackass",
 }
 
 export interface StyleSettings {

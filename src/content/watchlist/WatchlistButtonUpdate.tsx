@@ -35,8 +35,8 @@ export function updateButtonState(
 
     const handleMouseEnter = () => {
       button.innerHTML = eyeOffSvg + " REMOVE";
-      button.style.backgroundColor = "#ff4444";
-      button.style.color = "white";
+      button.style.backgroundColor = "#ffffff";
+      button.style.color = "black";
     };
 
     const handleMouseLeave = () => {

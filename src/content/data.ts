@@ -1,42 +1,45 @@
 import {
-  articleOffSvg,
   circusSvg,
-  eyeBoltSvg,
+  goAlertSvg,
   eyeOffSvg,
   eyeSvg,
-  fan,
-  forbid,
-  horseShoeSvg,
-  robotSvg,
-  trashSvg,
-  windminllSvg,
+  tbRating18PlusSvg,
+  ciTrashSvg,
+  piBaseballCapSvg,
+  officialSvg,
+  fakeNewsSvg,
+  riRobot3LineSvg,
+  liaFanSolidSvg,
+  riAdvertisementLineSvg,
 } from "../icons/icons";
 
 export const tagIconMapper = (tag: string): string => {
   switch (tag) {
     case "on_watchlist":
-      return eyeBoltSvg;
+      return goAlertSvg;
     case "fake_news":
-      return articleOffSvg;
+      return fakeNewsSvg;
     case "spam":
-      return trashSvg;
+      return ciTrashSvg;
     case "bot":
-      return robotSvg;
-    case "satire":
-      return horseShoeSvg;
+      return riRobot3LineSvg;
     case "conspiracy":
-      return windminllSvg;
+      return piBaseballCapSvg;
     case "parody":
       return circusSvg;
     case "fan_page":
-      return fan;
+      return liaFanSolidSvg;
     case "sexual":
-      return forbid;
+      return tbRating18PlusSvg;
+    case "official":
+      return officialSvg;
+    case "ad":
+      return riAdvertisementLineSvg;
     default:
-      return eyeBoltSvg;
+      return goAlertSvg;
   }
 };
 
-export const DEFAULT_WATCHLIST_MONITOR_TEXT = `${eyeSvg} MONITOR`;
+export const DEFAULT_WATCHLIST_MONITOR_TEXT = `${eyeSvg}`;
 export const BUTTON_HOVER_TEXT_WHEN_IN_WATCHLIST = `${eyeOffSvg} REMOVE`;
-export const BUTTON_HOVER_TEXT_WHEN_NOT_IN_WATCHLIST = `${eyeBoltSvg} ADD`;
+// export const BUTTON_HOVER_TEXT_WHEN_NOT_IN_WATCHLIST = `${goAlertSvg} ADD`;
