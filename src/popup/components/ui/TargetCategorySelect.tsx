@@ -22,7 +22,7 @@ export const TargetCategorySelect = ({
   return (
     <select
       value={selectedCategory}
-      onChange={(e) => onCategoryChange(e.target.value as Tags)}
+      onChange={(e) => onCategoryChange(e.target.value.toLowerCase() as Tags)}
       className="h-full w-full rounded bg-tertiary px-2 text-white"
     >
       {categoryOptions.map((category) => {

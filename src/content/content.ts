@@ -280,7 +280,7 @@ new MutationObserver(highlightTargetAccounts).observe(document, {
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.targetHandles) {
     const targetHandles = changes.targetHandles.newValue || [];
-
+    console.log(targetHandles);
     // Update all watchlist buttons
     document
       .querySelectorAll<HTMLElement>(".watchlist-button")

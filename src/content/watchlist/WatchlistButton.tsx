@@ -1,5 +1,4 @@
 import { TargetHandle } from "../types";
-// import { DEFAULT_WATCHLIST_MONITOR_TEXT } from "../data";
 import { updateButtonState } from "./WatchlistButtonUpdate";
 
 export function WatchlistButton({
@@ -28,7 +27,7 @@ export function WatchlistButtonContainer(): HTMLElement {
   const container = document.createElement("div");
   container.className = "watchlist-button-container";
   container.style.cssText = `
-    margin-left: 4px;
+    margin-left: 2px;
   `;
   return container;
 }

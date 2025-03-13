@@ -1,18 +1,9 @@
-import { Button } from "@mantine/core";
-
 interface TargetInputProps {
   inputVal: string;
   setInputVal: (value: string) => void;
-  addToList: () => void;
-  list: string[];
 }
 
-export const TargetInput = ({
-  inputVal,
-  setInputVal,
-  addToList,
-  list,
-}: TargetInputProps) => {
+export const TargetInput = ({ inputVal, setInputVal }: TargetInputProps) => {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-2">
       <input
@@ -26,17 +17,6 @@ export const TargetInput = ({
           height: "35px",
         }}
       />
-      <Button
-        variant="filled"
-        color="var(--color-tertiary)"
-        onClick={addToList}
-        disabled={inputVal === "" || list.includes(inputVal)}
-      >
-        Add
-      </Button>
-      {list.includes(inputVal) && (
-        <div className="text-xs text-red-400">Already in list</div>
-      )}
     </div>
   );
 };

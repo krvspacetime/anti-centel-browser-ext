@@ -59,18 +59,6 @@ export const DEFAULT_STYLE_CONFIGS: { [key: string]: StyleConfig } = {
     contentBlur: "8px",
     tweetBlur: "8px",
   },
-  satire: {
-    label: "Satire",
-    value: "satire",
-    overlayColor: "#FF0000",
-    overlayOpacity: 0.5,
-    borderColor: "#FF0000",
-    borderWidth: 2,
-    borderRadius: 5,
-    buttonColor: "green",
-    contentBlur: "8px",
-    tweetBlur: "8px",
-  },
   conspiracy: {
     label: "Conspiracy",
     value: "conspiracy",

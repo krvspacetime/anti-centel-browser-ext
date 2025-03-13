@@ -1,4 +1,5 @@
 import { settings } from "../../../icons/icons";
+import { tagIconMapper } from "../../data";
 import { StyleSettings, Tags } from "../../types";
 import { SettingsDialog } from "./SettingsDialog";
 
@@ -10,32 +11,32 @@ interface CollapsedIndicatorProps {
   styleSettings: StyleSettings;
 }
 
-const tagColor = (tag: Tags) => {
-  // Log the incoming tag and enum value to debug
-  console.log("Tag:", tag);
-  console.log("Enum:", Tags.ON_WATCHLIST);
+// const tagColor = (tag: Tags) => {
+//   // Log the incoming tag and enum value to debug
+//   console.log("Tag:", tag);
+//   console.log("Enum:", Tags.ON_WATCHLIST);
 
-  switch (tag) {
-    case Tags.ON_WATCHLIST:
-      return "red";
-    case Tags.FAKE_NEWS:
-      return "yellow";
-    case Tags.SPAM:
-      return "red";
-    case Tags.BOT:
-      return "blue";
-    case Tags.CONSPIRACY:
-      return "orange";
-    case Tags.SEXUAL:
-      return "purple";
-    case Tags.PARODY:
-      return "green";
-    case Tags.FAN_PAGE:
-      return "scarlet";
-    default:
-      return "blue";
-  }
-};
+//   switch (tag) {
+//     case Tags.ON_WATCHLIST:
+//       return "red";
+//     case Tags.FAKE_NEWS:
+//       return "yellow";
+//     case Tags.SPAM:
+//       return "red";
+//     case Tags.BOT:
+//       return "blue";
+//     case Tags.CONSPIRACY:
+//       return "orange";
+//     case Tags.SEXUAL:
+//       return "purple";
+//     case Tags.PARODY:
+//       return "green";
+//     case Tags.FAN_PAGE:
+//       return "scarlet";
+//     default:
+//       return "blue";
+//   }
+// };
 
 export const CollapsedIndicator = ({
   tweet,
@@ -72,15 +73,17 @@ export const CollapsedIndicator = ({
 
     const tagSpan = document.createElement("span");
     tagSpan.textContent = tag;
-    const color = tagColor(tag);
+    tagSpan.innerHTML = `${tag} ${tagIconMapper(tag)} `;
     tagSpan.style.cssText = `
         color: white;
         font-weight: 500;
         font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         font-size: 13px;
-        background-color: ${color};
         padding: 2px 4px;
         border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
     `;
 
     textContainer.appendChild(document.createTextNode("Hidden tweet from "));

@@ -1,4 +1,4 @@
-import { TargetList } from "../list/TargetList";
+import { TargetList } from "../ui/TargetList";
 
 export const POPUP_WIDTH = "500px";
 export const POPUP_HEIGHT = "450px";

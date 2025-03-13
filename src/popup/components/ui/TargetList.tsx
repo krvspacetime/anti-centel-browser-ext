@@ -1,20 +1,26 @@
 import { useEffect, useState } from "react";
-import { Accordion, Button, TextInput } from "@mantine/core";
+import { Button, TextInput } from "@mantine/core";
 import { TargetInput } from "./TargetInput";
 import { TargetCategorySelect } from "./TargetCategorySelect";
 import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/styleConfig";
 import { TargetHandle } from "../../../content/types";
 import { toProperCase } from "../../../content/utils/utils";
 import { POPUP_HEIGHT } from "../layout/AppLayout";
-import { Tags } from "../types";
+import { Actions, Tags } from "../types";
+import { TargetActionSelect } from "./TargetActionSelect";
+import { LuAtSign } from "react-icons/lu";
 
 export const TargetList = () => {
-  const [inputVal, setInputVal] = useState("");
+  const [userhandle, setUserHandle] = useState("");
   const [targetHandles, setTargetHandles] = useState<TargetHandle[]>([]);
   const [searchFilter, setSearchFilter] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Tags>(
     Tags.ON_WATCHLIST,
   );
+  const [action, setAction] = useState("monitor");
+  const onActionChange = (action: string) => {
+    setAction(action);
+  };
 
   const removeFromList = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -41,14 +47,20 @@ export const TargetList = () => {
 
   const addToList = () => {
     setTargetHandles((prev) => {
-      if (!prev.some((item) => item.handle === inputVal) && inputVal !== "") {
+      if (
+        !prev.some((item) => item.handle === userhandle) &&
+        userhandle.trim() !== ""
+      ) {
         const newHandle: TargetHandle = {
-          handle: inputVal,
+          handle:
+            userhandle.trim()[0] !== "@"
+              ? "@" + userhandle.trim()
+              : userhandle.trim(),
           tag: selectedCategory,
-          action: "monitor",
+          action: action as Actions,
         };
         const updatedHandles = [...prev, newHandle];
-        setInputVal("");
+        setUserHandle("");
 
         // Update storage and notify content script
         chrome.storage.sync.set({ targetHandles: updatedHandles }, () => {
@@ -63,6 +75,11 @@ export const TargetList = () => {
       return prev;
     });
   };
+
+  const handleSettingsClick = () => {
+    chrome.runtime.openOptionsPage();
+  };
+
   useEffect(() => {
     // Fetch the latest targetHandles from storage on mount
     chrome.storage.sync.get("targetHandles", (data) => {
@@ -89,15 +106,25 @@ export const TargetList = () => {
     }
   };
 
+  const isUserHandleInList = (userHandle: string, list: string[]) => {
+    const normalizedHandle = userHandle.replace(/^@/, "").toLowerCase(); // Remove "@" if present and convert to lower case
+    return (
+      list.map((handle) => handle.toLowerCase()).includes(normalizedHandle) ||
+      list
+        .map((handle) => handle.toLowerCase())
+        .includes(`@${normalizedHandle}`)
+    );
+  };
+
   const list = targetHandles
     .filter((item) =>
       item.handle.toLowerCase().includes(searchFilter.toLowerCase()),
     )
     .map((item, idx) => (
-      <div className="my-1 flex w-full gap-2 overflow-x-hidden px-2">
-        <p className="w-[45%] text-xs">{item.handle}</p>
-        <p className="w-[45%] text-center text-xs">{item.action}</p>
-        <div className="w-[45%]">
+      <tr key={idx} className="text-center text-xs">
+        <td className="text-left">{item.handle}</td>
+        <td className="text-left">{item.action}</td>
+        <td className="text-center">
           <p
             className={`${categoryColors(
               item.tag as Tags,
@@ -105,14 +132,11 @@ export const TargetList = () => {
           >
             {toProperCase(item.tag as Tags)}
           </p>
-        </div>
-        <div
-          className="w-[10%] flex-none cursor-pointer text-end text-xs"
-          onClick={(e) => removeFromList(e, idx)}
-        >
-          X
-        </div>
-      </div>
+        </td>
+        <td>
+          <div onClick={(e) => removeFromList(e, idx)}>X</div>
+        </td>
+      </tr>
     ));
   return (
     <div
@@ -122,59 +146,92 @@ export const TargetList = () => {
         backgroundColor: "var(--color-secondary)",
       }}
     >
-      <section>
+      <section
+        style={{
+          backgroundColor: "var(--color-secondary)",
+        }}
+      >
         <div className="mb-2 flex w-full flex-col items-center justify-center gap-1 p-8">
           <div className="h-[35px] w-full">
             <TargetCategorySelect
               categories={Object.keys(DEFAULT_STYLE_CONFIGS)}
               selectedCategory={selectedCategory}
-              onCategoryChange={(category) => setSelectedCategory(category)}
+              onCategoryChange={(category) => {
+                setSelectedCategory(category);
+              }}
             />
           </div>
           <div className="h-[35px] w-full">
             <TargetInput
-              inputVal={inputVal}
-              setInputVal={(value) => setInputVal(value)}
-              addToList={addToList}
-              list={targetHandles.map((th) => th.handle)}
+              inputVal={userhandle}
+              setInputVal={(value) => setUserHandle(value)}
+            />
+          </div>
+          <div className="h-[35px] w-full">
+            <TargetActionSelect
+              action={action}
+              onActionChange={onActionChange}
+            />
+          </div>
+          <div>
+            <Button
+              variant="filled"
+              color="var(--color-tertiary)"
+              onClick={addToList}
+              disabled={
+                isUserHandleInList(
+                  userhandle,
+                  targetHandles.map((th) => th.handle),
+                ) || userhandle.trim() === ""
+              }
+            >
+              Add
+            </Button>
+            {isUserHandleInList(
+              userhandle,
+              targetHandles.map((th) => th.handle),
+            ) ? (
+              <div className="text-xs text-red-400">
+                Userhandle is already in the list.
+              </div>
+            ) : (
+              <></>
+            )}
+          </div>
+          <div className="w-full px-6">
+            <TextInput
+              leftSection={<LuAtSign />}
+              placeholder="Filter list"
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
             />
           </div>
         </div>
-        <div className="mt-1 px-6">
-          <TextInput
-            placeholder="Filter list"
-            value={searchFilter}
-            onChange={(e) => setSearchFilter(e.target.value)}
-          />
-        </div>
-        <div className="text-white">
-          <section className="mt-3 flex w-full flex-col items-center justify-center">
-            <Accordion className="w-full" defaultValue={"list"}>
-              <Accordion.Item value="list" className="w-full">
-                <Accordion.Control>Show/Hide List</Accordion.Control>
-                <Accordion.Panel className="max-h-[200px] overflow-y-auto">
-                  <div className="my-1 flex w-full gap-2 overflow-x-hidden px-2 text-sm font-bold">
-                    <p className="w-[45%]">User</p>
-                    <p className="w-[45%] indent-8">Action</p>
-                    <div className="w-[45%] indent-6">
-                      <p>Tag</p>
-                    </div>
-                    <div className="flex-none">Remove</div>
-                  </div>
-                  {list}
-                </Accordion.Panel>
-              </Accordion.Item>
-            </Accordion>
-          </section>
+        <div className="max-h-[200px] overflow-y-auto text-white">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="font-bold">
+                <th className="w-[50%] text-left">User</th>
+                <th className="w-fit text-left">Action</th>
+                <th className="w-fit text-left">Tag</th>
+                <th className="w-fit text-left">Remove</th>
+              </tr>
+            </thead>
+            <tbody>{list}</tbody>
+          </table>
         </div>
       </section>
-      <section className="my-2 flex justify-center">
+      <section
+        className="flex h-full w-full items-center justify-center"
+        style={{
+          backgroundColor: "var(--color-secondary)",
+        }}
+      >
         <Button
+          onClick={handleSettingsClick}
           size="xs"
           color="var(--color-tertiary)"
-          style={{
-            width: "200px",
-          }}
+          style={{ width: "200px", margin: "0.5rem 0rem" }}
         >
           SETTINGS
         </Button>

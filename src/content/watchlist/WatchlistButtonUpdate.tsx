@@ -2,11 +2,12 @@ import { TargetHandle } from "../types";
 import { tagIconMapper, DEFAULT_WATCHLIST_MONITOR_TEXT } from "../data";
 
 import { eyeOffSvg } from "../../icons/icons";
-export function updateButtonState(
+
+export const updateButtonState = (
   button: HTMLElement,
   isInTargetList: boolean,
   targetHandles?: TargetHandle[],
-): void {
+) => {
   const handle = button.dataset.handle;
   const targetInfo = targetHandles?.find((th) => th.handle === handle);
   const tag = targetInfo?.tag ?? "on_watchlist";
@@ -23,24 +24,35 @@ export function updateButtonState(
   if (oldMouseLeave) button.removeEventListener("mouseleave", oldMouseLeave);
 
   button.dataset.originalText = isInTargetList
-    ? tagIconMapper(tag) + " " + tagUpper
+    ? `${tagUpper} ${tagIconMapper(tag)}`
     : DEFAULT_WATCHLIST_MONITOR_TEXT;
   button.innerHTML =
     button.dataset.originalText ?? DEFAULT_WATCHLIST_MONITOR_TEXT;
 
   // Set up hover states
   if (isInTargetList) {
-    // Set initial state directly
-    button.innerHTML = `${tagIconMapper(tag)} ${tagUpper}`;
+    const span = document.createElement("span");
+    span.innerHTML = `${tagUpper} ${tagIconMapper(tag)}`;
+    span.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-weight: bold;
+    `;
+
+    // Clear existing children and append the new span
+    button.innerHTML = ""; // Clear existing content
+    button.appendChild(span);
 
     const handleMouseEnter = () => {
-      button.innerHTML = eyeOffSvg + " REMOVE";
+      button.innerHTML = eyeOffSvg + " Remove";
       button.style.backgroundColor = "#ffffff";
       button.style.color = "black";
+      button.style.fontWeight = "bold";
     };
 
     const handleMouseLeave = () => {
-      button.innerHTML = `${tagIconMapper(tag)} ${tagUpper}`;
+      button.innerHTML = `${tagUpper} ${tagIconMapper(tag)}`;
       button.style.backgroundColor = "transparent";
       button.style.color = "white";
     };
@@ -51,12 +63,38 @@ export function updateButtonState(
     button.onmouseenter = handleMouseEnter;
     button.onmouseleave = handleMouseLeave;
   } else {
+    const tooltip = document.createElement("div");
+    tooltip.innerText = "Add user";
+
     button.onmouseenter = null;
     button.onmouseleave = null;
     button.innerHTML = DEFAULT_WATCHLIST_MONITOR_TEXT;
+    button.style.cssText = `
+    position: relative;
+    `;
+    tooltip.style.cssText = `
+    position: absolute;
+    right: -55px;
+    bottom: -10px;
+    visibility: hidden;
+    background-color: white;
+    color: black;
+    z-index: 1000;
+    padding: 1px 3px;
+    border-radius: 2px;
+    `;
+    button.appendChild(tooltip);
+
+    button.addEventListener("mouseenter", () => {
+      tooltip.style.visibility = "visible";
+    });
+
+    button.addEventListener("mouseleave", () => {
+      tooltip.style.visibility = "hidden";
+    });
   }
 
-  button.style.cssText = `
+  button.style.cssText += `
       padding: 2px 8px;
       border-radius: 8px;
       font-size: 13px;
@@ -70,8 +108,7 @@ export function updateButtonState(
       display: flex;
       justify-content: center;
       align-items: center;
-      outline: 1px solid rgba(255, 255, 255, 0.3);
       transition: all 0.2s ease;
       ${!isInTargetList ? ":hover { background-color: #1da1f2; }" : ""}
     `;
-}
+};
