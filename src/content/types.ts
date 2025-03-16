@@ -22,10 +22,11 @@ export enum Tags {
 }
 
 export interface StyleSettings {
+  theme: "dark" | "light";
   blur: {
     blurValue: number;
   };
-  higlight: {
+  highlight: {
     highlightColor: string;
     highlighThickness: number;
     highlightBorderRadius: number;

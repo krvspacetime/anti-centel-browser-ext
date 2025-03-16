@@ -19,8 +19,7 @@ import { OverlayWithRemoveButton } from "./utils/styleTweetUtils";
 
 const TWEET_ARTICLE_QUERY_SELECTOR = 'article[data-testid="tweet"]';
 const TWEET_HANDLE_QUERY_SELECTOR = 'a[role="link"] span';
-// const TWEET_CONTENT_QUERY_SELECTOR = '[data-testid="tweetText"]';
-// Update the createCategoryModal function to include action selection
+
 function createCategoryModal(
   handle: string,
 ): Promise<{ tag: Tags; action: TargetHandle["action"] } | null> {

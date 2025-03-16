@@ -15,9 +15,8 @@ A Chrome/Firefox extension for monitoring and managing Twitter accounts with con
 ## Features
 
 1. **Tweet Management**
-   - Hide tweets
-   - Highlight tweets
-   - Blur tweets
+   - Hide/Blur tweets
+   - Highlight suspicious accounts
 2. **Watchlist System**
 3. **Custom Styling**
 4. **Options UI**
@@ -39,8 +38,6 @@ chrome://extensions
 ```
 
 ### Firefox
-
-## **_IMPORTANT_:** Copy contents of `manifest-firefox.json` to `manifest.json` before building.
 
 ```bash
 # 1. Build Firefox version
@@ -118,7 +115,7 @@ graph TD
     E --> F[Options UI]
 ```
 
-### Project Structure
+### Code Structure
 
 ```
 src/
@@ -134,3 +131,21 @@ src/
 │   └── options.html       # config page
 └── background/            # service workers
 ```
+
+## Project Structure
+
+```
+├── src
+│   ├── content/        # Twitter DOM manipulation
+│   ├── popup/         # Extension popup UI
+│   ├── options_ui/    # User configuration
+│   ├── background/    # Service workers
+│   └── icons/         # SVG assets
+```
+
+## Dependencies
+
+- @mantine/core
+- @chakra-ui/react
+- chrome-types
+- postcss
