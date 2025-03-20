@@ -163,6 +163,7 @@ export const TweetStyleMenu = () => {
                 collapsedTweetColor={
                   styleSettings.hide.collapsedTweetUsernameColor
                 }
+                isDarkTheme={styleSettings.theme === "dark"}
               />
             </section>
           )}

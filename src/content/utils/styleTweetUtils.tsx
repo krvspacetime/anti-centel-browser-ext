@@ -2,7 +2,8 @@ import { eyeSvg } from "../../icons/icons";
 import { tagIconMapper } from "../data";
 import { StyleSettings } from "../types";
 
-function createTweetOverlay(blurValue: number) {
+function createTweetOverlay(blurValue: number, styleSettings: StyleSettings) {
+  const isDarkTheme = styleSettings.theme === "dark";
   const overlay = document.createElement("div");
   overlay.className = "tweet-overlay";
   overlay.style.cssText = `
@@ -11,10 +12,10 @@ function createTweetOverlay(blurValue: number) {
     left: 0;
     width: 100%;
     height: 100%;
-    background: "none";
+    background: ${isDarkTheme ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)"};
     pointer-events: auto;
     backdrop-filter: blur(${blurValue}px);
-    outline: 1px solid gold;
+    outline: 1px solid ${isDarkTheme ? "gold" : "#1da1f2"};
     pointer-events: none;
     z-index: 2
   `;
@@ -22,7 +23,8 @@ function createTweetOverlay(blurValue: number) {
   return overlay;
 }
 
-const createShowTweetButton = (onClick: () => void) => {
+const createShowTweetButton = (onClick: () => void, styleSettings: StyleSettings) => {
+  const isDarkTheme = styleSettings.theme === "dark";
   const showTweetButton = document.createElement("button");
   showTweetButton.className = "show-tweet-button";
   showTweetButton.innerHTML = `${eyeSvg}`;
@@ -32,9 +34,9 @@ const createShowTweetButton = (onClick: () => void) => {
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 8px 8px 8px 8px;
-    background: rgba(255,255,255,0.1);
-    outline: rgba(255,255,255,0.3)
-    color: black;
+    background: ${isDarkTheme ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"};
+    outline: ${isDarkTheme ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"};
+    color: ${isDarkTheme ? "white" : "black"};
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -46,7 +48,8 @@ const createShowTweetButton = (onClick: () => void) => {
   return showTweetButton;
 };
 
-const createHideTweetButton = (onClick: () => void) => {
+const createHideTweetButton = (onClick: () => void, styleSettings: StyleSettings) => {
+  const isDarkTheme = styleSettings.theme === "dark";
   const hideTweetButton = document.createElement("button");
   hideTweetButton.className = "hide-tweet-button";
   hideTweetButton.innerHTML = `${eyeSvg}`;
@@ -57,9 +60,9 @@ const createHideTweetButton = (onClick: () => void) => {
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 8px 8px 8px 8px;
-    background: rgba(255,255,255,0.1);
-    outline: rgba(255,255,255,0.3)
-    color: white;
+    background: ${isDarkTheme ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"};
+    outline: ${isDarkTheme ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"};
+    color: ${isDarkTheme ? "white" : "black"};
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -71,14 +74,15 @@ const createHideTweetButton = (onClick: () => void) => {
   return hideTweetButton;
 };
 
-const createTweetBadge = (handle: string, tag: string) => {
+const createTweetBadge = (handle: string, tag: string, styleSettings: StyleSettings) => {
+  const isDarkTheme = styleSettings.theme === "dark";
   const badgeContainer = document.createElement("div");
   badgeContainer.style.cssText = `
     position: absolute;
     top: 1%;
     right: 1%;
     background: transparent;
-    color: white;
+    color: ${isDarkTheme ? "white" : "black"};
     padding: 4px 8px;
     border-radius: 4px;
     text-align: center;
@@ -105,8 +109,8 @@ const createTweetBadge = (handle: string, tag: string) => {
   tooltip.style.cssText = `
     visibility: visible;
     font-size: 0.4 rem;
-    background-color: black;
-    color: white;
+    background-color: ${isDarkTheme ? "black" : "#1da1f2"};
+    color: ${isDarkTheme ? "white" : "white"};
     text-align: center;
     border-radius: 4px;
     padding: 5px;
@@ -165,23 +169,23 @@ export const OverlayWithRemoveButton = (
   category: string,
   styleSettings: StyleSettings,
 ) => {
-  const overlay = createTweetOverlay(styleSettings.blur.blurValue);
+  const overlay = createTweetOverlay(styleSettings.blur.blurValue, styleSettings);
   const buttonContainer = createButtonContainer();
-  const badge = createTweetBadge(handle, category);
+  const badge = createTweetBadge(handle, category, styleSettings);
 
   const showButton = createShowTweetButton(() => {
     overlay.style.backdropFilter = `blur(0px)`;
     showButton.style.display = "none";
     hideButton.style.display = "block";
     badge.style.display = "none";
-  });
+  }, styleSettings);
 
   const hideButton = createHideTweetButton(() => {
     overlay.style.backdropFilter = `blur(${styleSettings.blur.blurValue}px)`; // Use blur value from styleSettings
     showButton.style.display = "block";
     hideButton.style.display = "none";
     badge.style.display = "block";
-  });
+  }, styleSettings);
 
   overlay.appendChild(buttonContainer);
   buttonContainer.appendChild(showButton);

@@ -135,6 +135,10 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
     console.log("Style Settings:", styleSettings);
     const targetInfo = targetHandles.find((th) => th.handle === handle);
     const tweetArticle = tweet.closest('article[data-testid="tweet"]');
+
+    // Determine if we're in dark or light theme
+    const isDarkTheme = styleSettings.theme === "dark";
+
     if (isInTargetList) {
       const tag = targetInfo?.tag || "on_watchlist";
       const action = targetInfo?.action || "monitor";
@@ -153,7 +157,7 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
              left: 0;
              width: 100%;
              height: 100%;
-             background: rgba(0,0,0,0.1);
+             background: ${isDarkTheme ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)"};
              backdrop-filter: ${
                styleSettings.hide.blurHiddenTweetsOnUncollpase
                  ? `blur(${styleSettings.hide.hiddenTweetBlurValue}px)`
@@ -205,10 +209,16 @@ function styleTargetTweets(isInTargetList: boolean, tweet: HTMLElement): void {
         const highlightBorderRadius =
           styleSettings.highlight.highlightBorderRadius;
         const glowStrength = styleSettings.highlight.glowStrength;
+
+        // Adjust highlight color for better visibility based on theme
+        const effectiveHighlightColor = isDarkTheme
+          ? highlightColor
+          : highlightColor;
+
         tweet.style.cssText = `
-        outline: ${highlighThickness}px solid ${highlightColor};
+        outline: ${highlighThickness}px solid ${effectiveHighlightColor};
         border-radius: ${highlightBorderRadius}px;
-        box-shadow: 0 0 ${glowStrength}px ${highlightColor};
+        box-shadow: 0 0 ${glowStrength}px ${effectiveHighlightColor};
         `;
       }
     }
@@ -269,7 +279,13 @@ function highlightTargetAccounts(): void {
 }
 
 // Initial setup and mutation observer
-document.addEventListener("DOMContentLoaded", highlightTargetAccounts);
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOMContentLoaded event fired");
+  highlightTargetAccounts();
+  detectAndSetTheme();
+});
+
+// Observer for tweet changes
 new MutationObserver(highlightTargetAccounts).observe(document, {
   subtree: true,
   childList: true,
@@ -293,4 +309,142 @@ chrome.storage.onChanged.addListener((changes) => {
         }
       });
   }
+  
+  if (changes.styleSettings) {
+    console.log("Style settings changed:", changes.styleSettings.newValue);
+    // Re-apply styles with the new theme
+    document
+      .querySelectorAll<HTMLElement>(TWEET_ARTICLE_QUERY_SELECTOR)
+      .forEach((tweet) => {
+        tweet.dataset.processed = "false"; // Reset processed state
+      });
+    
+    // Re-apply styles with the new theme
+    highlightTargetAccounts();
+  }
 });
+
+// Run theme detection immediately
+detectAndSetTheme();
+
+/**
+ * Detects the current theme from the HTML tag and sets it in storage
+ */
+function detectAndSetTheme(): void {
+  // Initial theme detection
+  console.log("Detecting theme...");
+  const currentTheme = getCurrentTheme();
+  updateThemeInStorage(currentTheme);
+  
+  // Set up observer for theme changes
+  const htmlElement = document.documentElement;
+  const themeObserver = new MutationObserver((mutations) => {
+    console.log("MutationObserver triggered", mutations);
+    mutations.forEach((mutation) => {
+      if (
+        mutation.type === "attributes" && 
+        mutation.attributeName === "style" &&
+        mutation.target === htmlElement
+      ) {
+        console.log("Style attribute changed");
+        const newTheme = getCurrentTheme();
+        updateThemeInStorage(newTheme);
+      }
+    });
+  });
+  
+  // Start observing the HTML element for style attribute changes
+  themeObserver.observe(htmlElement, { attributes: true, attributeFilter: ["style"] });
+  console.log("Theme observer set up");
+}
+
+/**
+ * Gets the current theme from the HTML element's color-scheme attribute
+ */
+function getCurrentTheme(): "dark" | "light" {
+  console.log("Getting current theme...");
+  const htmlElement = document.documentElement;
+  const styleAttribute = htmlElement.getAttribute("style") || "";
+  console.log("Style attribute:", styleAttribute);
+  
+  // Check if the color-scheme is specified in the style attribute
+  if (styleAttribute.includes("color-scheme: dark")) {
+    console.log("dark");
+    return "dark";
+  } else if (styleAttribute.includes("color-scheme: light")) {
+    console.log("light");
+    return "light";
+  }
+  
+  // Default to dark if not specified
+  console.log("No color-scheme found, defaulting to dark");
+  return "dark";
+}
+
+/**
+ * Updates the theme in storage and refreshes styles if needed
+ */
+function updateThemeInStorage(theme: "dark" | "light"): void {
+  chrome.storage.sync.get("styleSettings", (data) => {
+    let styleSettings = data.styleSettings || {};
+    console.log("Current styleSettings:", styleSettings);
+    
+    // Initialize styleSettings with default values if it's empty
+    if (!styleSettings.theme) {
+      styleSettings = {
+        theme: theme,
+        blur: {
+          blurValue: 5,
+        },
+        highlight: {
+          highlightColor: "#1DA1F2",
+          highlightThickness: 2,
+          highlightBorderRadius: 4,
+          glowStrength: 5,
+        },
+        hide: {
+          hiddenTweetBlurValue: 5,
+          blurHiddenTweetsOnUncollpase: true,
+          collapsedTweetUsernameColor: theme === "dark" ? "#FFFFFF" : "#000000",
+        },
+      };
+      console.log("Initialized default styleSettings:", styleSettings);
+    } else {
+      // Only update if the theme has changed
+      if (styleSettings.theme !== theme) {
+        console.log(`Theme changed to: ${theme}`);
+        
+        // Update the theme in storage
+        styleSettings.theme = theme;
+        
+        // Adjust icon and text colors based on theme
+        if (theme === "dark") {
+          // Dark theme settings
+          styleSettings.highlight.highlightColor = styleSettings.highlight.highlightColor || "#1DA1F2";
+          styleSettings.hide.collapsedTweetUsernameColor = styleSettings.hide.collapsedTweetUsernameColor || "#FFFFFF";
+        } else {
+          // Light theme settings
+          styleSettings.highlight.highlightColor = styleSettings.highlight.highlightColor || "#1DA1F2";
+          styleSettings.hide.collapsedTweetUsernameColor = styleSettings.hide.collapsedTweetUsernameColor || "#000000";
+        }
+      } else {
+        console.log(`Theme unchanged: ${theme}`);
+        return; // No need to update storage if theme hasn't changed
+      }
+    }
+    
+    // Save updated settings to storage
+    chrome.storage.sync.set({ styleSettings }, () => {
+      console.log("Updated styleSettings in storage:", styleSettings);
+      // Refresh all styled elements to apply the new theme
+      document
+        .querySelectorAll<HTMLElement>(TWEET_ARTICLE_QUERY_SELECTOR)
+        .forEach((tweet) => {
+          tweet.dataset.processed = "false"; // Reset processed state
+        });
+      
+      // Re-apply styles with the new theme
+      highlightTargetAccounts();
+    });
+  });
+}

@@ -11,33 +11,6 @@ interface CollapsedIndicatorProps {
   styleSettings: StyleSettings;
 }
 
-// const tagColor = (tag: Tags) => {
-//   // Log the incoming tag and enum value to debug
-//   console.log("Tag:", tag);
-//   console.log("Enum:", Tags.ON_WATCHLIST);
-
-//   switch (tag) {
-//     case Tags.ON_WATCHLIST:
-//       return "red";
-//     case Tags.FAKE_NEWS:
-//       return "yellow";
-//     case Tags.SPAM:
-//       return "red";
-//     case Tags.BOT:
-//       return "blue";
-//     case Tags.CONSPIRACY:
-//       return "orange";
-//     case Tags.SEXUAL:
-//       return "purple";
-//     case Tags.PARODY:
-//       return "green";
-//     case Tags.FAN_PAGE:
-//       return "scarlet";
-//     default:
-//       return "blue";
-//   }
-// };
-
 export const CollapsedIndicator = ({
   tweet,
   handle,
@@ -46,19 +19,29 @@ export const CollapsedIndicator = ({
   styleSettings,
 }: CollapsedIndicatorProps) => {
   if (action === "hide") {
+    // Determine if we're in dark or light theme
+    const isDarkTheme = styleSettings.theme === "dark";
+    const textColor = isDarkTheme ? "#71767b" : "#536471";
+    const usernameColor = isDarkTheme
+      ? styleSettings.hide.collapsedTweetUsernameColor
+      : "#000000";
+
     // Create collapse indicator
     const collapseIndicator = document.createElement("div");
     collapseIndicator.className = "collapse-indicator";
     collapseIndicator.style.cssText = `
         width: 100%;
-        padding: 8px;
-        color: #71767b;
+        color: ${textColor};
+        padding-left: 4px;
+        padding-top: 1px;
+        padding-bottom: 1px;
         font-size: 13px;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
         cursor: pointer;
+        background-color: ${isDarkTheme ? "transparent" : "rgb(215 222 222)"};
       `;
 
     // Create text container with styled handle and tag
@@ -67,7 +50,7 @@ export const CollapsedIndicator = ({
     const handleSpan = document.createElement("span");
     handleSpan.textContent = handle;
     handleSpan.style.cssText = `
-        color: ${styleSettings.hide.collapsedTweetUsernameColor};
+        color: ${usernameColor};
         font-weight: 600;
     `;
 
@@ -75,11 +58,10 @@ export const CollapsedIndicator = ({
     tagSpan.textContent = tag;
     tagSpan.innerHTML = `${tag} ${tagIconMapper(tag)} `;
     tagSpan.style.cssText = `
-        color: white;
+        color: ${isDarkTheme ? styleSettings.hide.collapsedTweetUsernameColor : "#000000"};
         font-weight: 500;
         font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         font-size: 13px;
-        padding: 2px 4px;
         border-radius: 4px;
         display: inline-flex;
         align-items: center;
@@ -95,12 +77,12 @@ export const CollapsedIndicator = ({
     const optionsButton = document.createElement("button");
     optionsButton.innerHTML = settings;
     optionsButton.style.cssText = `
-        background: none;
+        background: transparent;
         border: none;
-        color: #71767b;
         cursor: pointer;
-        padding: 0 8px;
+        margin-right: 4px;
     `;
+    optionsButton.style.color = isDarkTheme ? "white" : "black";
 
     const dialog = SettingsDialog(handle, tag);
 

@@ -1,4 +1,4 @@
-import { TargetHandle } from "../types";
+import { TargetHandle, StyleSettings } from "../types";
 import { tagIconMapper, DEFAULT_WATCHLIST_MONITOR_TEXT } from "../data";
 
 import { eyeOffSvg } from "../../icons/icons";
@@ -29,86 +29,94 @@ export const updateButtonState = (
   button.innerHTML =
     button.dataset.originalText ?? DEFAULT_WATCHLIST_MONITOR_TEXT;
 
-  // Set up hover states
-  if (isInTargetList) {
-    const span = document.createElement("span");
-    span.innerHTML = `${tagUpper} ${tagIconMapper(tag)}`;
-    span.style.cssText = `
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      font-weight: bold;
-    `;
-
-    // Clear existing children and append the new span
-    button.innerHTML = ""; // Clear existing content
-    button.appendChild(span);
-
-    const handleMouseEnter = () => {
-      button.innerHTML = eyeOffSvg + " Remove";
-      button.style.backgroundColor = "#ffffff";
-      button.style.color = "black";
-      button.style.fontWeight = "bold";
+  // Get current theme from storage
+  chrome.storage.sync.get("styleSettings", (data) => {
+    const styleSettings = (data.styleSettings as StyleSettings) || {
+      theme: "dark",
     };
+    const isDarkTheme = styleSettings.theme === "dark";
 
-    const handleMouseLeave = () => {
-      button.innerHTML = `${tagUpper} ${tagIconMapper(tag)}`;
-      button.style.backgroundColor = "transparent";
-      button.style.color = "white";
-    };
+    // Set up hover states
+    if (isInTargetList) {
+      const span = document.createElement("span");
+      span.innerHTML = `${tagUpper} ${tagIconMapper(tag)}`;
+      span.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        font-weight: bold;
+      `;
 
-    button.addEventListener("mouseenter", handleMouseEnter);
-    button.addEventListener("mouseleave", handleMouseLeave);
+      // Clear existing children and append the new span
+      button.innerHTML = ""; // Clear existing content
+      button.appendChild(span);
 
-    button.onmouseenter = handleMouseEnter;
-    button.onmouseleave = handleMouseLeave;
-  } else {
-    const tooltip = document.createElement("div");
-    tooltip.innerText = "Add user";
+      const handleMouseEnter = () => {
+        button.innerHTML = eyeOffSvg + " Remove";
+        button.style.backgroundColor = isDarkTheme ? "#ffffff" : "#1da1f2";
+        button.style.color = isDarkTheme ? "black" : "white";
+        button.style.fontWeight = "bold";
+      };
 
-    button.onmouseenter = null;
-    button.onmouseleave = null;
-    button.innerHTML = DEFAULT_WATCHLIST_MONITOR_TEXT;
-    button.style.cssText = `
-    position: relative;
-    `;
-    tooltip.style.cssText = `
-    position: absolute;
-    right: -55px;
-    bottom: -10px;
-    visibility: hidden;
-    background-color: white;
-    color: black;
-    z-index: 1000;
-    padding: 1px 3px;
-    border-radius: 2px;
-    `;
-    button.appendChild(tooltip);
+      const handleMouseLeave = () => {
+        button.innerHTML = `${tagUpper} ${tagIconMapper(tag)}`;
+        button.style.backgroundColor = "transparent";
+        button.style.color = isDarkTheme ? "white" : "black";
+      };
 
-    button.addEventListener("mouseenter", () => {
-      tooltip.style.visibility = "visible";
-    });
+      button.addEventListener("mouseenter", handleMouseEnter);
+      button.addEventListener("mouseleave", handleMouseLeave);
 
-    button.addEventListener("mouseleave", () => {
-      tooltip.style.visibility = "hidden";
-    });
-  }
+      button.onmouseenter = handleMouseEnter;
+      button.onmouseleave = handleMouseLeave;
+    } else {
+      const tooltip = document.createElement("div");
+      tooltip.innerText = "Add user";
 
-  button.style.cssText += `
-      padding: 2px 8px;
-      border-radius: 8px;
-      font-size: 13px;
-      cursor: pointer;
-      background-color: transparent;
-      color: white;
-      border: none;
-      line-height: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      white-space: nowrap;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: all 0.2s ease;
-      ${!isInTargetList ? ":hover { background-color: #1da1f2; }" : ""}
-    `;
+      button.onmouseenter = null;
+      button.onmouseleave = null;
+      button.innerHTML = DEFAULT_WATCHLIST_MONITOR_TEXT;
+      button.style.cssText = `
+      position: relative;
+      `;
+      tooltip.style.cssText = `
+      position: absolute;
+      right: -55px;
+      bottom: -10px;
+      visibility: hidden;
+      background-color: ${isDarkTheme ? "white" : "#1da1f2"};
+      color: ${isDarkTheme ? "black" : "white"};
+      z-index: 1000;
+      padding: 1px 3px;
+      border-radius: 2px;
+      `;
+      button.appendChild(tooltip);
+
+      button.addEventListener("mouseenter", () => {
+        tooltip.style.visibility = "visible";
+      });
+
+      button.addEventListener("mouseleave", () => {
+        tooltip.style.visibility = "hidden";
+      });
+    }
+
+    button.style.cssText += `
+        padding: 2px 8px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        background-color: transparent;
+        color: ${isDarkTheme ? "white" : "black"};
+        border: none;
+        line-height: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        white-space: nowrap;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.2s ease;
+        ${!isInTargetList ? `:hover { background-color: ${isDarkTheme ? "#1da1f2" : "#e8f5fd"}; color: ${isDarkTheme ? "white" : "#1da1f2"}; }` : ""}
+      `;
+  });
 };
