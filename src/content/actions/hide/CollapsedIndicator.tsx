@@ -32,7 +32,7 @@ export const CollapsedIndicator = ({
     collapseIndicator.style.cssText = `
         width: 100%;
         color: ${textColor};
-        padding-left: 4px;
+        padding-left: 4px;--
         padding-top: 1px;
         padding-bottom: 1px;
         font-size: 13px;
