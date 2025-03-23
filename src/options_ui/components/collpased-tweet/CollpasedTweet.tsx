@@ -9,7 +9,6 @@ interface CollapsedTweetProps {
   collapsedTweetBlurValue: number;
   collapsedTweetColor: string;
   resetBlurValue: () => void;
-  isDarkTheme: boolean;
 }
 
 const SAMPLE_IMG = "img1.jpg";
@@ -21,7 +20,6 @@ export const CollapsedTweet = ({
   collapsedTweetBlurValue,
   resetBlurValue,
   collapsedTweetColor,
-  isDarkTheme,
 }: CollapsedTweetProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
@@ -36,7 +34,7 @@ export const CollapsedTweet = ({
         <div
           style={{
             width: `calc(${MOCK_TWEET_WIDTH} - 50px)` || `MOCK_TWEET_WIDTH`,
-            color: isDarkTheme ? "white" : "black",
+            color: "white",
           }}
         >
           Hidden tweet from{" "}

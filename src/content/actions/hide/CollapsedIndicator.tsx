@@ -32,7 +32,7 @@ export const CollapsedIndicator = ({
     collapseIndicator.style.cssText = `
         width: 100%;
         color: ${textColor};
-        padding-left: 4px;--
+        padding-left: 4px;
         padding-top: 1px;
         padding-bottom: 1px;
         font-size: 13px;
@@ -101,29 +101,60 @@ export const CollapsedIndicator = ({
       }
     });
 
+    // Add a data attribute to track the collapsed state
+    tweet.dataset.collapsed = "true";
+    
+    // Store the original height for future reference
+    const originalHeight = tweet.scrollHeight;
+    
+    // Set initial state
+    tweet.style.height = "0px";
+    
+    // Keep track of any ongoing animations
+    let animationInProgress = false;
+    
     // Update the click handler to modify text properly
     collapseIndicator.addEventListener("click", (e) => {
-      if (e.target !== optionsButton) {
-        const currentHeight = tweet.style.height;
-        if (currentHeight === "0px") {
-          tweet.style.height = `${tweet.scrollHeight}px`;
+      if (e.target !== optionsButton && !animationInProgress) {
+        // Set flag to prevent multiple clicks during animation
+        animationInProgress = true;
+        
+        // Get current state
+        const isCurrentlyCollapsed = tweet.dataset.collapsed === "true";
+        
+        // Add transition for smooth animation
+        tweet.style.transition = "height 0.3s ease";
+        
+        // Set the height based on collapsed state
+        if (isCurrentlyCollapsed) {
+          // Expanding: Set to the stored original height
+          tweet.style.height = `${originalHeight}px`;
+          
+          // Update the text
           textContainer.textContent = ""; // Clear existing content
-          textContainer.appendChild(
-            document.createTextNode("Showing tweet from "),
-          );
+          textContainer.appendChild(document.createTextNode("Showing tweet from "));
           textContainer.appendChild(handleSpan.cloneNode(true));
           textContainer.appendChild(document.createTextNode(" - "));
           textContainer.appendChild(tagSpan.cloneNode(true));
         } else {
+          // Collapsing: Set to 0
           tweet.style.height = "0px";
+          
+          // Update the text
           textContainer.textContent = ""; // Clear existing content
-          textContainer.appendChild(
-            document.createTextNode("Hidden tweet from "),
-          );
+          textContainer.appendChild(document.createTextNode("Hidden tweet from "));
           textContainer.appendChild(handleSpan.cloneNode(true));
           textContainer.appendChild(document.createTextNode(" - "));
           textContainer.appendChild(tagSpan.cloneNode(true));
         }
+        
+        // Toggle the collapsed state
+        tweet.dataset.collapsed = isCurrentlyCollapsed ? "false" : "true";
+        
+        // Wait for animation to complete before allowing another click
+        setTimeout(() => {
+          animationInProgress = false;
+        }, 350); // Slightly longer than the animation to ensure it completes
       }
     });
 

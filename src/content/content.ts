@@ -472,6 +472,7 @@ function updateThemeInStorage(theme: "dark" | "light"): void {
     if (!styleSettings.theme) {
       styleSettings = {
         theme: theme,
+        hideUserDetails: true,
         blur: {
           blurValue: 5,
         },
@@ -510,13 +511,16 @@ function updateThemeInStorage(theme: "dark" | "light"): void {
           styleSettings.hide.collapsedTweetUsernameColor =
             styleSettings.hide.collapsedTweetUsernameColor || "#000000";
         }
-      } else {
-        console.log(`Theme unchanged: ${theme}`);
-        return; // No need to update storage if theme hasn't changed
+      }
+      
+      // Ensure hideUserDetails exists (might be missing in older saved settings)
+      if (styleSettings.hideUserDetails === undefined) {
+        styleSettings.hideUserDetails = false; // Default value from styleDefaults.ts
+        console.log("Added missing hideUserDetails property:", styleSettings);
       }
     }
 
-    // Save updated settings to storage
+    // Save the updated styleSettings back to storage
     chrome.storage.sync.set({ styleSettings }, () => {
       console.log("Updated styleSettings in storage:", styleSettings);
       // Refresh all styled elements to apply the new theme
@@ -585,14 +589,14 @@ function addGlobalStyles(styleSettings: any) {
 
   styleTag.textContent = `
     .tweet-hidden {
-      height: 0px !important;
-      overflow: hidden !important;
-      position: relative !important;
-      transition: height 0.3s ease !important;
-      display: flex !important; /* Ensure it's not display:none which would prevent transitions */
+      height: 0px;
+      overflow: hidden;
+      position: relative;
+      transition: height 0.3s ease;
+      display: flex; /* Ensure it's not display:none which would prevent transitions */
     }
     .tweet-highlighted {
-      position: relative !important;
+      position: relative;
       outline: ${styleSettings.highlight.highlightThickness}px solid ${styleSettings.highlight.highlightColor} !important;
       border-radius: ${styleSettings.highlight.highlightBorderRadius}px !important;
       box-shadow: 0 0 ${styleSettings.highlight.glowStrength}px ${styleSettings.highlight.highlightColor} !important;
@@ -642,7 +646,17 @@ function init() {
 
   // Get styleSettings first, then initialize everything else
   chrome.storage.sync.get("styleSettings", (data) => {
-    const styleSettings = data.styleSettings || {};
+    let styleSettings = data.styleSettings || {};
+    
+    // Ensure hideUserDetails exists with a default value if it's missing
+    if (styleSettings.hideUserDetails === undefined) {
+      styleSettings.hideUserDetails = false; // Default from styleDefaults.ts
+      
+      // Save the updated settings back to storage
+      chrome.storage.sync.set({ styleSettings }, () => {
+        console.log("Added missing hideUserDetails to styleSettings:", styleSettings);
+      });
+    }
 
     // Add global styles with styleSettings
     addGlobalStyles(styleSettings);
@@ -650,6 +664,11 @@ function init() {
     // Continue with other initialization
     detectAndSetTheme();
     highlightTargetAccounts();
+    
+    // Call hideUserDetails if enabled
+    if (styleSettings.hideUserDetails) {
+      hideUserDetails();
+    }
 
     // Set up a MutationObserver to detect new tweets and user details
     const observer = new MutationObserver((mutations) => {
@@ -683,7 +702,9 @@ function init() {
       if (shouldHighlight) {
         highlightTargetAccounts();
       }
-      if (shouldHideUserDetails) {
+      
+      // Only call hideUserDetails if it's enabled in settings
+      if (shouldHideUserDetails && styleSettings.hideUserDetails) {
         hideUserDetails();
       }
     });
@@ -693,8 +714,10 @@ function init() {
       subtree: true,
     });
 
-    // Initial call to hide user details
-    hideUserDetails();
+    // Initial call to hide user details if enabled
+    if (styleSettings.hideUserDetails) {
+      hideUserDetails();
+    }
 
     // Set up an intersection observer to ensure styles are maintained when tweets come into view
     const intersectionObserver = new IntersectionObserver((entries) => {

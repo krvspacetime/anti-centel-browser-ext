@@ -8,6 +8,7 @@ const DEFAULT_COLLAPSED_TWEET_USERNAME_COLOR = "rgba(42, 209, 72, 0.5)";
 
 export interface StyleSettings {
   theme: "dark" | "light";
+  hideUserDetails: boolean;
   blur: {
     blurValue: number;
   };
@@ -26,6 +27,7 @@ export interface StyleSettings {
 
 export const STYLE_SETTINGS: StyleSettings = {
   theme: "light",
+  hideUserDetails: false,
   blur: { blurValue: DEFAULT_BLUR_VALUE },
   highlight: {
     highlightColor: DEFAULT_HIGHLIGHT_COLOR,

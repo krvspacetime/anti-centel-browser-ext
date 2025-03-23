@@ -7,6 +7,7 @@ import { HideOptions } from "./HideOptions";
 import { BlurOptions } from "./BlurOptions";
 import { SegmentedControl } from "@mantine/core";
 import segmentedControl from "./segmentedControl.module.css";
+import { HideUserDetails } from "../misc/HideUserDetails";
 const SAMPLE_IMG = "avatar.jpg";
 const SAMPLE_TEXT =
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
@@ -71,6 +72,13 @@ export const TweetStyleMenu = () => {
     }));
   };
 
+  const onChangeHideUserDetails = (value: boolean) => {
+    console.log("Changing hideUserDetails to", value);
+    setStyleSettings((prev) => ({
+      ...prev,
+      hideUserDetails: value,
+    }));
+  };
   // Segmented control
   const [selectedTab, setSelectedTab] = useState("highlight");
   return (
@@ -90,6 +98,7 @@ export const TweetStyleMenu = () => {
                 { label: "Highlight", value: "highlight" },
                 { label: "Blur", value: "blur" },
                 { label: "Hide", value: "hide" },
+                { label: "Misc", value: "misc" },
               ]}
             />
           </section>
@@ -118,6 +127,14 @@ export const TweetStyleMenu = () => {
                   onChangeCollapsedTweetUsernameColor
                 }
               />
+            )}
+            {selectedTab === "misc" && (
+              <div>
+                <HideUserDetails
+                  styleSettings={styleSettings}
+                  onChangeHideUserDetails={onChangeHideUserDetails}
+                />
+              </div>
             )}
           </section>
         </div>
@@ -163,7 +180,6 @@ export const TweetStyleMenu = () => {
                 collapsedTweetColor={
                   styleSettings.hide.collapsedTweetUsernameColor
                 }
-                isDarkTheme={styleSettings.theme === "dark"}
               />
             </section>
           )}
