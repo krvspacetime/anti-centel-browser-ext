@@ -85,7 +85,6 @@ function createCategoryModal(
     const modalContent = ModalContent();
     const title = ModalTitle(`Monitor ${handle}`);
 
-    // const tags = Object.keys(DEFAULT_STYLE_CONFIGS);
     const tags = Object.values(Tags);
     const actions: TargetHandle["action"][] = [
       "monitor",
@@ -258,9 +257,10 @@ function styleTargetTweets(
           // Also apply inline styles to ensure they persist when scrolling
           const highlightThickness = styleSettings.highlight.highlightThickness;
           const highlightColor = styleSettings.highlight.highlightColor;
-          const highlightBorderRadius = styleSettings.highlight.highlightBorderRadius;
+          const highlightBorderRadius =
+            styleSettings.highlight.highlightBorderRadius;
           const glowStrength = styleSettings.highlight.glowStrength;
-          
+
           tweet.style.outline = `${highlightThickness}px solid ${highlightColor}`;
           tweet.style.borderRadius = `${highlightBorderRadius}px`;
           tweet.style.boxShadow = `0 0 ${glowStrength}px ${highlightColor}`;
@@ -576,8 +576,6 @@ function hideUserDetails() {
   observer.observe(document, { childList: true, subtree: true });
 }
 
-hideUserDetails();
-
 // Add a style tag to handle tweet visibility persistence with styleSettings
 function addGlobalStyles(styleSettings: any) {
   const styleTag = document.createElement("style");
@@ -591,7 +589,7 @@ function addGlobalStyles(styleSettings: any) {
       overflow: hidden !important;
       position: relative !important;
       transition: height 0.3s ease !important;
-      display: block !important; /* Ensure it's not display:none which would prevent transitions */
+      display: flex !important; /* Ensure it's not display:none which would prevent transitions */
     }
     .tweet-highlighted {
       position: relative !important;
@@ -653,9 +651,10 @@ function init() {
     detectAndSetTheme();
     highlightTargetAccounts();
 
-    // Set up a MutationObserver to detect new tweets
+    // Set up a MutationObserver to detect new tweets and user details
     const observer = new MutationObserver((mutations) => {
       let shouldHighlight = false;
+      let shouldHideUserDetails = false;
 
       mutations.forEach((mutation) => {
         if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
@@ -668,6 +667,14 @@ function init() {
               ) {
                 shouldHighlight = true;
               }
+              // Check for user details elements
+              if (
+                element.querySelector &&
+                (element.querySelector('[data-testid="UserCell"]') ||
+                  element.querySelector('[data-testid="UserAvatar"]'))
+              ) {
+                shouldHideUserDetails = true;
+              }
             }
           });
         }
@@ -676,12 +683,18 @@ function init() {
       if (shouldHighlight) {
         highlightTargetAccounts();
       }
+      if (shouldHideUserDetails) {
+        hideUserDetails();
+      }
     });
 
     observer.observe(document.body, {
       childList: true,
       subtree: true,
     });
+
+    // Initial call to hide user details
+    hideUserDetails();
 
     // Set up an intersection observer to ensure styles are maintained when tweets come into view
     const intersectionObserver = new IntersectionObserver((entries) => {

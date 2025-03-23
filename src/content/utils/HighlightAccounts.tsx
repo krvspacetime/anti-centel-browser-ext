@@ -1,6 +1,6 @@
-import { TargetHandle } from "../../content/types";
+import { TargetHandle } from "../types";
 
-export function highlitTargetAccounts(
+export function highlightTargetAccounts(
   styleTargetTweets: (isInTargetList: boolean, tweet: HTMLElement) => void,
   createWatchListButtons: (
     tweet: HTMLElement,

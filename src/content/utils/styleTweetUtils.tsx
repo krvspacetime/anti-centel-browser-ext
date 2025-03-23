@@ -1,4 +1,3 @@
-import { eyeSvg } from "../../icons/icons";
 import { tagIconMapper } from "../data";
 import { StyleSettings } from "../types";
 
@@ -23,17 +22,55 @@ function createTweetOverlay(blurValue: number, styleSettings: StyleSettings) {
   return overlay;
 }
 
-const createShowTweetButton = (onClick: () => void, styleSettings: StyleSettings) => {
+const createShowTweetButton = (
+  onClick: () => void,
+  styleSettings: StyleSettings,
+) => {
   const isDarkTheme = styleSettings.theme === "dark";
   const showTweetButton = document.createElement("button");
   showTweetButton.className = "show-tweet-button";
-  showTweetButton.innerHTML = `${eyeSvg}`;
+
+  // Create the SVG element
+  const showIcon = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "svg",
+  );
+  showIcon.setAttribute("viewBox", "0 0 24 24");
+  showIcon.setAttribute("width", "24");
+  showIcon.setAttribute("height", "24");
+  showIcon.setAttribute("fill", isDarkTheme ? "white" : "black");
+
+  // Create the path for the eye icon
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute(
+    "d",
+    "M12 15c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm6.3-6.73L15.46 5.35c-.78-.78-2.05-.78-2.83 0l-1.83 1.83c-.39.39-.39 1.02 0 1.41l1.59 1.59c.39.39 1.02.39 1.41 0l4.54-4.54c.39-.39.39-1.02 0-1.41l-1.24-1.24c-.39-.39-1.02-.39-1.41 0zM12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9z",
+  );
+  showIcon.appendChild(path);
+
+  // Create the text label
+  const text = document.createElement("span");
+  text.textContent = "Show";
+  text.style.cssText = `
+    margin-left: 8px;
+    font-size: 14px;
+    color: ${isDarkTheme ? "white" : "black"};
+  `;
+
+  // Add both elements to the button
+  showTweetButton.appendChild(showIcon);
+  showTweetButton.appendChild(text);
+
   showTweetButton.style.cssText = `
     position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 8px 8px 8px 8px;
+    padding: 8px 16px;
     background: ${isDarkTheme ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"};
     outline: ${isDarkTheme ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"};
     color: ${isDarkTheme ? "white" : "black"};
@@ -41,6 +78,8 @@ const createShowTweetButton = (onClick: () => void, styleSettings: StyleSettings
     border-radius: 4px;
     cursor: pointer;
     pointer-events: auto;
+    transition: all 0.2s ease;
+    font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   `;
 
   showTweetButton.addEventListener("click", onClick);
@@ -48,18 +87,55 @@ const createShowTweetButton = (onClick: () => void, styleSettings: StyleSettings
   return showTweetButton;
 };
 
-const createHideTweetButton = (onClick: () => void, styleSettings: StyleSettings) => {
+const createHideTweetButton = (
+  onClick: () => void,
+  styleSettings: StyleSettings,
+) => {
   const isDarkTheme = styleSettings.theme === "dark";
   const hideTweetButton = document.createElement("button");
   hideTweetButton.className = "hide-tweet-button";
-  hideTweetButton.innerHTML = `${eyeSvg}`;
+
+  // Create the SVG element
+  const hideIcon = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "svg",
+  );
+  hideIcon.setAttribute("viewBox", "0 0 24 24");
+  hideIcon.setAttribute("width", "24");
+  hideIcon.setAttribute("height", "24");
+  hideIcon.setAttribute("fill", isDarkTheme ? "white" : "black");
+
+  // Create the path for the eye-slash icon
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute(
+    "d",
+    "M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9zm6.3 6.73L15.46 5.35c-.78-.78-2.05-.78-2.83 0l-1.83 1.83c-.39.39-.39 1.02 0 1.41l1.59 1.59c.39.39 1.02.39 1.41 0l4.54-4.54c.39-.39.39-1.02 0-1.41l-1.24-1.24c-.39-.39-1.02-.39-1.41 0zM12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9z",
+  );
+  hideIcon.appendChild(path);
+
+  // Create the text label
+  const text = document.createElement("span");
+  text.textContent = "Hide";
+  text.style.cssText = `
+    margin-left: 8px;
+    font-size: 14px;
+    color: ${isDarkTheme ? "white" : "black"};
+  `;
+
+  // Add both elements to the button
+  hideTweetButton.appendChild(hideIcon);
+  hideTweetButton.appendChild(text);
+
   hideTweetButton.style.cssText = `
-    display: none;
     position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 8px 8px 8px 8px;
+    padding: 8px 16px;
     background: ${isDarkTheme ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"};
     outline: ${isDarkTheme ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"};
     color: ${isDarkTheme ? "white" : "black"};
@@ -67,6 +143,8 @@ const createHideTweetButton = (onClick: () => void, styleSettings: StyleSettings
     border-radius: 4px;
     cursor: pointer;
     pointer-events: auto;
+    transition: all 0.2s ease;
+    font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   `;
 
   hideTweetButton.addEventListener("click", onClick);
@@ -74,7 +152,11 @@ const createHideTweetButton = (onClick: () => void, styleSettings: StyleSettings
   return hideTweetButton;
 };
 
-const createTweetBadge = (handle: string, tag: string, styleSettings: StyleSettings) => {
+const createTweetBadge = (
+  handle: string,
+  tag: string,
+  styleSettings: StyleSettings,
+) => {
   const isDarkTheme = styleSettings.theme === "dark";
   const badgeContainer = document.createElement("div");
   badgeContainer.style.cssText = `
@@ -169,7 +251,10 @@ export const OverlayWithRemoveButton = (
   category: string,
   styleSettings: StyleSettings,
 ) => {
-  const overlay = createTweetOverlay(styleSettings.blur.blurValue, styleSettings);
+  const overlay = createTweetOverlay(
+    styleSettings.blur.blurValue,
+    styleSettings,
+  );
   const buttonContainer = createButtonContainer();
   const badge = createTweetBadge(handle, category, styleSettings);
 

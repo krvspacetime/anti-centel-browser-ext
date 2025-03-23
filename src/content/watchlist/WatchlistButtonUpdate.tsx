@@ -17,6 +17,23 @@ export const updateButtonState = (
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
+  // Set initial transparent background immediately
+  button.style.cssText = `
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    line-height: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+  `;
+
   // Remove existing event listeners first
   const oldMouseEnter = button.onmouseenter;
   const oldMouseLeave = button.onmouseleave;
@@ -35,6 +52,9 @@ export const updateButtonState = (
       theme: "dark",
     };
     const isDarkTheme = styleSettings.theme === "dark";
+
+    // Update text color based on theme
+    button.style.color = isDarkTheme ? "white" : "black";
 
     // Set up hover states
     if (isInTargetList) {
@@ -76,47 +96,31 @@ export const updateButtonState = (
       button.onmouseenter = null;
       button.onmouseleave = null;
       button.innerHTML = DEFAULT_WATCHLIST_MONITOR_TEXT;
-      button.style.cssText = `
-      position: relative;
-      `;
+      
       tooltip.style.cssText = `
-      position: absolute;
-      right: -55px;
-      bottom: -10px;
-      visibility: hidden;
-      background-color: ${isDarkTheme ? "white" : "#1da1f2"};
-      color: ${isDarkTheme ? "black" : "white"};
-      z-index: 1000;
-      padding: 1px 3px;
-      border-radius: 2px;
+        position: absolute;
+        right: -55px;
+        bottom: -10px;
+        visibility: hidden;
+        background-color: ${isDarkTheme ? "white" : "#1da1f2"};
+        color: ${isDarkTheme ? "black" : "white"};
+        z-index: 1000;
+        padding: 1px 3px;
+        border-radius: 2px;
       `;
       button.appendChild(tooltip);
 
       button.addEventListener("mouseenter", () => {
         tooltip.style.visibility = "visible";
+        button.style.backgroundColor = isDarkTheme ? "#1da1f2" : "#e8f5fd";
+        button.style.color = isDarkTheme ? "white" : "#1da1f2";
       });
 
       button.addEventListener("mouseleave", () => {
         tooltip.style.visibility = "hidden";
+        button.style.backgroundColor = "transparent";
+        button.style.color = isDarkTheme ? "white" : "black";
       });
     }
-
-    button.style.cssText += `
-        padding: 2px 8px;
-        border-radius: 8px;
-        font-size: 13px;
-        cursor: pointer;
-        background-color: transparent;
-        color: ${isDarkTheme ? "white" : "black"};
-        border: none;
-        line-height: 16px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        white-space: nowrap;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: all 0.2s ease;
-        ${!isInTargetList ? `:hover { background-color: ${isDarkTheme ? "#1da1f2" : "#e8f5fd"}; color: ${isDarkTheme ? "white" : "#1da1f2"}; }` : ""}
-      `;
   });
 };
