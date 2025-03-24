@@ -1,12 +1,4 @@
 import {
-  Modal,
-  ModalButtons,
-  ModalCancelButton,
-  ModalContent,
-  ModalTitle,
-} from "./modal/Modal";
-
-import {
   WatchlistButton,
   WatchlistButtonContainer,
 } from "./watchlist/WatchlistButton";
@@ -16,115 +8,11 @@ import { updateButtonState } from "./watchlist/WatchlistButtonUpdate";
 import { Tags, TargetHandle } from "./types";
 import { CollapsedIndicator } from "./actions/hide/CollapsedIndicator";
 import { OverlayWithRemoveButton } from "./utils/styleTweetUtils";
+import { extractHandleFromTweet } from "./utils/tweetUtils";
+import { createCategoryModal } from "./components/modals/categoryModal";
 
 const TWEET_ARTICLE_QUERY_SELECTOR = 'article[role="article"]';
 const TWEET_HANDLE_QUERY_SELECTOR = 'a[role="link"] span';
-
-/**
- * Extracts the handle from a tweet, handling both regular tweets and retweets
- */
-function extractHandleFromTweet(tweet: HTMLElement): string | null {
-  // Check if this is a retweet by looking for the retweet indicator
-  const isRetweet = tweet.textContent?.includes("reposted") || false;
-  console.log(`Is retweet: ${isRetweet}`);
-
-  if (isRetweet) {
-    console.log("Extracting correct handle from retweets...");
-
-    // For retweets, we need to find the span that contains the @ symbol
-    // This is more reliable than using the index
-    const spans = tweet.querySelectorAll("span");
-    for (let i = 0; i < spans.length; i++) {
-      const span = spans[i];
-      // Look for spans that start with @ - these are the actual usernames
-      if (span.textContent && span.textContent.startsWith("@")) {
-        console.log(`Found retweet handle: ${span.textContent}`);
-        return span.textContent;
-      }
-    }
-
-    // Fallback to the old method if we couldn't find a span with @
-    const handleElements = tweet.querySelectorAll(TWEET_HANDLE_QUERY_SELECTOR);
-    for (let i = 0; i < handleElements.length; i++) {
-      if (
-        handleElements[i].textContent &&
-        handleElements[i].parentElement?.textContent?.includes("reposted")
-      ) {
-        // The next element should be the original author's handle
-        const handleElement = handleElements[i + 1];
-        console.log(`Fallback retweet handle: ${handleElement?.textContent}`);
-        return handleElement?.textContent || null;
-      }
-    }
-  } else {
-    // For regular tweets, check for spans with @ first
-    const spans = tweet.querySelectorAll("span");
-    for (let i = 0; i < spans.length; i++) {
-      const span = spans[i];
-      if (span.textContent && span.textContent.startsWith("@")) {
-        console.log(`Found regular tweet handle: ${span.textContent}`);
-        return span.textContent;
-      }
-    }
-
-    // Fallback to the old method
-    const handleElements = tweet.querySelectorAll(TWEET_HANDLE_QUERY_SELECTOR);
-    if (handleElements.length > 3) {
-      return handleElements[3].textContent;
-    }
-  }
-
-  return null;
-}
-
-function createCategoryModal(
-  handle: string,
-): Promise<{ tag: Tags; action: TargetHandle["action"] } | null> {
-  return new Promise((resolve) => {
-    const modal = Modal();
-    const modalContent = ModalContent();
-    const title = ModalTitle(`Monitor ${handle}`);
-
-    const tags = Object.values(Tags);
-    const actions: TargetHandle["action"][] = [
-      "monitor",
-      "hide",
-      "blur",
-      "highlight",
-    ];
-
-    // First select the action
-    const actionButtons = ModalButtons(actions as string[], (action) => {
-      // Then select the tag
-      const tagButtons = ModalButtons(tags, (tag) => {
-        resolve({
-          tag: tag as Tags,
-          action: action as TargetHandle["action"],
-        });
-        document.body.removeChild(modal);
-      });
-
-      modalContent.innerHTML = ""; // Clear previous buttons
-      modalContent.appendChild(title);
-      tagButtons.forEach((button) => modalContent.appendChild(button));
-      modalContent.appendChild(cancelButton);
-    });
-
-    const cancelButton = ModalCancelButton({
-      label: "Cancel",
-      onClick: () => {
-        resolve(null);
-        document.body.removeChild(modal);
-      },
-    });
-
-    modal.appendChild(modalContent);
-    modalContent.appendChild(title);
-    actionButtons.forEach((button) => modalContent.appendChild(button));
-    modalContent.appendChild(cancelButton);
-    document.body.appendChild(modal);
-  });
-}
 
 function refreshTweetStyles(handle: string): void {
   document
@@ -512,7 +400,7 @@ function updateThemeInStorage(theme: "dark" | "light"): void {
             styleSettings.hide.collapsedTweetUsernameColor || "#000000";
         }
       }
-      
+
       // Ensure hideUserDetails exists (might be missing in older saved settings)
       if (styleSettings.hideUserDetails === undefined) {
         styleSettings.hideUserDetails = false; // Default value from styleDefaults.ts
@@ -647,14 +535,17 @@ function init() {
   // Get styleSettings first, then initialize everything else
   chrome.storage.sync.get("styleSettings", (data) => {
     let styleSettings = data.styleSettings || {};
-    
+
     // Ensure hideUserDetails exists with a default value if it's missing
     if (styleSettings.hideUserDetails === undefined) {
       styleSettings.hideUserDetails = false; // Default from styleDefaults.ts
-      
+
       // Save the updated settings back to storage
       chrome.storage.sync.set({ styleSettings }, () => {
-        console.log("Added missing hideUserDetails to styleSettings:", styleSettings);
+        console.log(
+          "Added missing hideUserDetails to styleSettings:",
+          styleSettings,
+        );
       });
     }
 
@@ -664,7 +555,7 @@ function init() {
     // Continue with other initialization
     detectAndSetTheme();
     highlightTargetAccounts();
-    
+
     // Call hideUserDetails if enabled
     if (styleSettings.hideUserDetails) {
       hideUserDetails();
@@ -702,7 +593,7 @@ function init() {
       if (shouldHighlight) {
         highlightTargetAccounts();
       }
-      
+
       // Only call hideUserDetails if it's enabled in settings
       if (shouldHideUserDetails && styleSettings.hideUserDetails) {
         hideUserDetails();

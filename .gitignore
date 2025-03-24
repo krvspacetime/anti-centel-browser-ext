@@ -30,3 +30,7 @@ build-timestamp.txt
 *.sln
 *.sw?
 node_modules
+vite.config.ts.timestamp*
+
+// Reference files
+PROPOSED_CONTENT_CHANGES.md
