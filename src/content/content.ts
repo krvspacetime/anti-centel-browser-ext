@@ -9,7 +9,7 @@ import { Tags, TargetHandle } from "./types";
 import { CollapsedIndicator } from "./actions/hide/CollapsedIndicator";
 import { OverlayWithRemoveButton } from "./utils/styleTweetUtils";
 import { extractHandleFromTweet } from "./utils/tweetUtils";
-import { createCategoryModal } from "./components/modals/categoryModal";
+import { createCategoryModal } from "./components/modals/createCategoryModal";
 
 const TWEET_ARTICLE_QUERY_SELECTOR = 'article[role="article"]';
 const TWEET_HANDLE_QUERY_SELECTOR = 'a[role="link"] span';
@@ -27,11 +27,12 @@ function refreshTweetStyles(handle: string): void {
 }
 
 export async function handleWatchlistAction(handle: string): Promise<void> {
-  chrome.storage.sync.get("targetHandles", async (data) => {
+  chrome.storage.sync.get(["targetHandles", "styleSettings"], async (data) => {
     const targetHandles = (data.targetHandles || []) as TargetHandle[];
+    const styleSettings = data.styleSettings;
 
     if (!targetHandles.some((th) => th.handle === handle)) {
-      const targetInfo = await createCategoryModal(handle);
+      const targetInfo = await createCategoryModal(handle, styleSettings);
 
       if (targetInfo) {
         const newHandle: TargetHandle = {
@@ -433,7 +434,7 @@ function hideUserDetails() {
     "#react-root > div > div > div.css-175oi2r.r-1f2l425.r-13qz1uu.r-417010.r-18u37iz > header > div > div > div > div.css-175oi2r.r-184id4b",
   ) as HTMLElement;
   const whatsHappeningImg = document.querySelector(
-    "#react-root > div > div > div.css-175oi2r.r-1f2l425.r-13qz1uu.r-417010.r-18u37iz > main > div > div > div > div.css-175oi2r.r-14lw9ot.r-jxzhtn.r-1ua6aaf.r-th6na.r-1phboty.r-16y2uox.r-184en5c.r-1abdc3e.r-1lg4w6u.r-f8sm7e.r-13qz1uu.r-1ye8kvj > div > div.css-175oi2r.r-14lw9ot.r-184en5c > div > div.css-175oi2r.r-1h8ys4a > div:nth-child(1) > div > div > div > div.css-175oi2r.r-18kxxzh.r-1wron08.r-onrtq4.r-ttdzmv > div",
+    "#react-root > div > div > div.css-175oi2r.r-1f2l425.r-13qz1uu.r-417010.r-18u37iz > main > div > div > div > div.css-175oi2r.r-kemksi.r-1kqtdi0.r-1ua6aaf.r-th6na.r-1phboty.r-16y2uox.r-184en5c.r-1abdc3e.r-1lg4w6u.r-f8sm7e.r-13qz1uu.r-1ye8kvj > div > div.css-175oi2r.r-kemksi.r-184en5c > div > div.css-175oi2r.r-1h8ys4a > div:nth-child(1) > div > div > div > div.css-175oi2r.r-18kxxzh.r-1wron08.r-onrtq4.r-ttdzmv > div",
   ) as HTMLElement;
 
   if (userDetailContainer && whatsHappeningImg) {

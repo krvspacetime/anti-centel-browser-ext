@@ -2,6 +2,7 @@
  * Modal for selecting category and action for watchlist
  */
 
+import { StyleSettings } from "../../types";
 import { Tags, Actions } from "../../types/targets";
 import { createElement } from "../../utils/domUtils";
 
@@ -12,6 +13,7 @@ import { createElement } from "../../utils/domUtils";
  */
 export function createCategoryModal(
   handle: string,
+  styleSettings: StyleSettings,
 ): Promise<{ tag: Tags; action: Actions } | null> {
   return new Promise((resolve) => {
     // Create modal container
@@ -21,7 +23,10 @@ export function createCategoryModal(
     modalContainer.style.left = "0";
     modalContainer.style.width = "100%";
     modalContainer.style.height = "100%";
-    modalContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    modalContainer.style.backgroundColor =
+      styleSettings.theme === "dark"
+        ? "rgba(0, 0, 0, 0.5)"
+        : "rgba(0, 0, 0, 0.5)";
     modalContainer.style.display = "flex";
     modalContainer.style.justifyContent = "center";
     modalContainer.style.alignItems = "center";
@@ -29,7 +34,8 @@ export function createCategoryModal(
 
     // Create modal content
     const modalContent = createElement("div", "", "modal-content");
-    modalContent.style.backgroundColor = "#ffffff";
+    modalContent.style.backgroundColor =
+      styleSettings.theme === "dark" ? "#1e1e1e" : "#ffffff";
     modalContent.style.borderRadius = "8px";
     modalContent.style.padding = "16px";
     modalContent.style.width = "400px";
@@ -42,7 +48,8 @@ export function createCategoryModal(
       "modal-title",
     );
     modalTitle.style.marginTop = "0";
-    modalTitle.style.color = "#000000";
+    modalTitle.style.color =
+      styleSettings.theme === "dark" ? "#ffffff" : "#000000";
 
     // Create category section
     const categorySection = createElement("div", "", "category-section");
@@ -54,7 +61,8 @@ export function createCategoryModal(
       "category-label",
     );
     categoryLabel.style.marginBottom = "8px";
-    categoryLabel.style.color = "#000000";
+    categoryLabel.style.color =
+      styleSettings.theme === "dark" ? "#ffffff" : "#000000";
 
     const categoryButtons = createElement("div", "", "category-buttons");
     categoryButtons.style.display = "flex";
@@ -83,19 +91,23 @@ export function createCategoryModal(
       button.style.padding = "8px 12px";
       button.style.border = "1px solid #cccccc";
       button.style.borderRadius = "4px";
-      button.style.backgroundColor = "#f0f0f0";
+      button.style.backgroundColor =
+        styleSettings.theme === "dark" ? "#f0f0f0" : "#f0f0f0";
       button.style.cursor = "pointer";
 
       button.addEventListener("click", () => {
         // Deselect all buttons
         document.querySelectorAll(".tag-button").forEach((btn) => {
-          (btn as HTMLElement).style.backgroundColor = "#f0f0f0";
-          (btn as HTMLElement).style.color = "#000000";
+          (btn as HTMLElement).style.backgroundColor =
+            styleSettings.theme === "dark" ? "#f0f0f0" : "#f0f0f0";
+          (btn as HTMLElement).style.color =
+            styleSettings.theme === "dark" ? "#000000" : "#000000";
         });
 
         // Select this button
         button.style.backgroundColor = "#1DA1F2";
-        button.style.color = "#ffffff";
+        button.style.color =
+          styleSettings.theme === "dark" ? "#ffffff" : "#ffffff";
         selectedTag = tag;
       });
 
@@ -108,7 +120,8 @@ export function createCategoryModal(
 
     const actionLabel = createElement("h3", "Select Action:", "action-label");
     actionLabel.style.marginBottom = "8px";
-    actionLabel.style.color = "#000000";
+    actionLabel.style.color =
+      styleSettings.theme === "dark" ? "#ffffff" : "#000000";
 
     const actionButtons = createElement("div", "", "action-buttons");
     actionButtons.style.display = "flex";
@@ -121,21 +134,29 @@ export function createCategoryModal(
     actionOptions.forEach((action) => {
       const button = createElement("button", action, "action-button");
       button.style.padding = "8px 12px";
-      button.style.border = "1px solid #cccccc";
+      button.style.border =
+        styleSettings.theme === "dark"
+          ? "1px solid #cccccc"
+          : "1px solid #cccccc";
       button.style.borderRadius = "4px";
-      button.style.backgroundColor = "#f0f0f0";
+      button.style.backgroundColor =
+        styleSettings.theme === "dark" ? "#f0f0f0" : "#f0f0f0";
       button.style.cursor = "pointer";
 
       button.addEventListener("click", () => {
         // Deselect all buttons
         document.querySelectorAll(".action-button").forEach((btn) => {
-          (btn as HTMLElement).style.backgroundColor = "#f0f0f0";
-          (btn as HTMLElement).style.color = "#000000";
+          (btn as HTMLElement).style.backgroundColor =
+            styleSettings.theme === "dark" ? "#f0f0f0" : "#f0f0f0";
+          (btn as HTMLElement).style.color =
+            styleSettings.theme === "dark" ? "#000000" : "#000000";
         });
 
         // Select this button
-        button.style.backgroundColor = "#1DA1F2";
-        button.style.color = "#ffffff";
+        button.style.backgroundColor =
+          styleSettings.theme === "dark" ? "#1DA1F2" : "#1DA1F2";
+        button.style.color =
+          styleSettings.theme === "dark" ? "#ffffff" : "#ffffff";
         selectedAction = action;
       });
 
@@ -150,17 +171,23 @@ export function createCategoryModal(
 
     const cancelButton = createElement("button", "Cancel", "cancel-button");
     cancelButton.style.padding = "8px 16px";
-    cancelButton.style.border = "1px solid #cccccc";
+    cancelButton.style.border =
+      styleSettings.theme === "dark"
+        ? "1px solid #cccccc"
+        : "1px solid #cccccc";
     cancelButton.style.borderRadius = "4px";
-    cancelButton.style.backgroundColor = "#f0f0f0";
+    cancelButton.style.backgroundColor =
+      styleSettings.theme === "dark" ? "#f0f0f0" : "#f0f0f0";
     cancelButton.style.cursor = "pointer";
 
     const confirmButton = createElement("button", "Confirm", "confirm-button");
     confirmButton.style.padding = "8px 16px";
     confirmButton.style.border = "none";
     confirmButton.style.borderRadius = "4px";
-    confirmButton.style.backgroundColor = "#1DA1F2";
-    confirmButton.style.color = "#ffffff";
+    confirmButton.style.backgroundColor =
+      styleSettings.theme === "dark" ? "#1DA1F2" : "#1DA1F2";
+    confirmButton.style.color =
+      styleSettings.theme === "dark" ? "#ffffff" : "#ffffff";
     confirmButton.style.cursor = "pointer";
 
     // Add event listeners
