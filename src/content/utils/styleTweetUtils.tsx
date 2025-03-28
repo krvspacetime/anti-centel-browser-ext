@@ -42,11 +42,16 @@ const createShowTweetButton = (
 
   // Create the path for the eye icon
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute(
-    "d",
-    "M12 15c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm6.3-6.73L15.46 5.35c-.78-.78-2.05-.78-2.83 0l-1.83 1.83c-.39.39-.39 1.02 0 1.41l1.59 1.59c.39.39 1.02.39 1.41 0l4.54-4.54c.39-.39.39-1.02 0-1.41l-1.24-1.24c-.39-.39-1.02-.39-1.41 0zM12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9z",
+  const circle = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "circle",
   );
+  path.setAttribute("d", "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z");
+  circle.setAttribute("cx", "12");
+  circle.setAttribute("cy", "12");
+  circle.setAttribute("r", "3");
   showIcon.appendChild(path);
+  showIcon.appendChild(circle);
 
   // Create the text label
   const text = document.createElement("span");
@@ -80,6 +85,7 @@ const createShowTweetButton = (
     pointer-events: auto;
     transition: all 0.2s ease;
     font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    backdrop-filter: blur(10px);
   `;
 
   showTweetButton.addEventListener("click", onClick);
@@ -103,15 +109,23 @@ const createHideTweetButton = (
   hideIcon.setAttribute("viewBox", "0 0 24 24");
   hideIcon.setAttribute("width", "24");
   hideIcon.setAttribute("height", "24");
-  hideIcon.setAttribute("fill", isDarkTheme ? "white" : "black");
+  hideIcon.setAttribute("fill", isDarkTheme ? "#ffffff" : "#000000");
+  hideIcon.setAttribute("stroke", isDarkTheme ? "#ffffff" : "#000000");
 
   // Create the path for the eye-slash icon
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute(
     "d",
-    "M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9zm6.3 6.73L15.46 5.35c-.78-.78-2.05-.78-2.83 0l-1.83 1.83c-.39.39-.39 1.02 0 1.41l1.59 1.59c.39.39 1.02.39 1.41 0l4.54-4.54c.39-.39.39-1.02 0-1.41l-1.24-1.24c-.39-.39-1.02-.39-1.41 0zM12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9z",
+    "M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24",
   );
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", "1");
+  line.setAttribute("y1", "1");
+  line.setAttribute("x2", "23");
+  line.setAttribute("y2", "23");
+
   hideIcon.appendChild(path);
+  hideIcon.appendChild(line);
 
   // Create the text label
   const text = document.createElement("span");
@@ -128,7 +142,7 @@ const createHideTweetButton = (
 
   hideTweetButton.style.cssText = `
     position: absolute;
-    display: flex;
+    display: none;
     flex-direction: row;
     align-items: center;
     gap: 8px;
@@ -145,6 +159,7 @@ const createHideTweetButton = (
     pointer-events: auto;
     transition: all 0.2s ease;
     font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    backdrop-filter: blur(10px);
   `;
 
   hideTweetButton.addEventListener("click", onClick);
@@ -162,7 +177,7 @@ const createTweetBadge = (
   badgeContainer.style.cssText = `
     position: absolute;
     top: 1%;
-    right: 1%;
+    right: 5%;
     background: transparent;
     color: ${isDarkTheme ? "white" : "black"};
     padding: 4px 8px;
@@ -261,13 +276,13 @@ export const OverlayWithRemoveButton = (
   const showButton = createShowTweetButton(() => {
     overlay.style.backdropFilter = `blur(0px)`;
     showButton.style.display = "none";
-    hideButton.style.display = "block";
+    hideButton.style.display = "flex";
     badge.style.display = "none";
   }, styleSettings);
 
   const hideButton = createHideTweetButton(() => {
     overlay.style.backdropFilter = `blur(${styleSettings.blur.blurValue}px)`; // Use blur value from styleSettings
-    showButton.style.display = "block";
+    showButton.style.display = "flex";
     hideButton.style.display = "none";
     badge.style.display = "block";
   }, styleSettings);
