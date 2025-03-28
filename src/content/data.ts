@@ -42,4 +42,3 @@ export const tagIconMapper = (tag: string): string => {
 
 export const DEFAULT_WATCHLIST_MONITOR_TEXT = `${eyeSvg}`;
 export const BUTTON_HOVER_TEXT_WHEN_IN_WATCHLIST = `${eyeOffSvg} REMOVE`;
-// export const BUTTON_HOVER_TEXT_WHEN_NOT_IN_WATCHLIST = `${goAlertSvg} ADD`;
