@@ -67,11 +67,39 @@ export function extractHandleFromTweet(tweet: HTMLElement): string | null {
     console.log("Could not extract handle from retweet");
     return null;
   } else {
-    // For regular tweets, the handle is in the first span with role="link"
+    // For regular tweets, we need to find the span that contains the @ symbol
+    // First try to find it using the handle selector and then look for siblings
     const handleElement = tweet.querySelector(TWEET_HANDLE_QUERY_SELECTOR);
-    if (handleElement && handleElement.textContent) {
-      console.log(`Found regular tweet handle: ${handleElement.textContent}`);
-      return handleElement.textContent;
+    
+    if (handleElement) {
+      // Look for a sibling element that contains the @ symbol
+      const parentElement = handleElement.closest('[data-testid="User-Name"]');
+      if (parentElement) {
+        // Find all spans within the parent element
+        const spans = parentElement.querySelectorAll("span");
+        for (const span of spans) {
+          if (span.textContent && span.textContent.startsWith("@")) {
+            console.log(`Found regular tweet handle: ${span.textContent}`);
+            return span.textContent;
+          }
+        }
+      }
+      
+      // If we couldn't find it in siblings, try looking at all spans in the tweet
+      const allSpans = tweet.querySelectorAll("span");
+      for (const span of allSpans) {
+        if (span.textContent && span.textContent.startsWith("@")) {
+          console.log(`Found regular tweet handle (fallback): ${span.textContent}`);
+          return span.textContent;
+        }
+      }
+      
+      // If we still can't find the handle with @, log a warning and return the text content
+      // This is a fallback to maintain existing behavior
+      if (handleElement.textContent) {
+        console.log(`Warning: Could not find @ handle, using: ${handleElement.textContent}`);
+        return handleElement.textContent;
+      }
     }
 
     console.log("Could not extract handle from regular tweet");
