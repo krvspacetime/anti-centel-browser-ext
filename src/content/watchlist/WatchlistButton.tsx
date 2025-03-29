@@ -27,7 +27,9 @@ export function WatchlistButtonContainer(): HTMLElement {
   const container = document.createElement("div");
   container.className = "watchlist-button-container";
   container.style.cssText = `
-    margin-left: 2px;
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
   `;
   return container;
 }

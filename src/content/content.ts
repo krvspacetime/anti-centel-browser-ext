@@ -5,7 +5,7 @@ import {
 
 import { updateButtonState } from "./watchlist/WatchlistButtonUpdate";
 
-import { Tags, TargetHandle } from "./types";
+import { StyleSettings, Tags, TargetHandle } from "./types";
 import { CollapsedIndicator } from "./actions/hide/CollapsedIndicator";
 import { OverlayWithRemoveButton } from "./utils/styleTweetUtils";
 import { extractHandleFromTweet } from "./utils/tweetUtils";
@@ -470,7 +470,7 @@ function hideUserDetails() {
 }
 
 // Add a style tag to handle tweet visibility persistence with styleSettings
-function addGlobalStyles(styleSettings: any) {
+function addGlobalStyles(styleSettings: StyleSettings) {
   const styleTag = document.createElement("style");
 
   // Determine if we're in dark or light theme
@@ -486,7 +486,7 @@ function addGlobalStyles(styleSettings: any) {
     }
     .tweet-highlighted {
       position: relative;
-      outline: ${styleSettings.highlight.highlightThickness}px solid ${styleSettings.highlight.highlightColor} !important;
+      outline: ${styleSettings.highlight.highlighThickness}px solid ${styleSettings.highlight.highlightColor} !important;
       border-radius: ${styleSettings.highlight.highlightBorderRadius}px !important;
       box-shadow: 0 0 ${styleSettings.highlight.glowStrength}px ${styleSettings.highlight.highlightColor} !important;
     }
@@ -509,18 +509,10 @@ function addGlobalStyles(styleSettings: any) {
       position: absolute !important;
       top: 0 !important;
       right: 0 !important;
-      background-color: ${
-        isDarkTheme
-          ? styleSettings.overlayBackgroundColorDark
-          : styleSettings.overlayBackgroundColorLight
-      } !important;
-      color: ${
-        isDarkTheme
-          ? styleSettings.overlayTextColorDark
-          : styleSettings.overlayTextColorLight
-      } !important;
+      background-color: ${isDarkTheme} ? #000000 : #FFFFFF !important;
+      color: ${isDarkTheme} #FFFFFF : #000000 !important;
       padding: 5px 10px !important;
-      border-radius: 0 0 0 5px !important;
+      border-radius: 0 0 0 5px !important;  
       z-index: 1000 !important;
       font-size: 12px !important;
       font-weight: bold !important;
@@ -535,7 +527,7 @@ function init() {
 
   // Get styleSettings first, then initialize everything else
   chrome.storage.sync.get("styleSettings", (data) => {
-    let styleSettings = data.styleSettings || {};
+    const styleSettings = data.styleSettings || {};
 
     // Ensure hideUserDetails exists with a default value if it's missing
     if (styleSettings.hideUserDetails === undefined) {

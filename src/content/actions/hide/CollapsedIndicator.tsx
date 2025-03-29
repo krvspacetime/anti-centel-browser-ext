@@ -1,7 +1,7 @@
 import { settings } from "../../../icons/icons";
-import { tagIconMapper } from "../../data";
 import { StyleSettings, Tags } from "../../types";
 import { SettingsDialog } from "./SettingsDialog";
+import { getTagIcon } from "../../utils/iconUtils";
 
 interface CollapsedIndicatorProps {
   action: "hide" | "blur";
@@ -21,68 +21,169 @@ export const CollapsedIndicator = ({
   if (action === "hide") {
     // Determine if we're in dark or light theme
     const isDarkTheme = styleSettings.theme === "dark";
-    const textColor = isDarkTheme ? "#71767b" : "#536471";
-    const usernameColor = isDarkTheme
-      ? styleSettings.hide.collapsedTweetUsernameColor
-      : "#000000";
+
+    // Define theme colors
+    const colors = {
+      // Background colors
+      bgDark: "#15181c",
+      bgLight: "#f7f9f9",
+
+      // Text colors
+      textDark: "#71767b",
+      textLight: "#536471",
+
+      // Accent colors
+      accentDark: "#1d9bf0",
+      accentLight: "#1d9bf0",
+
+      // Username colors
+      usernameDark: styleSettings.hide.collapsedTweetUsernameColor || "#ffffff",
+      usernameLight: "#000000",
+
+      // Border colors
+      borderDark: "#2f3336",
+      borderLight: "#eff3f4",
+
+      // Hover colors
+      hoverBgDark: "#1e2732",
+      hoverBgLight: "#e6e7e8",
+    };
 
     // Create collapse indicator
     const collapseIndicator = document.createElement("div");
     collapseIndicator.className = "collapse-indicator";
     collapseIndicator.style.cssText = `
-        width: 100%;
-        color: ${textColor};
-        padding-left: 4px;
-        padding-top: 1px;
-        padding-bottom: 1px;
-        font-size: 13px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        background-color: ${isDarkTheme ? "transparent" : "rgb(215 222 222)"};
-      `;
+      width: 100%;
+      color: ${isDarkTheme ? colors.textDark : colors.textLight};
+      font-size: 14px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background-color: ${isDarkTheme ? colors.bgDark : colors.bgLight};
+      border-radius: 12px;
+      margin: 4px 0;
+      border: 1px solid ${isDarkTheme ? colors.borderDark : colors.borderLight};
+      transition: background-color 0.2s ease;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    `;
+
+    // Add hover effect
+    collapseIndicator.addEventListener("mouseenter", () => {
+      collapseIndicator.style.backgroundColor = isDarkTheme
+        ? colors.hoverBgDark
+        : colors.hoverBgLight;
+    });
+
+    collapseIndicator.addEventListener("mouseleave", () => {
+      collapseIndicator.style.backgroundColor = isDarkTheme
+        ? colors.bgDark
+        : colors.bgLight;
+    });
 
     // Create text container with styled handle and tag
-    const textContainer = document.createElement("span");
+    const textContainer = document.createElement("div");
+    textContainer.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    `;
+
+    const statusText = document.createElement("span");
+    statusText.textContent = "Hidden tweet from";
+    statusText.style.cssText = `
+      font-weight: 400;
+    `;
 
     const handleSpan = document.createElement("span");
     handleSpan.textContent = handle;
     handleSpan.style.cssText = `
-        color: ${usernameColor};
-        font-weight: 600;
+      color: ${isDarkTheme ? colors.usernameDark : colors.usernameLight};
+      font-weight: 700;
+      margin: 0 4px;
     `;
 
-    const tagSpan = document.createElement("span");
-    tagSpan.textContent = tag;
-    tagSpan.innerHTML = `${tag} ${tagIconMapper(tag)} `;
-    tagSpan.style.cssText = `
-        color: ${isDarkTheme ? styleSettings.hide.collapsedTweetUsernameColor : "#000000"};
-        font-weight: 500;
-        font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        font-size: 13px;
-        border-radius: 4px;
-        display: inline-flex;
-        align-items: center;
-        gap: 2px;
+    // Create tag container with icon
+    const tagContainer = document.createElement("div");
+    tagContainer.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background-color: ${isDarkTheme ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.05)"};
+      padding: 2px 8px;
+      border-radius: 16px;
+      margin-left: 4px;
     `;
 
-    textContainer.appendChild(document.createTextNode("Hidden tweet from "));
-    textContainer.appendChild(handleSpan);
-    textContainer.appendChild(document.createTextNode(" - "));
-    textContainer.appendChild(tagSpan);
+    // Get the SVG icon for the tag
+    const iconSvg = getTagIcon(tag);
+    const iconContainer = document.createElement("div");
+    iconContainer.style.cssText = `
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+    `;
+    iconContainer.innerHTML = iconSvg;
 
-    // Create options button
+    // Set icon color
+    const svgElement = iconContainer.querySelector("svg");
+    if (svgElement) {
+      svgElement.style.fill = isDarkTheme
+        ? colors.usernameDark
+        : colors.usernameLight;
+      svgElement.style.width = "14px";
+      svgElement.style.height = "14px";
+    }
+
+    // Format tag text
+    let formattedTag = tag.replace(/_/g, " ");
+    formattedTag =
+      formattedTag.charAt(0).toUpperCase() +
+      formattedTag.slice(1).toLowerCase();
+
+    const tagText = document.createElement("span");
+    tagText.textContent = formattedTag;
+    tagText.style.cssText = `
+      color: ${isDarkTheme ? colors.usernameDark : colors.usernameLight};
+      font-weight: 600;
+      font-size: 12px;
+    `;
+
+    tagContainer.appendChild(iconContainer);
+    tagContainer.appendChild(tagText);
+
+    // Create options button with improved styling
     const optionsButton = document.createElement("button");
     optionsButton.innerHTML = settings;
     optionsButton.style.cssText = `
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        margin-right: 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
     `;
-    optionsButton.style.color = isDarkTheme ? "white" : "black";
+    optionsButton.style.color = isDarkTheme
+      ? colors.usernameDark
+      : colors.usernameLight;
+
+    // Add hover effect to settings button
+    optionsButton.addEventListener("mouseenter", () => {
+      optionsButton.style.backgroundColor = isDarkTheme
+        ? "rgba(255, 255, 255, 0.1)"
+        : "rgba(0, 0, 0, 0.05)";
+    });
+
+    optionsButton.addEventListener("mouseleave", () => {
+      optionsButton.style.backgroundColor = "transparent";
+    });
 
     const dialog = SettingsDialog(handle, tag);
 
@@ -103,60 +204,57 @@ export const CollapsedIndicator = ({
 
     // Add a data attribute to track the collapsed state
     tweet.dataset.collapsed = "true";
-    
+
     // Store the original height for future reference
     const originalHeight = tweet.scrollHeight;
-    
+
     // Set initial state
     tweet.style.height = "0px";
-    
+
     // Keep track of any ongoing animations
     let animationInProgress = false;
-    
+
     // Update the click handler to modify text properly
     collapseIndicator.addEventListener("click", (e) => {
       if (e.target !== optionsButton && !animationInProgress) {
         // Set flag to prevent multiple clicks during animation
         animationInProgress = true;
-        
+
         // Get current state
         const isCurrentlyCollapsed = tweet.dataset.collapsed === "true";
-        
+
         // Add transition for smooth animation
         tweet.style.transition = "height 0.3s ease";
-        
+
         // Set the height based on collapsed state
         if (isCurrentlyCollapsed) {
           // Expanding: Set to the stored original height
           tweet.style.height = `${originalHeight}px`;
-          
+
           // Update the text
-          textContainer.textContent = ""; // Clear existing content
-          textContainer.appendChild(document.createTextNode("Showing tweet from "));
-          textContainer.appendChild(handleSpan.cloneNode(true));
-          textContainer.appendChild(document.createTextNode(" - "));
-          textContainer.appendChild(tagSpan.cloneNode(true));
+          statusText.textContent = "Showing tweet from";
         } else {
           // Collapsing: Set to 0
           tweet.style.height = "0px";
-          
+
           // Update the text
-          textContainer.textContent = ""; // Clear existing content
-          textContainer.appendChild(document.createTextNode("Hidden tweet from "));
-          textContainer.appendChild(handleSpan.cloneNode(true));
-          textContainer.appendChild(document.createTextNode(" - "));
-          textContainer.appendChild(tagSpan.cloneNode(true));
+          statusText.textContent = "Hidden tweet from";
         }
-        
+
         // Toggle the collapsed state
         tweet.dataset.collapsed = isCurrentlyCollapsed ? "false" : "true";
-        
+
         // Wait for animation to complete before allowing another click
         setTimeout(() => {
           animationInProgress = false;
         }, 350); // Slightly longer than the animation to ensure it completes
       }
     });
+
+    // Assemble the components
+    textContainer.appendChild(statusText);
+    textContainer.appendChild(handleSpan);
+    textContainer.appendChild(tagContainer);
 
     // Append elements
     collapseIndicator.appendChild(textContainer);

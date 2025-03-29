@@ -14,6 +14,7 @@ export enum Action {
   MONITOR = "monitor",
   HIDE = "hide",
   BLUR = "blur",
+  HIGHLIGHT = "highlight",
 }
 
 export enum Tags {
