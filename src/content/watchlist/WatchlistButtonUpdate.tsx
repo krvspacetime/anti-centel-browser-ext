@@ -1,5 +1,4 @@
 import { TargetHandle, StyleSettings, Tags } from "../types";
-import { tagIconMapper, DEFAULT_WATCHLIST_MONITOR_TEXT } from "../data";
 import { getTagIcon } from "../utils/iconUtils";
 import { eyeOffSvg } from "../../icons/icons";
 
@@ -67,11 +66,8 @@ export const updateButtonState = (
   if (oldMouseEnter) button.removeEventListener("mouseenter", oldMouseEnter);
   if (oldMouseLeave) button.removeEventListener("mouseleave", oldMouseLeave);
 
-  button.dataset.originalText = isInTargetList
-    ? `${tagUpper} ${tagIconMapper(tag)}`
-    : DEFAULT_WATCHLIST_MONITOR_TEXT;
-  button.innerHTML =
-    button.dataset.originalText ?? DEFAULT_WATCHLIST_MONITOR_TEXT;
+  // Clear the button content immediately instead of setting temporary text
+  button.innerHTML = "";
 
   // Get current theme from storage
   chrome.storage.sync.get("styleSettings", (data) => {
@@ -122,8 +118,7 @@ export const updateButtonState = (
       const textElement = document.createElement("span");
       textElement.textContent = tagUpper;
 
-      // Clear existing children and append the new elements
-      button.innerHTML = ""; // Clear existing content
+      // Append the new elements
       span.appendChild(iconContainer);
       span.appendChild(textElement);
       button.appendChild(span);
@@ -248,9 +243,6 @@ export const updateButtonState = (
 
       const addText = document.createElement("span");
       addText.textContent = "Add";
-
-      // Clear existing content
-      button.innerHTML = "";
 
       addSpan.appendChild(addIconContainer);
       addSpan.appendChild(addText);
