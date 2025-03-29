@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, TextInput } from "@mantine/core";
+import { Button, TextInput, Badge, ActionIcon, Tooltip } from "@mantine/core";
 import { TargetInput } from "./TargetInput";
 import { TargetCategorySelect } from "./TargetCategorySelect";
 import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/styleConfig";
@@ -8,7 +8,93 @@ import { toProperCase } from "../../../content/utils/utils";
 import { POPUP_HEIGHT } from "../layout/AppLayout";
 import { Actions, Tags } from "../types";
 import { TargetActionSelect } from "./TargetActionSelect";
-import { LuAtSign } from "react-icons/lu";
+import { LuAtSign, LuTrash2 } from "react-icons/lu";
+import { getTagIcon } from "../../../content/utils/iconUtils";
+
+// Component for rendering a single target row
+const TargetRow = ({ 
+  item, 
+  index, 
+  onRemove 
+}: { 
+  item: TargetHandle; 
+  index: number; 
+  onRemove: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, index: number) => void;
+}) => {
+  // Get the SVG icon for the tag
+  const tagIconSvg = getTagIcon(item.tag as Tags);
+  
+  return (
+    <tr key={index} className="border-b border-gray-700 text-xs hover:bg-gray-800/30">
+      <td className="py-2 pl-3 text-left">{item.handle}</td>
+      <td className="py-2 text-left capitalize">{item.action}</td>
+      <td className="py-2 text-center">
+        <Badge
+          className="flex items-center gap-1"
+          color={getCategoryColor(item.tag as Tags)}
+          variant="filled"
+          size="sm"
+          radius="sm"
+          leftSection={
+            <div 
+              className="flex h-4 w-4 items-center justify-center" 
+              dangerouslySetInnerHTML={{ __html: tagIconSvg }} 
+            />
+          }
+        >
+          {toProperCase(item.tag as Tags)}
+        </Badge>
+      </td>
+      <td className="py-2 pr-3 text-center">
+        <Tooltip label="Remove">
+          <ActionIcon 
+            color="red" 
+            variant="subtle" 
+            onClick={(e) => onRemove(e, index)}
+            size="sm"
+          >
+            <LuTrash2 size={16} />
+          </ActionIcon>
+        </Tooltip>
+      </td>
+    </tr>
+  );
+};
+
+// Helper function to get category color
+const getCategoryColor = (category: Tags): string => {
+  switch (category) {
+    case Tags.FAKE_NEWS:
+      return "red";
+    case Tags.PARODY:
+      return "blue";
+    case Tags.BOT:
+      return "yellow";
+    case Tags.SPAM:
+      return "orange";
+    case Tags.CONSPIRACY:
+      return "grape";
+    case Tags.FAN_PAGE:
+      return "pink";
+    case Tags.SEXUAL:
+      return "violet";
+    case Tags.OFFICIAL:
+      return "green";
+    case Tags.AD:
+      return "cyan";
+    default:
+      return "gray";
+  }
+};
+
+// Helper function to check if a handle is already in the list
+const isHandleInList = (userHandle: string, list: string[]): boolean => {
+  const normalizedHandle = userHandle.replace(/^@/, "").toLowerCase();
+  return (
+    list.map((handle) => handle.toLowerCase()).includes(normalizedHandle) ||
+    list.map((handle) => handle.toLowerCase()).includes(`@${normalizedHandle}`)
+  );
+};
 
 export const TargetList = () => {
   const [userhandle, setUserHandle] = useState("");
@@ -18,12 +104,15 @@ export const TargetList = () => {
     Tags.ON_WATCHLIST,
   );
   const [action, setAction] = useState("monitor");
+  
+  // Handle action change
   const onActionChange = (action: string) => {
     setAction(action);
   };
 
+  // Remove a target from the list
   const removeFromList = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     index: number,
   ) => {
     event.stopPropagation();
@@ -39,16 +128,18 @@ export const TargetList = () => {
     });
   };
 
+  // Handle messages from other parts of the extension
   const handleMessage = (message: { type: string; data: TargetHandle[] }) => {
     if (message.type === "updateHandles") {
       setTargetHandles(message.data);
     }
   };
 
+  // Add a new target to the list
   const addToList = () => {
     setTargetHandles((prev) => {
       if (
-        !prev.some((item) => item.handle === userhandle) &&
+        !prev.some((item) => item.handle.toLowerCase() === userhandle.toLowerCase()) &&
         userhandle.trim() !== ""
       ) {
         const newHandle: TargetHandle = {
@@ -76,10 +167,12 @@ export const TargetList = () => {
     });
   };
 
+  // Open settings page
   const handleSettingsClick = () => {
     chrome.runtime.openOptionsPage();
   };
 
+  // Initialize data and set up listeners
   useEffect(() => {
     // Fetch the latest targetHandles from storage on mount
     chrome.storage.sync.get("targetHandles", (data) => {
@@ -95,49 +188,17 @@ export const TargetList = () => {
     };
   }, []);
 
-  const categoryColors = (category: Tags) => {
-    switch (category) {
-      case Tags.FAKE_NEWS:
-        return "bg-red-500";
-      case Tags.PARODY:
-        return "bg-blue-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
+  // Filter and map target handles to rows
+  const filteredTargets = targetHandles.filter((item) =>
+    item.handle.toLowerCase().includes(searchFilter.toLowerCase())
+  );
 
-  const isUserHandleInList = (userHandle: string, list: string[]) => {
-    const normalizedHandle = userHandle.replace(/^@/, "").toLowerCase(); // Remove "@" if present and convert to lower case
-    return (
-      list.map((handle) => handle.toLowerCase()).includes(normalizedHandle) ||
-      list
-        .map((handle) => handle.toLowerCase())
-        .includes(`@${normalizedHandle}`)
-    );
-  };
+  // Check if current handle is already in the list
+  const isCurrentHandleInList = isHandleInList(
+    userhandle,
+    targetHandles.map((th) => th.handle)
+  );
 
-  const list = targetHandles
-    .filter((item) =>
-      item.handle.toLowerCase().includes(searchFilter.toLowerCase()),
-    )
-    .map((item, idx) => (
-      <tr key={idx} className="text-center text-xs">
-        <td className="text-left">{item.handle}</td>
-        <td className="text-left">{item.action}</td>
-        <td className="text-center">
-          <p
-            className={`${categoryColors(
-              item.tag as Tags,
-            )} w-fit rounded px-2 text-center text-xs`}
-          >
-            {toProperCase(item.tag as Tags)}
-          </p>
-        </td>
-        <td>
-          <div onClick={(e) => removeFromList(e, idx)}>X</div>
-        </td>
-      </tr>
-    ));
   return (
     <div
       className="flex w-full flex-col justify-between"
@@ -146,12 +207,14 @@ export const TargetList = () => {
         backgroundColor: "var(--color-secondary)",
       }}
     >
+      {/* Input section */}
       <section
         style={{
           backgroundColor: "var(--color-secondary)",
         }}
       >
-        <div className="mb-2 flex w-full flex-col items-center justify-center gap-1 p-8">
+        <div className="mb-2 flex w-full flex-col items-center justify-center gap-2 p-6">
+          {/* Category selection */}
           <div className="h-[35px] w-full">
             <TargetCategorySelect
               categories={Object.keys(DEFAULT_STYLE_CONFIGS)}
@@ -161,66 +224,86 @@ export const TargetList = () => {
               }}
             />
           </div>
+          
+          {/* Handle input */}
           <div className="h-[35px] w-full">
             <TargetInput
               inputVal={userhandle}
               setInputVal={(value) => setUserHandle(value)}
             />
           </div>
+          
+          {/* Action selection */}
           <div className="h-[35px] w-full">
             <TargetActionSelect
               action={action}
               onActionChange={onActionChange}
             />
           </div>
-          <div>
+          
+          {/* Add button */}
+          <div className="mt-1 flex w-full flex-col items-center">
             <Button
               variant="filled"
               color="var(--color-tertiary)"
               onClick={addToList}
-              disabled={
-                isUserHandleInList(
-                  userhandle,
-                  targetHandles.map((th) => th.handle),
-                ) || userhandle.trim() === ""
-              }
+              disabled={isCurrentHandleInList || userhandle.trim() === ""}
+              fullWidth
             >
-              Add
+              Add to List
             </Button>
-            {isUserHandleInList(
-              userhandle,
-              targetHandles.map((th) => th.handle),
-            ) ? (
-              <div className="text-xs text-red-400">
-                Userhandle is already in the list.
+            
+            {isCurrentHandleInList && (
+              <div className="mt-1 text-xs text-red-400">
+                This handle is already in the list
               </div>
-            ) : (
-              <></>
             )}
           </div>
-          <div className="w-full px-6">
+          
+          {/* Search filter */}
+          <div className="mt-2 w-full">
             <TextInput
-              leftSection={<LuAtSign />}
+              leftSection={<LuAtSign size={16} />}
               placeholder="Filter list"
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
+              size="xs"
             />
           </div>
         </div>
-        <div className="max-h-[200px] overflow-y-auto text-white">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="font-bold">
-                <th className="w-[50%] text-left">User</th>
-                <th className="w-fit text-left">Action</th>
-                <th className="w-fit text-left">Tag</th>
-                <th className="w-fit text-left">Remove</th>
-              </tr>
-            </thead>
-            <tbody>{list}</tbody>
-          </table>
+        
+        {/* Target list table */}
+        <div className="max-h-[220px] overflow-y-auto rounded border border-gray-700 text-white">
+          {filteredTargets.length > 0 ? (
+            <table className="w-full border-collapse text-sm">
+              <thead className="sticky top-0 bg-gray-800">
+                <tr className="border-b border-gray-700 font-medium">
+                  <th className="py-2 pl-3 text-left">User</th>
+                  <th className="py-2 text-left">Action</th>
+                  <th className="py-2 text-center">Tag</th>
+                  <th className="py-2 pr-3 text-center">Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTargets.map((item, idx) => (
+                  <TargetRow 
+                    key={idx} 
+                    item={item} 
+                    index={idx} 
+                    onRemove={removeFromList} 
+                  />
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="flex h-[100px] items-center justify-center text-gray-400">
+              {searchFilter ? "No matches found" : "No targets added yet"}
+            </div>
+          )}
         </div>
       </section>
+      
+      {/* Settings button section */}
       <section
         className="flex h-full w-full items-center justify-center"
         style={{
@@ -229,9 +312,10 @@ export const TargetList = () => {
       >
         <Button
           onClick={handleSettingsClick}
-          size="xs"
+          size="sm"
           color="var(--color-tertiary)"
           style={{ width: "200px", margin: "0.5rem 0rem" }}
+          variant="outline"
         >
           SETTINGS
         </Button>
