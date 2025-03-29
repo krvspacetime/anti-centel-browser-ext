@@ -6,26 +6,32 @@ import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/st
 import { TargetHandle } from "../../../content/types";
 import { toProperCase } from "../../../content/utils/utils";
 import { POPUP_HEIGHT } from "../layout/AppLayout";
-import { Actions, Tags } from "../types";
+import { Actions, Tags } from "../../types/targets";
 import { TargetActionSelect } from "./TargetActionSelect";
 import { LuAtSign, LuTrash2 } from "react-icons/lu";
-import { getTagIcon } from "../../../content/utils/iconUtils";
+import { getTagIcon } from "../icons/iconUtils";
 
 // Component for rendering a single target row
-const TargetRow = ({ 
-  item, 
-  index, 
-  onRemove 
-}: { 
-  item: TargetHandle; 
-  index: number; 
-  onRemove: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, index: number) => void;
+const TargetRow = ({
+  item,
+  index,
+  onRemove,
+}: {
+  item: TargetHandle;
+  index: number;
+  onRemove: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    index: number,
+  ) => void;
 }) => {
   // Get the SVG icon for the tag
   const tagIconSvg = getTagIcon(item.tag as Tags);
-  
+
   return (
-    <tr key={index} className="border-b border-gray-700 text-xs hover:bg-gray-800/30">
+    <tr
+      key={index}
+      className="border-b border-gray-700 text-xs hover:bg-gray-800/30"
+    >
       <td className="py-2 pl-3 text-left">{item.handle}</td>
       <td className="py-2 text-left capitalize">{item.action}</td>
       <td className="py-2 text-center">
@@ -36,9 +42,9 @@ const TargetRow = ({
           size="sm"
           radius="sm"
           leftSection={
-            <div 
-              className="flex h-4 w-4 items-center justify-center" 
-              dangerouslySetInnerHTML={{ __html: tagIconSvg }} 
+            <div
+              className="flex h-4 w-4 items-center justify-center"
+              dangerouslySetInnerHTML={{ __html: tagIconSvg }}
             />
           }
         >
@@ -47,9 +53,9 @@ const TargetRow = ({
       </td>
       <td className="py-2 pr-3 text-center">
         <Tooltip label="Remove">
-          <ActionIcon 
-            color="red" 
-            variant="subtle" 
+          <ActionIcon
+            color="red"
+            variant="subtle"
             onClick={(e) => onRemove(e, index)}
             size="sm"
           >
@@ -104,7 +110,7 @@ export const TargetList = () => {
     Tags.ON_WATCHLIST,
   );
   const [action, setAction] = useState("monitor");
-  
+
   // Handle action change
   const onActionChange = (action: string) => {
     setAction(action);
@@ -139,7 +145,9 @@ export const TargetList = () => {
   const addToList = () => {
     setTargetHandles((prev) => {
       if (
-        !prev.some((item) => item.handle.toLowerCase() === userhandle.toLowerCase()) &&
+        !prev.some(
+          (item) => item.handle.toLowerCase() === userhandle.toLowerCase(),
+        ) &&
         userhandle.trim() !== ""
       ) {
         const newHandle: TargetHandle = {
@@ -190,13 +198,13 @@ export const TargetList = () => {
 
   // Filter and map target handles to rows
   const filteredTargets = targetHandles.filter((item) =>
-    item.handle.toLowerCase().includes(searchFilter.toLowerCase())
+    item.handle.toLowerCase().includes(searchFilter.toLowerCase()),
   );
 
   // Check if current handle is already in the list
   const isCurrentHandleInList = isHandleInList(
     userhandle,
-    targetHandles.map((th) => th.handle)
+    targetHandles.map((th) => th.handle),
   );
 
   return (
@@ -224,7 +232,7 @@ export const TargetList = () => {
               }}
             />
           </div>
-          
+
           {/* Handle input */}
           <div className="h-[35px] w-full">
             <TargetInput
@@ -232,7 +240,7 @@ export const TargetList = () => {
               setInputVal={(value) => setUserHandle(value)}
             />
           </div>
-          
+
           {/* Action selection */}
           <div className="h-[35px] w-full">
             <TargetActionSelect
@@ -240,7 +248,7 @@ export const TargetList = () => {
               onActionChange={onActionChange}
             />
           </div>
-          
+
           {/* Add button */}
           <div className="mt-1 flex w-full flex-col items-center">
             <Button
@@ -252,14 +260,14 @@ export const TargetList = () => {
             >
               Add to List
             </Button>
-            
+
             {isCurrentHandleInList && (
               <div className="mt-1 text-xs text-red-400">
                 This handle is already in the list
               </div>
             )}
           </div>
-          
+
           {/* Search filter */}
           <div className="mt-2 w-full">
             <TextInput
@@ -271,7 +279,7 @@ export const TargetList = () => {
             />
           </div>
         </div>
-        
+
         {/* Target list table */}
         <div className="max-h-[220px] overflow-y-auto rounded border border-gray-700 text-white">
           {filteredTargets.length > 0 ? (
@@ -286,11 +294,11 @@ export const TargetList = () => {
               </thead>
               <tbody>
                 {filteredTargets.map((item, idx) => (
-                  <TargetRow 
-                    key={idx} 
-                    item={item} 
-                    index={idx} 
-                    onRemove={removeFromList} 
+                  <TargetRow
+                    key={idx}
+                    item={item}
+                    index={idx}
+                    onRemove={removeFromList}
                   />
                 ))}
               </tbody>
@@ -302,7 +310,7 @@ export const TargetList = () => {
           )}
         </div>
       </section>
-      
+
       {/* Settings button section */}
       <section
         className="flex h-full w-full items-center justify-center"

@@ -1,4 +1,4 @@
-import { Tags } from "../types";
+import { Tags } from "../../types/targets";
 
 interface TargetCategorySelectProps {
   categories: string[];
