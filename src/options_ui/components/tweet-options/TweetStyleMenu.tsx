@@ -1,25 +1,35 @@
 import { useState, useEffect } from "react";
 import { MockTweet } from "../mock-tweet/MockTweet";
 import { CollapsedTweet } from "../collpased-tweet/CollpasedTweet";
-import { STYLE_SETTINGS, StyleSettings } from "./styleDefaults";
+import { STYLE_SETTINGS } from "./styleDefaults";
 import { HighlightOptions } from "./HighlightOptions";
 import { HideOptions } from "./HideOptions";
 import { BlurOptions } from "./BlurOptions";
 import { SegmentedControl } from "@mantine/core";
 import segmentedControl from "./segmentedControl.module.css";
 import { HideUserDetails } from "../misc/HideUserDetails";
+import { ImportExportOptions } from "./ImportExportOptions";
+
 const SAMPLE_IMG = "avatar.jpg";
 const SAMPLE_TEXT =
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
 
 export const TweetStyleMenu = () => {
   const [styleSettings, setStyleSettings] = useState(STYLE_SETTINGS);
+  const [targetHandles, setTargetHandles] = useState([]);
+  const [importExportStatus, setImportExportStatus] = useState({
+    type: "",
+    message: "",
+  });
 
-  // Load initial style settings from storage
+  // Load initial style settings and target handles from storage
   useEffect(() => {
-    chrome.storage.sync.get("styleSettings", (data) => {
+    chrome.storage.sync.get(["styleSettings", "targetHandles"], (data) => {
       if (data.styleSettings) {
         setStyleSettings(data.styleSettings);
+      }
+      if (data.targetHandles) {
+        setTargetHandles(data.targetHandles);
       }
     });
   }, []);
@@ -28,11 +38,6 @@ export const TweetStyleMenu = () => {
   useEffect(() => {
     chrome.storage.sync.set({ styleSettings });
   }, [styleSettings]);
-
-  //@ts-ignore
-  const [lastStyleValues, setLastStyleValues] = useState<
-    StyleSettings | undefined
-  >(undefined);
 
   const valueLabelFormat = (value: number) => {
     const units = "px";
@@ -79,6 +84,96 @@ export const TweetStyleMenu = () => {
       hideUserDetails: value,
     }));
   };
+
+  // Export settings to JSON file
+  const handleExportSettings = () => {
+    chrome.storage.sync.get(["styleSettings", "targetHandles"], (data) => {
+      const exportData = {
+        styleSettings: data.styleSettings || styleSettings,
+        targetHandles: data.targetHandles || targetHandles,
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "twitter-extension-settings.json";
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setImportExportStatus({
+        type: "success",
+        message: "Settings exported successfully!",
+      });
+
+      // Clear status message after 3 seconds
+      setTimeout(() => {
+        setImportExportStatus({ type: "", message: "" });
+      }, 3000);
+    });
+  };
+
+  // Import settings from JSON file
+  const handleImportSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedData = JSON.parse(e.target?.result as string);
+
+        if (importedData.styleSettings) {
+          setStyleSettings(importedData.styleSettings);
+          chrome.storage.sync.set({
+            styleSettings: importedData.styleSettings,
+          });
+        }
+
+        if (importedData.targetHandles) {
+          setTargetHandles(importedData.targetHandles);
+          chrome.storage.sync.set({
+            targetHandles: importedData.targetHandles,
+          });
+
+          // Notify content script about updated handles
+          chrome.runtime.sendMessage({
+            type: "updateHandles",
+            data: importedData.targetHandles,
+          });
+        }
+
+        setImportExportStatus({
+          type: "success",
+          message: "Settings imported successfully!",
+        });
+      } catch (error) {
+        console.error("Error importing settings:", error);
+        setImportExportStatus({
+          type: "error",
+          message: "Error importing settings. Please check the file format.",
+        });
+      }
+
+      // Clear status message after 3 seconds
+      setTimeout(() => {
+        setImportExportStatus({ type: "", message: "" });
+      }, 3000);
+
+      // Reset the file input
+      event.target.value = "";
+    };
+
+    reader.readAsText(file);
+  };
+
   // Segmented control
   const [selectedTab, setSelectedTab] = useState("highlight");
   return (
@@ -99,6 +194,7 @@ export const TweetStyleMenu = () => {
                 { label: "Blur", value: "blur" },
                 { label: "Hide", value: "hide" },
                 { label: "Misc", value: "misc" },
+                { label: "Import/Export", value: "importexport" },
               ]}
             />
           </section>
@@ -135,6 +231,13 @@ export const TweetStyleMenu = () => {
                   onChangeHideUserDetails={onChangeHideUserDetails}
                 />
               </div>
+            )}
+            {selectedTab === "importexport" && (
+              <ImportExportOptions
+                onExport={handleExportSettings}
+                onImport={handleImportSettings}
+                status={importExportStatus}
+              />
             )}
           </section>
         </div>
@@ -181,6 +284,21 @@ export const TweetStyleMenu = () => {
                   styleSettings.hide.collapsedTweetUsernameColor
                 }
               />
+            </section>
+          )}
+          {selectedTab === "importexport" && (
+            <section>
+              <p className="text-2xl font-bold">Settings Backup</p>
+              <div className="mt-4 rounded-lg border border-gray-700 bg-gray-800 p-4 text-white">
+                <p className="mb-2">
+                  Export your current settings and target list to a JSON file
+                  for backup or to transfer to another device.
+                </p>
+                <p className="mb-4">
+                  Import settings from a previously exported JSON file to
+                  restore your configuration.
+                </p>
+              </div>
             </section>
           )}
         </section>
