@@ -10,6 +10,7 @@ import { getActionIcon, getTagIcon } from "../../utils/iconUtils";
 /**
  * Create a modal for selecting category and action
  * @param handle The handle to add to the watchlist
+ * @param styleSettings The style settings for the modal
  * @returns Promise that resolves with the selected category and action, or null if cancelled
  */
 export function createCategoryModal(

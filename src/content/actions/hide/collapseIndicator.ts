@@ -1,7 +1,7 @@
 import { settings } from "../../../icons/icons";
 import { StyleSettings, Tags } from "../../types";
-import { SettingsDialog } from "./SettingsDialog";
 import { getTagIcon } from "../../utils/iconUtils";
+import { SettingsDialog } from "./settingsDialog";
 
 interface CollapsedIndicatorProps {
   action: "hide" | "blur";

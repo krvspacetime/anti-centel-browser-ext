@@ -34,3 +34,4 @@ vite.config.ts.timestamp*
 
 // Reference files
 PROPOSED_CONTENT_CHANGES.md
+CONTENT_REFACTOR_STRUCTURE.md
