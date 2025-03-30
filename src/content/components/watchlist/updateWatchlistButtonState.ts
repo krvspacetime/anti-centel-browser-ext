@@ -1,8 +1,8 @@
-import { TargetHandle, StyleSettings, Tags } from "../types";
-import { getTagIcon } from "../utils/iconUtils";
-import { eyeOffSvg } from "../../icons/icons";
+import { TargetHandle, StyleSettings, Tags } from "../../types";
+import { getTagIcon } from "../../utils/iconUtils";
+import { eyeOffSvg } from "../../../icons/icons";
 
-export const updateButtonState = (
+export const updateWatchlistButtonState = (
   button: HTMLElement,
   isInTargetList: boolean,
   targetHandles?: TargetHandle[],

@@ -1,9 +1,9 @@
 import {
-  WatchlistButton,
-  WatchlistButtonContainer,
-} from "./watchlist/WatchlistButton";
+  createWatchlistButton,
+  createWatchlistButtonContainer,
+} from "./components/watchlist/createWatchlistButton";
 
-import { updateButtonState } from "./watchlist/WatchlistButtonUpdate";
+import { updateWatchlistButtonState } from "./components/watchlist/updateWatchlistButtonState";
 
 import { Tags, TargetHandle } from "./types";
 import { CollapsedIndicator } from "./actions/hide/collapseIndicator";
@@ -187,9 +187,9 @@ function createWatchListButtons(
   const existingButton = tweet.querySelector(".watchlist-button");
   if (existingButton) return;
 
-  const buttonContainer = WatchlistButtonContainer();
+  const buttonContainer = createWatchlistButtonContainer();
 
-  const button = WatchlistButton({
+  const button = createWatchlistButton({
     handle,
     onClick: () => handleWatchlistAction(handle),
     targetHandles,
@@ -257,7 +257,7 @@ chrome.storage.onChanged.addListener((changes) => {
           const isInTargetList = targetHandles.some(
             (th: TargetHandle) => th.handle === handle,
           );
-          updateButtonState(button, isInTargetList, targetHandles);
+          updateWatchlistButtonState(button, isInTargetList, targetHandles);
         }
       });
   }

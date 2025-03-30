@@ -1,7 +1,7 @@
-import { TargetHandle } from "../types";
-import { updateButtonState } from "./WatchlistButtonUpdate";
+import { TargetHandle } from "../../types";
+import { updateWatchlistButtonState } from "./updateWatchlistButtonState";
 
-export function WatchlistButton({
+export function createWatchlistButton({
   handle,
   onClick,
   targetHandles,
@@ -17,13 +17,13 @@ export function WatchlistButton({
   const isInTargetList = targetHandles.some((th) => th.handle === handle);
 
   // Initialize the button with the correct state
-  updateButtonState(button, isInTargetList, targetHandles);
+  updateWatchlistButtonState(button, isInTargetList, targetHandles);
 
   button.addEventListener("click", onClick);
   return button;
 }
 
-export function WatchlistButtonContainer(): HTMLElement {
+export function createWatchlistButtonContainer(): HTMLElement {
   const container = document.createElement("div");
   container.className = "watchlist-button-container";
   container.style.cssText = `
