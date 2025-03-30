@@ -4,12 +4,18 @@ import { TargetInput } from "./TargetInput";
 import { TargetCategorySelect } from "./TargetCategorySelect";
 import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/styleConfig";
 import { TargetHandle } from "../../../content/types";
-import { toProperCase } from "../../../content/utils/utils";
 import { POPUP_HEIGHT } from "../layout/AppLayout";
 import { Actions, Tags } from "../../types/targets";
 import { TargetActionSelect } from "./TargetActionSelect";
 import { LuAtSign, LuTrash2 } from "react-icons/lu";
 import { getTagIcon } from "../icons/iconUtils";
+
+const toProperCase = (str: string) => {
+  return str
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
 
 // Component for rendering a single target row
 const TargetRow = ({

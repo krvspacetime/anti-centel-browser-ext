@@ -5,7 +5,7 @@ import {
 
 import { updateButtonState } from "./watchlist/WatchlistButtonUpdate";
 
-import { StyleSettings, Tags, TargetHandle } from "./types";
+import { Tags, TargetHandle } from "./types";
 import { CollapsedIndicator } from "./actions/hide/CollapsedIndicator";
 import { OverlayWithRemoveButton } from "./utils/styleBlurredTweetsUtils";
 import { extractHandleFromTweet } from "./utils/tweetUtils";
@@ -469,58 +469,6 @@ function hideUserDetails() {
   observer.observe(document, { childList: true, subtree: true });
 }
 
-// Add a style tag to handle tweet visibility persistence with styleSettings
-function addGlobalStyles(styleSettings: StyleSettings) {
-  const styleTag = document.createElement("style");
-
-  // Determine if we're in dark or light theme
-  const isDarkTheme = styleSettings.theme === "dark";
-
-  styleTag.textContent = `
-    .tweet-hidden {
-      height: 0px;
-      overflow: hidden;
-      position: relative;
-      transition: height 0.3s ease;
-      display: flex; /* Ensure it's not display:none which would prevent transitions */
-    }
-    .tweet-highlighted {
-      position: relative;
-      outline: ${styleSettings.highlight.highlighThickness}px solid ${styleSettings.highlight.highlightColor} !important;
-      border-radius: ${styleSettings.highlight.highlightBorderRadius}px !important;
-      box-shadow: 0 0 ${styleSettings.highlight.glowStrength}px ${styleSettings.highlight.highlightColor} !important;
-    }
-    .tweet-blur-overlay {
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      background: ${isDarkTheme ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)"} !important;
-      backdrop-filter: ${
-        styleSettings.hide.blurHiddenTweetsOnUncollpase
-          ? `blur(${styleSettings.hide.hiddenTweetBlurValue}px)`
-          : "none"
-      } !important;
-      pointer-events: none !important;
-      z-index: 10 !important;
-    }
-    .tweet-overlay {
-      position: absolute !important;
-      top: 0 !important;
-      right: 0 !important;
-      background-color: ${isDarkTheme} ? #000000 : #FFFFFF !important;
-      color: ${isDarkTheme} #FFFFFF : #000000 !important;
-      padding: 5px 10px !important;
-      border-radius: 0 0 0 5px !important;  
-      z-index: 1000 !important;
-      font-size: 12px !important;
-      font-weight: bold !important;
-    }
-  `;
-  document.head.appendChild(styleTag);
-}
-
 // Initialize the extension
 function init() {
   console.log("Anti-Centel extension initialized");
@@ -541,9 +489,6 @@ function init() {
         );
       });
     }
-
-    // Add global styles with styleSettings
-    addGlobalStyles(styleSettings);
 
     // Continue with other initialization
     detectAndSetTheme();
