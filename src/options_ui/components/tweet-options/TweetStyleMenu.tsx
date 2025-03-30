@@ -11,6 +11,7 @@ import {
   Title,
   Transition,
   Divider,
+  Button,
 } from "@mantine/core";
 import segmentedControl from "./segmentedControl.module.css";
 import { HideUserDetails } from "../misc/HideUserDetails";
@@ -21,6 +22,8 @@ import {
   LuEyeOff,
   LuSettings2,
   LuDownloadCloud,
+  LuSave,
+  LuRotateCcw,
 } from "react-icons/lu";
 
 const SAMPLE_IMG = "avatar.jpg";
@@ -29,12 +32,14 @@ const SAMPLE_TEXT =
 
 export const TweetStyleMenu = () => {
   const [styleSettings, setStyleSettings] = useState(STYLE_SETTINGS);
+  const [savedStyleSettings, setSavedStyleSettings] = useState(STYLE_SETTINGS);
   const [targetHandles, setTargetHandles] = useState([]);
   const [importExportStatus, setImportExportStatus] = useState({
     type: "",
     message: "",
   });
   const [animatePreview, setAnimatePreview] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Segmented control
   const [selectedTab, setSelectedTab] = useState("highlight");
@@ -43,6 +48,7 @@ export const TweetStyleMenu = () => {
     chrome.storage.sync.get(["styleSettings", "targetHandles"], (data) => {
       if (data.styleSettings) {
         setStyleSettings(data.styleSettings);
+        setSavedStyleSettings(data.styleSettings);
       }
       if (data.targetHandles) {
         setTargetHandles(data.targetHandles);
@@ -50,10 +56,12 @@ export const TweetStyleMenu = () => {
     });
   }, []);
 
-  // Save style settings to storage whenever they change
+  // Check for unsaved changes whenever styleSettings changes
   useEffect(() => {
-    chrome.storage.sync.set({ styleSettings });
-  }, [styleSettings]);
+    const hasChanges =
+      JSON.stringify(styleSettings) !== JSON.stringify(savedStyleSettings);
+    setHasUnsavedChanges(hasChanges);
+  }, [styleSettings, savedStyleSettings]);
 
   // Animate preview when tab changes
   useEffect(() => {
@@ -110,6 +118,39 @@ export const TweetStyleMenu = () => {
     }));
   };
 
+  // Apply changes to Chrome storage
+  const applyChanges = () => {
+    chrome.storage.sync.set({ styleSettings });
+    setSavedStyleSettings(styleSettings);
+    setHasUnsavedChanges(false);
+
+    setImportExportStatus({
+      type: "success",
+      message: "Settings saved successfully!",
+    });
+
+    // Clear status message after 3 seconds
+    setTimeout(() => {
+      setImportExportStatus({ type: "", message: "" });
+    }, 3000);
+  };
+
+  // Reset to last saved settings
+  const resetChanges = () => {
+    setStyleSettings(savedStyleSettings);
+    setHasUnsavedChanges(false);
+
+    setImportExportStatus({
+      type: "info",
+      message: "Changes discarded.",
+    });
+
+    // Clear status message after 3 seconds
+    setTimeout(() => {
+      setImportExportStatus({ type: "", message: "" });
+    }, 3000);
+  };
+
   // Export settings to JSON file
   const handleExportSettings = () => {
     chrome.storage.sync.get(["styleSettings", "targetHandles"], (data) => {
@@ -159,6 +200,7 @@ export const TweetStyleMenu = () => {
 
         if (importedData.styleSettings) {
           setStyleSettings(importedData.styleSettings);
+          setSavedStyleSettings(importedData.styleSettings);
           chrome.storage.sync.set({
             styleSettings: importedData.styleSettings,
           });
@@ -217,14 +259,56 @@ export const TweetStyleMenu = () => {
         p="xl"
         className="mx-auto max-w-7xl bg-white transition-all duration-300 dark:bg-gray-800"
       >
-        <Title
-          order={1}
-          className="mb-6 font-bold text-gray-800 dark:text-gray-100"
-        >
-          Settings
-        </Title>
+        <div className="mb-6 flex items-center justify-between">
+          <Title
+            order={1}
+            className="font-bold text-gray-800 dark:text-gray-100"
+          >
+            Settings
+          </Title>
+
+          <div className="flex items-center gap-2">
+            {hasUnsavedChanges && (
+              <div className="rounded-md bg-yellow-50 p-2 text-sm text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200">
+                <p>
+                  You have unsaved changes
+                </p>
+              </div>
+            )}
+            <Button
+              leftSection={<LuRotateCcw size={16} />}
+              variant="outline"
+              color="gray"
+              onClick={resetChanges}
+              disabled={!hasUnsavedChanges}
+            >
+              Reset
+            </Button>
+            <Button
+              leftSection={<LuSave size={16} />}
+              onClick={applyChanges}
+              disabled={!hasUnsavedChanges}
+            >
+              Apply Changes
+            </Button>
+          </div>
+        </div>
 
         <Divider className="mb-6" />
+
+        {importExportStatus.message && (
+          <div
+            className={`mb-4 rounded-md p-3 ${
+              importExportStatus.type === "success"
+                ? "bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200"
+                : importExportStatus.type === "error"
+                  ? "bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200"
+                  : "bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200"
+            }`}
+          >
+            {importExportStatus.message}
+          </div>
+        )}
 
         <div className="flex w-full flex-col gap-6 md:flex-row">
           <div className="flex w-full flex-col gap-6 md:w-2/3 md:flex-row">
