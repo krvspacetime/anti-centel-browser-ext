@@ -109,7 +109,7 @@ export const TargetList = () => {
   const [selectedCategory, setSelectedCategory] = useState<Tags>(
     Tags.ON_WATCHLIST,
   );
-  const [action, setAction] = useState("monitor");
+  const [action, setAction] = useState("tag");
 
   // Handle action change
   const onActionChange = (action: string) => {
@@ -321,7 +321,7 @@ export const TargetList = () => {
         <Button
           onClick={handleSettingsClick}
           size="sm"
-          color="var(--color-tertiary)"
+          color="#ffffff"
           style={{ width: "200px", margin: "0.5rem 0rem" }}
           variant="outline"
         >

@@ -1,7 +1,7 @@
 import { Select } from "@mantine/core";
 import actionStyles from "./action-select.module.css";
 
-const ACTIONS = ["monitor", "hide", "blur", "highlight"];
+const ACTIONS = ["tag", "hide", "blur", "highlight"];
 
 interface TargetActionSelectProps {
   action: string;
@@ -17,7 +17,7 @@ export const TargetActionSelect = ({
       classNames={actionStyles}
       data={ACTIONS}
       value={action}
-      onChange={(value) => onActionChange(value ?? "monitor")}
+      onChange={(value) => onActionChange(value ?? "tag")}
     />
   );
 };

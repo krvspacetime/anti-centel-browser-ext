@@ -6,7 +6,7 @@ export interface TargetHandle {
   action: Actions;
 }
 
-export type Actions = "monitor" | "hide" | "blur" | "highlight";
+export type Actions = "tag" | "hide" | "blur" | "highlight";
 export enum Tags {
   ON_WATCHLIST = "on_watchlist",
   FAKE_NEWS = "fake_news",

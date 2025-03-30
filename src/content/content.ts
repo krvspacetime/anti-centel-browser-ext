@@ -97,7 +97,7 @@ function styleTargetTweets(
 
     if (isInTargetList) {
       const tag = targetInfo?.tag || "on_watchlist";
-      const action = targetInfo?.action || "monitor";
+      const action = targetInfo?.action || "tag";
 
       if (action === "hide") {
         // Use a more permanent approach to hiding that won't be affected by Twitter's DOM recycling

@@ -115,7 +115,7 @@ export function createCategoryModal(
     actionButtons.style.gap = "8px";
 
     // Create buttons for each action
-    const actionOptions: Actions[] = ["monitor", "hide", "blur", "highlight"];
+    const actionOptions: Actions[] = ["tag", "hide", "blur", "highlight"];
     let selectedAction: Actions | null = null;
 
     actionOptions.forEach((action) => {

@@ -8,10 +8,10 @@ export interface TargetHandle {
   action: Actions;
 }
 
-export type Actions = "monitor" | "hide" | "blur" | "highlight";
+export type Actions = "tag" | "hide" | "blur" | "highlight";
 
 export enum Action {
-  MONITOR = "monitor",
+  TAG = "tag",
   HIDE = "hide",
   BLUR = "blur",
   HIGHLIGHT = "highlight",
