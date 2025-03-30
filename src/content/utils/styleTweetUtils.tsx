@@ -1,5 +1,5 @@
-import { tagIconMapper } from "../data";
-import { StyleSettings } from "../types";
+import { StyleSettings, Tags } from "../types";
+import { getTagIcon } from "../utils/iconUtils";
 
 function createTweetOverlay(blurValue: number, styleSettings: StyleSettings) {
   const isDarkTheme = styleSettings.theme === "dark";
@@ -11,12 +11,14 @@ function createTweetOverlay(blurValue: number, styleSettings: StyleSettings) {
     left: 0;
     width: 100%;
     height: 100%;
-    background: ${isDarkTheme ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)"};
+    background: ${isDarkTheme ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"};
     pointer-events: auto;
     backdrop-filter: blur(${blurValue}px);
-    outline: 1px solid ${isDarkTheme ? "gold" : "#1da1f2"};
+    border: 1px solid ${isDarkTheme ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"};
+    border-radius: 12px;
     pointer-events: none;
-    z-index: 2
+    z-index: 2;
+    transition: backdrop-filter 0.3s ease, background 0.3s ease;
   `;
 
   return overlay;
@@ -36,9 +38,13 @@ const createShowTweetButton = (
     "svg",
   );
   showIcon.setAttribute("viewBox", "0 0 24 24");
-  showIcon.setAttribute("width", "24");
-  showIcon.setAttribute("height", "24");
-  showIcon.setAttribute("fill", isDarkTheme ? "white" : "black");
+  showIcon.setAttribute("width", "16");
+  showIcon.setAttribute("height", "16");
+  showIcon.setAttribute("fill", "none");
+  showIcon.setAttribute("stroke", isDarkTheme ? "white" : "black");
+  showIcon.setAttribute("stroke-width", "2");
+  showIcon.setAttribute("stroke-linecap", "round");
+  showIcon.setAttribute("stroke-linejoin", "round");
 
   // Create the path for the eye icon
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -57,8 +63,8 @@ const createShowTweetButton = (
   const text = document.createElement("span");
   text.textContent = "Show";
   text.style.cssText = `
-    margin-left: 8px;
-    font-size: 14px;
+    margin-left: 4px;
+    font-size: 12px;
     color: ${isDarkTheme ? "white" : "black"};
   `;
 
@@ -71,22 +77,38 @@ const createShowTweetButton = (
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 8px 16px;
-    background: ${isDarkTheme ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"};
-    outline: ${isDarkTheme ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"};
+    gap: 4px;
+    top: 8px;
+    right: 24px;
+    padding: 4px 8px;
+    background: ${isDarkTheme ? "rgba(30,30,30,0.8)" : "rgba(240,240,240,0.8)"};
+    border: 1px solid ${isDarkTheme ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)"};
     color: ${isDarkTheme ? "white" : "black"};
-    border: none;
-    border-radius: 4px;
+    border-radius: 16px;
     cursor: pointer;
     pointer-events: auto;
     transition: all 0.2s ease;
-    font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    backdrop-filter: blur(10px);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    backdrop-filter: blur(4px);
+    font-weight: 500;
+    box-shadow: 0 2px 4px ${isDarkTheme ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.1)"};
+    opacity: 0.8;
+    z-index: 4;
   `;
+
+  showTweetButton.addEventListener("mouseenter", () => {
+    showTweetButton.style.opacity = "1";
+    showTweetButton.style.background = isDarkTheme
+      ? "rgba(40,40,40,0.9)"
+      : "rgba(250,250,250,0.9)";
+  });
+
+  showTweetButton.addEventListener("mouseleave", () => {
+    showTweetButton.style.opacity = "0.8";
+    showTweetButton.style.background = isDarkTheme
+      ? "rgba(30,30,30,0.8)"
+      : "rgba(240,240,240,0.8)";
+  });
 
   showTweetButton.addEventListener("click", onClick);
 
@@ -107,10 +129,13 @@ const createHideTweetButton = (
     "svg",
   );
   hideIcon.setAttribute("viewBox", "0 0 24 24");
-  hideIcon.setAttribute("width", "24");
-  hideIcon.setAttribute("height", "24");
-  hideIcon.setAttribute("fill", isDarkTheme ? "#ffffff" : "#000000");
-  hideIcon.setAttribute("stroke", isDarkTheme ? "#ffffff" : "#000000");
+  hideIcon.setAttribute("width", "16");
+  hideIcon.setAttribute("height", "16");
+  hideIcon.setAttribute("fill", "none");
+  hideIcon.setAttribute("stroke", isDarkTheme ? "white" : "black");
+  hideIcon.setAttribute("stroke-width", "2");
+  hideIcon.setAttribute("stroke-linecap", "round");
+  hideIcon.setAttribute("stroke-linejoin", "round");
 
   // Create the path for the eye-slash icon
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -131,8 +156,8 @@ const createHideTweetButton = (
   const text = document.createElement("span");
   text.textContent = "Hide";
   text.style.cssText = `
-    margin-left: 8px;
-    font-size: 14px;
+    margin-left: 4px;
+    font-size: 12px;
     color: ${isDarkTheme ? "white" : "black"};
   `;
 
@@ -145,22 +170,38 @@ const createHideTweetButton = (
     display: none;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 8px 16px;
-    background: ${isDarkTheme ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"};
-    outline: ${isDarkTheme ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"};
+    gap: 4px;
+    top: 8px;
+    right: 24px;
+    padding: 4px 8px;
+    background: ${isDarkTheme ? "rgba(30,30,30,0.8)" : "rgba(240,240,240,0.8)"};
+    border: 1px solid ${isDarkTheme ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)"};
     color: ${isDarkTheme ? "white" : "black"};
-    border: none;
-    border-radius: 4px;
+    border-radius: 16px;
     cursor: pointer;
     pointer-events: auto;
     transition: all 0.2s ease;
-    font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    backdrop-filter: blur(10px);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    backdrop-filter: blur(4px);
+    font-weight: 500;
+    box-shadow: 0 2px 4px ${isDarkTheme ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.1)"};
+    opacity: 0.8;
+    z-index: 4;
   `;
+
+  hideTweetButton.addEventListener("mouseenter", () => {
+    hideTweetButton.style.opacity = "1";
+    hideTweetButton.style.background = isDarkTheme
+      ? "rgba(40,40,40,0.9)"
+      : "rgba(250,250,250,0.9)";
+  });
+
+  hideTweetButton.addEventListener("mouseleave", () => {
+    hideTweetButton.style.opacity = "0.8";
+    hideTweetButton.style.background = isDarkTheme
+      ? "rgba(30,30,30,0.8)"
+      : "rgba(240,240,240,0.8)";
+  });
 
   hideTweetButton.addEventListener("click", onClick);
 
@@ -176,65 +217,98 @@ const createTweetBadge = (
   const badgeContainer = document.createElement("div");
   badgeContainer.style.cssText = `
     position: absolute;
-    top: 1%;
-    right: 5%;
-    background: transparent;
+    top: 8px;
+    left: 8px;
+    background: ${isDarkTheme ? "rgba(30,30,30,0.8)" : "rgba(240,240,240,0.8)"};
     color: ${isDarkTheme ? "white" : "black"};
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 16px;
     text-align: center;
-    font-size: 11px;
+    font-size: 12px;
     pointer-events: auto;
     z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid ${isDarkTheme ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)"};
+    backdrop-filter: blur(4px);
+    font-weight: 500;
+    box-shadow: 0 2px 4px ${isDarkTheme ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.1)"};
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
   `;
 
-  const tweetBadge = document.createElement("div");
-  tweetBadge.innerHTML = tagIconMapper(tag);
-  tweetBadge.className = "tweet-badge";
+  // Get the SVG icon for the tag
+  const iconSvg = getTagIcon(tag as Tags);
+
+  // Create icon container
+  const iconContainer = document.createElement("div");
+  iconContainer.style.cssText = `
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+  `;
+  iconContainer.innerHTML = iconSvg;
+
+  // Set icon color
+  const svgElement = iconContainer.querySelector("svg");
+  if (svgElement) {
+    svgElement.style.fill = isDarkTheme ? "white" : "black";
+    svgElement.style.width = "14px";
+    svgElement.style.height = "14px";
+  }
+
+  // Format tag text
+  const categoryLabel = tag.replace(/_/g, " ").split(" ");
+  const upperCaseCategoryLabel = categoryLabel
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  const tagText = document.createElement("span");
+  tagText.textContent = upperCaseCategoryLabel;
+
+  badgeContainer.appendChild(iconContainer);
+  badgeContainer.appendChild(tagText);
 
   // Create tooltip element
   const tooltip = document.createElement("div");
-  const categoryLabel = tag.replace("_", " ").split(" ");
-  const upperCaseCategoryLabel = categoryLabel.map((word) => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  });
-
-  tooltip.textContent = `${handle} - ${upperCaseCategoryLabel.join(" ")}`; // Set tooltip text to the tag
-  tooltip.className = "tag-overlay-tooltip"; // Add a class for styling
-  tooltip.style.alignItems = "center";
-  tooltip.style.justifyContent = "center";
+  tooltip.textContent = `${handle} - ${upperCaseCategoryLabel}`;
+  tooltip.className = "tag-overlay-tooltip";
   tooltip.style.cssText = `
-    visibility: visible;
-    font-size: 0.4 rem;
-    background-color: ${isDarkTheme ? "black" : "#1da1f2"};
-    color: ${isDarkTheme ? "white" : "white"};
+    visibility: hidden;
+    font-size: 12px;
+    background-color: ${isDarkTheme ? "rgba(20,20,20,0.95)" : "rgba(250,250,250,0.95)"};
+    color: ${isDarkTheme ? "white" : "black"};
     text-align: center;
-    border-radius: 4px;
-    padding: 5px;
-    z-index: 3;
-    margin-right: 10px;
+    border-radius: 6px;
+    padding: 6px 10px;
+    z-index: 5;
     opacity: 0;
-    transition: visibility 0s, opacity 0.3s linear;
+    transition: visibility 0s, opacity 0.3s ease;
     position: absolute;
-    right: 100%;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 0;
+    top: 100%;
+    margin-top: 8px;
     white-space: nowrap;
+    box-shadow: 0 2px 10px ${isDarkTheme ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.1)"};
+    border: 1px solid ${isDarkTheme ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"};
+    pointer-events: none;
   `;
 
-  badgeContainer.appendChild(tweetBadge);
-  badgeContainer.appendChild(tooltip); // Append tooltip to the badge
+  badgeContainer.appendChild(tooltip);
 
-  tweetBadge.addEventListener("mouseover", () => {
-    console.log("tooltip in");
+  badgeContainer.addEventListener("mouseenter", () => {
     tooltip.style.visibility = "visible";
-    tooltip.style.opacity = "1"; // Show tooltip
+    tooltip.style.opacity = "1";
+    badgeContainer.style.opacity = "1";
   });
 
-  tweetBadge.addEventListener("mouseout", () => {
-    console.log("tooltip out");
+  badgeContainer.addEventListener("mouseleave", () => {
     tooltip.style.visibility = "hidden";
-    tooltip.style.opacity = "0"; // Hide tooltip
+    tooltip.style.opacity = "0";
+    badgeContainer.style.opacity = "0.8";
   });
 
   return badgeContainer;
@@ -245,18 +319,14 @@ const createButtonContainer = () => {
   buttonContainer.className = "button-container";
   buttonContainer.style.cssText = `
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 0;
+    left: 0;
     display: flex;
     width: 100%;
     height: 100%;
-    justify-content: center;
-    align-items: row;
-    flex-direction: column;
-    gap: 2px;
-    transform: translate(-50%, -50%);
     pointer-events: none;
     background: transparent;
+    z-index: 3;
   `;
   return buttonContainer;
 };
@@ -274,22 +344,71 @@ export const OverlayWithRemoveButton = (
   const badge = createTweetBadge(handle, category, styleSettings);
 
   const showButton = createShowTweetButton(() => {
+    // Reduce blur instead of removing it completely for a smoother experience
     overlay.style.backdropFilter = `blur(0px)`;
+    overlay.style.background = "transparent";
+    overlay.style.border = "none";
+
     showButton.style.display = "none";
     hideButton.style.display = "flex";
     badge.style.display = "none";
+
+    // Add a subtle animation
+    overlay.animate(
+      [
+        { backdropFilter: `blur(${styleSettings.blur.blurValue}px)` },
+        { backdropFilter: "blur(0px)" },
+      ],
+      {
+        duration: 300,
+        easing: "ease-out",
+      },
+    );
   }, styleSettings);
 
   const hideButton = createHideTweetButton(() => {
-    overlay.style.backdropFilter = `blur(${styleSettings.blur.blurValue}px)`; // Use blur value from styleSettings
+    overlay.style.backdropFilter = `blur(${styleSettings.blur.blurValue}px)`;
+    overlay.style.background =
+      styleSettings.theme === "dark"
+        ? "rgba(0,0,0,0.05)"
+        : "rgba(255,255,255,0.05)";
+    overlay.style.border =
+      styleSettings.theme === "dark"
+        ? "1px solid rgba(255,255,255,0.1)"
+        : "1px solid rgba(0,0,0,0.1)";
+
     showButton.style.display = "flex";
     hideButton.style.display = "none";
-    badge.style.display = "block";
+    badge.style.display = "flex";
+
+    // Add a subtle animation
+    overlay.animate(
+      [
+        { backdropFilter: "blur(0px)" },
+        { backdropFilter: `blur(${styleSettings.blur.blurValue}px)` },
+      ],
+      {
+        duration: 300,
+        easing: "ease-in",
+      },
+    );
   }, styleSettings);
 
-  overlay.appendChild(buttonContainer);
+  // Add hover effect to the entire overlay
+  overlay.addEventListener("mouseenter", () => {
+    showButton.style.opacity = "1";
+    badge.style.opacity = "1";
+  });
+
+  overlay.addEventListener("mouseleave", () => {
+    showButton.style.opacity = "0.8";
+    badge.style.opacity = "0.8";
+  });
+
   buttonContainer.appendChild(showButton);
   buttonContainer.appendChild(hideButton);
   buttonContainer.appendChild(badge);
+  overlay.appendChild(buttonContainer);
+
   return overlay;
 };

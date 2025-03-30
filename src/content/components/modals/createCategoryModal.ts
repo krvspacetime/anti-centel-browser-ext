@@ -45,7 +45,7 @@ export function createCategoryModal(
       confirmButtonBgDark: "#0d47a1",
       confirmButtonBgLight: "#1976d2",
       confirmButtonText: "#ffffff",
-      
+
       // Disabled button
       disabledButtonBgDark: "#0d47a1",
       disabledButtonBgLight: "#1976d2",
@@ -65,7 +65,7 @@ export function createCategoryModal(
     modalContainer.style.alignItems = "center";
     modalContainer.style.zIndex = "9999";
     modalContainer.style.backdropFilter = "blur(3px)";
-    modalContainer.style.fontFamily = 
+    modalContainer.style.fontFamily =
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
 
     // Create modal content
@@ -76,9 +76,9 @@ export function createCategoryModal(
     modalContent.style.padding = "24px";
     modalContent.style.width = "450px";
     modalContent.style.maxWidth = "90%";
-    modalContent.style.boxShadow = 
-      styleSettings.theme === "dark" 
-        ? "0 10px 25px rgba(0, 0, 0, 0.5)" 
+    modalContent.style.boxShadow =
+      styleSettings.theme === "dark"
+        ? "0 10px 25px rgba(0, 0, 0, 0.5)"
         : "0 10px 25px rgba(0, 0, 0, 0.2)";
 
     // Create modal title
@@ -126,10 +126,10 @@ export function createCategoryModal(
       buttonContainer.style.flexDirection = "column";
       buttonContainer.style.alignItems = "center";
       buttonContainer.style.justifyContent = "center";
-      buttonContainer.style.width = "90px";
-      buttonContainer.style.height = "90px";
+      buttonContainer.style.width = "70px";
+      buttonContainer.style.height = "70px";
       buttonContainer.style.margin = "4px";
-      buttonContainer.style.padding = "8px";
+      buttonContainer.style.padding = "6px";
       buttonContainer.style.border =
         styleSettings.theme === "dark"
           ? `1px solid ${colors.buttonBorderDark}`
@@ -154,24 +154,26 @@ export function createCategoryModal(
       iconContainer.style.width = "40px";
       iconContainer.style.height = "40px";
       iconContainer.style.marginBottom = "8px";
-      
+
       // Get icon SVG for the tag
       const iconSvg = getTagIcon(tag);
       iconContainer.innerHTML = iconSvg;
-      
+
       // Set icon color based on theme
       const svgElement = iconContainer.querySelector("svg");
       if (svgElement) {
-        svgElement.style.fill = 
-          styleSettings.theme === "dark" ? colors.buttonTextDark : colors.buttonTextLight;
+        svgElement.style.fill =
+          styleSettings.theme === "dark"
+            ? colors.buttonTextDark
+            : colors.buttonTextLight;
       }
-      
+
       // Add text label
       const textLabel = createElement("span", formattedTag, "tag-label");
       textLabel.style.fontSize = "12px";
       textLabel.style.textAlign = "center";
       textLabel.style.wordBreak = "break-word";
-      
+
       // Assemble button
       buttonContainer.appendChild(iconContainer);
       buttonContainer.appendChild(textLabel);
@@ -187,12 +189,14 @@ export function createCategoryModal(
             styleSettings.theme === "dark"
               ? colors.buttonTextDark
               : colors.buttonTextLight;
-          
+
           // Reset icon color
           const svg = (btn as HTMLElement).querySelector("svg");
           if (svg) {
-            svg.style.fill = 
-              styleSettings.theme === "dark" ? colors.buttonTextDark : colors.buttonTextLight;
+            svg.style.fill =
+              styleSettings.theme === "dark"
+                ? colors.buttonTextDark
+                : colors.buttonTextLight;
           }
         });
 
@@ -202,13 +206,13 @@ export function createCategoryModal(
             ? colors.selectedButtonBgDark
             : colors.selectedButtonBgLight;
         buttonContainer.style.color = colors.selectedButtonText;
-        
+
         // Update icon color
         const svg = buttonContainer.querySelector("svg");
         if (svg) {
           svg.style.fill = colors.selectedButtonText;
         }
-        
+
         selectedTag = tag;
         updateConfirmButtonState();
       });
