@@ -1,5 +1,5 @@
 import { StyleSettings, Tags } from "../types";
-import { getTagIcon } from "../utils/iconUtils";
+import { getTagIcon } from "./iconUtils";
 
 function createTweetOverlay(blurValue: number, styleSettings: StyleSettings) {
   const isDarkTheme = styleSettings.theme === "dark";

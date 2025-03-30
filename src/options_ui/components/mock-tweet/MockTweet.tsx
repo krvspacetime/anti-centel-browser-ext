@@ -1,6 +1,13 @@
 import { MockTweetAvatar } from "./MockTweetAvatar";
 import { MockTweetAvatarHandle } from "./MockTweetHandle";
 import { StyleSettings } from "../tweet-options/styleDefaults";
+import {
+  LuMessageCircle,
+  LuRepeat2,
+  LuHeart,
+  LuBarChart2,
+  LuShare,
+} from "react-icons/lu";
 
 interface MockTweetProps {
   blurValue?: number;
@@ -18,7 +25,8 @@ interface MockTweetProps {
   onSetLastStyleValues?: () => void;
 }
 
-export const MOCK_TWEET_WIDTH = "500px";
+// Reduced width to fit better in the preview panel
+export const MOCK_TWEET_WIDTH = "380";
 
 export const MockTweet = ({
   blurValue,
@@ -28,8 +36,8 @@ export const MockTweet = ({
   glowStrength,
   tweetText,
   tweetImgSrc,
-  username,
-  userhandle,
+  username = "John Doe",
+  userhandle = "@johndoe",
   resetBlurValue,
   withBlurReset,
   onSetLastStyleValues,
@@ -37,9 +45,9 @@ export const MockTweet = ({
   return (
     <div className="relative">
       <div
-        className="flex flex-col p-5 pr-9"
+        className="flex flex-col rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
         style={{
-          width: MOCK_TWEET_WIDTH,
+          width: `${MOCK_TWEET_WIDTH}px`,
           filter: `blur(${blurValue}px)`,
           outline: `${highlighThickness}px solid ${highlightColor}`,
           borderRadius: `${highlightBorderRadius}px`,
@@ -47,38 +55,76 @@ export const MockTweet = ({
             glowStrength && highlighThickness
               ? `0 0 ${glowStrength + highlighThickness}px ${highlightColor}`
               : "",
-          transition: "box-shadow 0.3s ease",
+          transition: "all 0.3s ease",
         }}
       >
-        <MockTweetAvatar />
-        <MockTweetAvatarHandle username={username} userhandle={userhandle} />
-        <p className="mb-1 ml-7 text-justify text-sm">{tweetText}</p>
-        <img
-          src={tweetImgSrc}
-          width={MOCK_TWEET_WIDTH}
-          className="ml-7 aspect-square w-[95%]"
-        />
+        <div className="flex items-start gap-3">
+          <MockTweetAvatar />
+          <div className="flex-1 overflow-hidden">
+            <MockTweetAvatarHandle
+              username={username}
+              userhandle={userhandle}
+            />
+            <p className="mt-3 text-sm text-gray-800 dark:text-gray-200">
+              {tweetText}
+            </p>
+
+            {tweetImgSrc && (
+              <div className="mb-3 overflow-hidden rounded-xl border border-gray-100 dark:border-gray-700">
+                <img
+                  src={tweetImgSrc}
+                  alt="Tweet image"
+                  className="h-auto w-full object-cover"
+                  // style={{ maxWidth: `${parseInt(MOCK_TWEET_WIDTH) - 60}px` }}
+                />
+              </div>
+            )}
+
+            {/* Tweet actions */}
+            <div className="mt-2 flex justify-between text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-1 text-xs hover:text-blue-500">
+                <LuMessageCircle size={14} />
+                <span>24</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs hover:text-green-500">
+                <LuRepeat2 size={14} />
+                <span>12</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs hover:text-red-500">
+                <LuHeart size={14} />
+                <span>348</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs hover:text-blue-500">
+                <LuBarChart2 size={14} />
+                <span>2.4K</span>
+              </div>
+              <div className="flex items-center text-xs hover:text-blue-500">
+                <LuShare size={14} />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="absolute inset-0 flex size-full items-center justify-center">
-        <section
-          style={{
-            visibility: withBlurReset ? "visible" : "hidden",
-          }}
-        >
-          <button
-            className="rounded-xl rounded-r-none bg-gray-800 p-1 px-3 text-white outline-white/30 hover:bg-gray-950"
-            onClick={() => {
-              resetBlurValue ? resetBlurValue() : null;
-              onSetLastStyleValues ? onSetLastStyleValues() : null;
-            }}
-          >
-            Remove
-          </button>
-          <button className="rounded-xl rounded-l-none bg-gray-800 p-1 px-3 text-white outline outline-[1px] outline-white/30 hover:bg-red-600">
-            X
-          </button>
-        </section>
-      </div>
+
+      {/* Reset buttons */}
+      {withBlurReset && (
+        <div className="absolute inset-0 flex size-full items-center justify-center">
+          <div className="flex flex-col gap-2">
+            <button
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md transition-colors hover:bg-blue-700"
+              onClick={() => {
+                resetBlurValue?.();
+                onSetLastStyleValues?.();
+              }}
+            >
+              Show Tweet
+            </button>
+            <button className="rounded-md bg-gray-700 px-4 py-2 text-sm font-medium text-white shadow-md transition-colors hover:bg-gray-800">
+              Keep Hidden
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

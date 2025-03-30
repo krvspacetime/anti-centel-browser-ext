@@ -5,14 +5,27 @@ import { STYLE_SETTINGS } from "./styleDefaults";
 import { HighlightOptions } from "./HighlightOptions";
 import { HideOptions } from "./HideOptions";
 import { BlurOptions } from "./BlurOptions";
-import { SegmentedControl } from "@mantine/core";
+import {
+  SegmentedControl,
+  Paper,
+  Title,
+  Transition,
+  Divider,
+} from "@mantine/core";
 import segmentedControl from "./segmentedControl.module.css";
 import { HideUserDetails } from "../misc/HideUserDetails";
 import { ImportExportOptions } from "./ImportExportOptions";
+import {
+  LuHighlighter,
+  LuEye,
+  LuEyeOff,
+  LuSettings2,
+  LuDownloadCloud,
+} from "react-icons/lu";
 
 const SAMPLE_IMG = "avatar.jpg";
 const SAMPLE_TEXT =
-  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+  "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
 
 export const TweetStyleMenu = () => {
   const [styleSettings, setStyleSettings] = useState(STYLE_SETTINGS);
@@ -21,7 +34,10 @@ export const TweetStyleMenu = () => {
     type: "",
     message: "",
   });
+  const [animatePreview, setAnimatePreview] = useState(false);
 
+  // Segmented control
+  const [selectedTab, setSelectedTab] = useState("highlight");
   // Load initial style settings and target handles from storage
   useEffect(() => {
     chrome.storage.sync.get(["styleSettings", "targetHandles"], (data) => {
@@ -39,13 +55,22 @@ export const TweetStyleMenu = () => {
     chrome.storage.sync.set({ styleSettings });
   }, [styleSettings]);
 
+  // Animate preview when tab changes
+  useEffect(() => {
+    setAnimatePreview(false);
+    const timer = setTimeout(() => setAnimatePreview(true), 50);
+    return () => clearTimeout(timer);
+  }, [selectedTab]);
+
   const valueLabelFormat = (value: number) => {
     const units = "px";
     return `${value} ${units}`;
   };
+
   const resetBlurValue = () => {
     setStyleSettings((prev) => ({ ...prev, blurValue: 0 }));
   };
+
   const resetHiddenTweetBlurValue = () => {
     setStyleSettings((prev) => ({ ...prev, hiddenTweetBlurValue: 0 }));
   };
@@ -63,6 +88,7 @@ export const TweetStyleMenu = () => {
       blur: { ...prev.blur, blurValue: value },
     }));
   };
+
   const onChangeHiddenTweetBlurValue = (value: number) => {
     setStyleSettings((prev) => ({
       ...prev,
@@ -78,7 +104,6 @@ export const TweetStyleMenu = () => {
   };
 
   const onChangeHideUserDetails = (value: boolean) => {
-    console.log("Changing hideUserDetails to", value);
     setStyleSettings((prev) => ({
       ...prev,
       hideUserDetails: value,
@@ -91,6 +116,8 @@ export const TweetStyleMenu = () => {
       const exportData = {
         styleSettings: data.styleSettings || styleSettings,
         targetHandles: data.targetHandles || targetHandles,
+        exportDate: new Date().toISOString(),
+        version: "1.0",
       };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
@@ -100,7 +127,7 @@ export const TweetStyleMenu = () => {
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = "twitter-extension-settings.json";
+      a.download = `twitter-extension-settings-${new Date().toISOString().split("T")[0]}.json`;
       document.body.appendChild(a);
       a.click();
 
@@ -152,7 +179,7 @@ export const TweetStyleMenu = () => {
 
         setImportExportStatus({
           type: "success",
-          message: "Settings imported successfully!",
+          message: `Settings imported successfully! (${importedData.targetHandles?.length || 0} targets)`,
         });
       } catch (error) {
         console.error("Error importing settings:", error);
@@ -174,135 +201,225 @@ export const TweetStyleMenu = () => {
     reader.readAsText(file);
   };
 
-  // Segmented control
-  const [selectedTab, setSelectedTab] = useState("highlight");
+  const tabIcons = {
+    highlight: <LuHighlighter size={18} />,
+    blur: <LuEye size={18} />,
+    hide: <LuEyeOff size={18} />,
+    misc: <LuSettings2 size={18} />,
+    importexport: <LuDownloadCloud size={18} />,
+  };
+
   return (
-    <main className="p-5">
-      <h1 className="p-3 text-3xl">Style Configuration</h1>
-      <div className="flex w-full justify-between gap-5 p-5">
-        <div className="flex gap-5">
-          <section className="h-fit">
-            <SegmentedControl
-              classNames={segmentedControl}
-              size="lg"
-              orientation="vertical"
-              color="gray"
-              value={selectedTab}
-              onChange={setSelectedTab}
-              data={[
-                { label: "Highlight", value: "highlight" },
-                { label: "Blur", value: "blur" },
-                { label: "Hide", value: "hide" },
-                { label: "Misc", value: "misc" },
-                { label: "Import/Export", value: "importexport" },
-              ]}
-            />
-          </section>
-          <section className="sticky top-5 h-full">
-            {selectedTab === "blur" && (
-              <BlurOptions
-                onChangeBlurValue={onChangeBlurValue}
-                valueLabelFormat={valueLabelFormat}
-                styleSettings={styleSettings}
-              />
-            )}
-            {selectedTab === "highlight" && (
-              <HighlightOptions
-                styleSettings={styleSettings}
-                setStyleSettings={setStyleSettings}
-                valueLabelFormat={valueLabelFormat}
-              />
-            )}
-            {selectedTab === "hide" && (
-              <HideOptions
-                valueLabelFormat={valueLabelFormat}
-                styleSettings={styleSettings}
-                onSetChecked={(value: boolean) => onSetChecked(value)}
-                onChangeHiddenTweetBlurValue={onChangeHiddenTweetBlurValue}
-                onChangeCollapsedTweetUsernameColor={
-                  onChangeCollapsedTweetUsernameColor
-                }
-              />
-            )}
-            {selectedTab === "misc" && (
-              <div>
-                <HideUserDetails
-                  styleSettings={styleSettings}
-                  onChangeHideUserDetails={onChangeHideUserDetails}
+    <main className="min-h-screen bg-gray-50 p-5 transition-colors duration-300 dark:bg-gray-900">
+      <Paper
+        shadow="sm"
+        radius="md"
+        p="xl"
+        className="mx-auto max-w-7xl bg-white transition-all duration-300 dark:bg-gray-800"
+      >
+        <Title
+          order={1}
+          className="mb-6 font-bold text-gray-800 dark:text-gray-100"
+        >
+          Settings
+        </Title>
+
+        <Divider className="mb-6" />
+
+        <div className="flex w-full flex-col gap-6 md:flex-row">
+          <div className="flex w-full flex-col gap-6 md:w-2/3 md:flex-row">
+            <section className="h-fit">
+              <Paper shadow="xs" radius="md" className="sticky top-5">
+                <SegmentedControl
+                  classNames={segmentedControl}
+                  size="md"
+                  orientation="vertical"
+                  color="blue"
+                  value={selectedTab}
+                  onChange={setSelectedTab}
+                  data={[
+                    {
+                      label: "Highlight",
+                      value: "highlight",
+                      icon: tabIcons.highlight,
+                    },
+                    { label: "Blur", value: "blur", icon: tabIcons.blur },
+                    { label: "Hide", value: "hide", icon: tabIcons.hide },
+                    { label: "Misc", value: "misc", icon: tabIcons.misc },
+                    {
+                      label: "Import/Export",
+                      value: "importexport",
+                      icon: tabIcons.importexport,
+                    },
+                  ].map((item) => ({
+                    ...item,
+                    label: (
+                      <div className="flex items-center gap-2">
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </div>
+                    ),
+                  }))}
                 />
-              </div>
-            )}
-            {selectedTab === "importexport" && (
-              <ImportExportOptions
-                onExport={handleExportSettings}
-                onImport={handleImportSettings}
-                status={importExportStatus}
-              />
-            )}
+              </Paper>
+            </section>
+
+            <section className="sticky top-5 w-full">
+              <Paper shadow="xs" radius="md" p="md" className="h-full">
+                {selectedTab === "blur" && (
+                  <BlurOptions
+                    onChangeBlurValue={onChangeBlurValue}
+                    valueLabelFormat={valueLabelFormat}
+                    styleSettings={styleSettings}
+                  />
+                )}
+                {selectedTab === "highlight" && (
+                  <HighlightOptions
+                    styleSettings={styleSettings}
+                    setStyleSettings={setStyleSettings}
+                    valueLabelFormat={valueLabelFormat}
+                  />
+                )}
+                {selectedTab === "hide" && (
+                  <HideOptions
+                    valueLabelFormat={valueLabelFormat}
+                    styleSettings={styleSettings}
+                    onSetChecked={(value: boolean) => onSetChecked(value)}
+                    onChangeHiddenTweetBlurValue={onChangeHiddenTweetBlurValue}
+                    onChangeCollapsedTweetUsernameColor={
+                      onChangeCollapsedTweetUsernameColor
+                    }
+                  />
+                )}
+                {selectedTab === "misc" && (
+                  <div>
+                    <HideUserDetails
+                      styleSettings={styleSettings}
+                      onChangeHideUserDetails={onChangeHideUserDetails}
+                    />
+                  </div>
+                )}
+                {selectedTab === "importexport" && (
+                  <ImportExportOptions
+                    onExport={handleExportSettings}
+                    onImport={handleImportSettings}
+                    status={importExportStatus}
+                    targetCount={targetHandles.length}
+                  />
+                )}
+              </Paper>
+            </section>
+          </div>
+
+          <section className="w-full md:w-1/3">
+            <Paper shadow="xs" radius="md" p="md" className="h-full">
+              <Transition
+                mounted={animatePreview}
+                transition="fade"
+                duration={400}
+              >
+                {(styles) => (
+                  <div style={styles}>
+                    {selectedTab === "blur" && (
+                      <section>
+                        <Title
+                          order={3}
+                          className="mb-4 text-gray-800 dark:text-gray-100"
+                        >
+                          Blur Preview
+                        </Title>
+                        <MockTweet
+                          withBlurReset
+                          blurValue={styleSettings.blur.blurValue}
+                          tweetText={SAMPLE_TEXT}
+                          tweetImgSrc={SAMPLE_IMG}
+                          resetBlurValue={resetBlurValue}
+                          highlighThickness={1}
+                          highlightColor="rgba(255,255,255,0.30)"
+                        />
+                      </section>
+                    )}
+                    {selectedTab === "highlight" && (
+                      <section>
+                        <Title
+                          order={3}
+                          className="mb-4 text-gray-800 dark:text-gray-100"
+                        >
+                          Highlight Preview
+                        </Title>
+                        <MockTweet
+                          highlightColor={
+                            styleSettings.highlight.highlightColor
+                          }
+                          highlighThickness={
+                            styleSettings.highlight.highlighThickness
+                          }
+                          highlightBorderRadius={
+                            styleSettings.highlight.highlightBorderRadius
+                          }
+                          glowStrength={styleSettings.highlight.glowStrength}
+                          tweetText={SAMPLE_TEXT}
+                          tweetImgSrc={SAMPLE_IMG}
+                        />
+                      </section>
+                    )}
+                    {selectedTab === "hide" && (
+                      <section>
+                        <Title
+                          order={3}
+                          className="mb-4 text-gray-800 dark:text-gray-100"
+                        >
+                          Hide Preview
+                        </Title>
+                        <CollapsedTweet
+                          blurTweet={
+                            styleSettings.hide.blurHiddenTweetsOnUncollpase
+                          }
+                          collapsedTweetBlurValue={
+                            styleSettings.hide.hiddenTweetBlurValue
+                          }
+                          resetBlurValue={resetHiddenTweetBlurValue}
+                          collapsedTweetColor={
+                            styleSettings.hide.collapsedTweetUsernameColor
+                          }
+                        />
+                      </section>
+                    )}
+                    {selectedTab === "importexport" && (
+                      <section>
+                        <Title
+                          order={3}
+                          className="mb-4 text-gray-800 dark:text-gray-100"
+                        >
+                          Settings Backup
+                        </Title>
+                        <div className="rounded-lg border border-gray-200 bg-gray-100 p-4 text-gray-800 transition-colors duration-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
+                          <p className="mb-2">
+                            Export your current settings and target list to a
+                            JSON file for backup or to transfer to another
+                            device.
+                          </p>
+                          <p className="mb-4">
+                            Import settings from a previously exported JSON file
+                            to restore your configuration.
+                          </p>
+                          <div className="mt-4 rounded-md bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+                            <p>
+                              You currently have{" "}
+                              <strong>{targetHandles.length}</strong> targets in
+                              your watchlist.
+                            </p>
+                          </div>
+                        </div>
+                      </section>
+                    )}
+                  </div>
+                )}
+              </Transition>
+            </Paper>
           </section>
         </div>
-        <section className="flex flex-col gap-2">
-          {selectedTab === "blur" && (
-            <section>
-              <p className="text-2xl font-bold">Blur Preview</p>
-              <MockTweet
-                withBlurReset
-                blurValue={styleSettings.blur.blurValue}
-                tweetText={SAMPLE_TEXT}
-                tweetImgSrc={SAMPLE_IMG}
-                resetBlurValue={resetBlurValue}
-                highlighThickness={1}
-                highlightColor="rgba(255,255,255,0.30)"
-              />
-            </section>
-          )}
-          {selectedTab === "highlight" && (
-            <section>
-              <p className="text-2xl font-bold">Highlight Preview</p>
-              <MockTweet
-                highlightColor={styleSettings.highlight.highlightColor}
-                highlighThickness={styleSettings.highlight.highlighThickness}
-                highlightBorderRadius={
-                  styleSettings.highlight.highlightBorderRadius
-                }
-                glowStrength={styleSettings.highlight.glowStrength}
-                tweetText={SAMPLE_TEXT}
-                tweetImgSrc={SAMPLE_IMG}
-              />
-            </section>
-          )}
-          {selectedTab === "hide" && (
-            <section>
-              <p className="text-2xl font-bold">Hide Preview</p>
-              <CollapsedTweet
-                blurTweet={styleSettings.hide.blurHiddenTweetsOnUncollpase}
-                collapsedTweetBlurValue={
-                  styleSettings.hide.hiddenTweetBlurValue
-                }
-                resetBlurValue={resetHiddenTweetBlurValue}
-                collapsedTweetColor={
-                  styleSettings.hide.collapsedTweetUsernameColor
-                }
-              />
-            </section>
-          )}
-          {selectedTab === "importexport" && (
-            <section>
-              <p className="text-2xl font-bold">Settings Backup</p>
-              <div className="mt-4 rounded-lg border border-gray-700 bg-gray-800 p-4 text-white">
-                <p className="mb-2">
-                  Export your current settings and target list to a JSON file
-                  for backup or to transfer to another device.
-                </p>
-                <p className="mb-4">
-                  Import settings from a previously exported JSON file to
-                  restore your configuration.
-                </p>
-              </div>
-            </section>
-          )}
-        </section>
-      </div>
+      </Paper>
     </main>
   );
 };

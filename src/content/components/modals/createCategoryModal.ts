@@ -5,7 +5,7 @@
 import { StyleSettings } from "../../types";
 import { Tags, Actions, Action } from "../../types/targets";
 import { createElement } from "../../utils/domUtils";
-import { getTagIcon } from "../../utils/iconUtils";
+import { getActionIcon, getTagIcon } from "../../utils/iconUtils";
 
 /**
  * Create a modal for selecting category and action
@@ -232,6 +232,7 @@ export function createCategoryModal(
     const actionButtons = createElement("div", "", "action-buttons");
     actionButtons.style.display = "flex";
     actionButtons.style.gap = "8px";
+    actionButtons.style.flexWrap = "wrap";
 
     // Create buttons for each action
     const actionOptions = Object.values(Action);
@@ -244,30 +245,76 @@ export function createCategoryModal(
         formattedAction.charAt(0).toUpperCase() +
         formattedAction.slice(1).toLowerCase();
 
-      const button = createElement(
-        "button",
-        capitalizedAction,
-        "action-button",
+      // Create button container for icon and text (similar to tag buttons)
+      const buttonContainer = createElement(
+        "div",
+        "",
+        "action-button-container",
       );
-      button.style.padding = "8px 12px";
-      button.style.border =
+      buttonContainer.style.display = "flex";
+      buttonContainer.style.flexDirection = "row";
+      buttonContainer.style.alignItems = "center";
+      buttonContainer.style.justifyContent = "space-between";
+      buttonContainer.style.width = "120px";
+      buttonContainer.style.height = "40px";
+      buttonContainer.style.margin = "4px";
+      buttonContainer.style.padding = "8px 12px";
+      buttonContainer.style.border =
         styleSettings.theme === "dark"
           ? `1px solid ${colors.buttonBorderDark}`
           : `1px solid ${colors.buttonBorderLight}`;
-      button.style.borderRadius = "4px";
-      button.style.backgroundColor =
+      buttonContainer.style.borderRadius = "8px";
+      buttonContainer.style.backgroundColor =
         styleSettings.theme === "dark"
           ? colors.buttonBgDark
           : colors.buttonBgLight;
-      button.style.color =
+      buttonContainer.style.color =
         styleSettings.theme === "dark"
           ? colors.buttonTextDark
           : colors.buttonTextLight;
-      button.style.cursor = "pointer";
+      buttonContainer.style.cursor = "pointer";
+      buttonContainer.style.transition = "all 0.2s ease";
 
-      button.addEventListener("click", () => {
+      // Add icon
+      const iconContainer = createElement("div", "", "icon-container");
+      iconContainer.style.display = "flex";
+      iconContainer.style.justifyContent = "center";
+      iconContainer.style.alignItems = "center";
+      iconContainer.style.width = "24px";
+      iconContainer.style.height = "24px";
+      iconContainer.style.marginLeft = "8px";
+
+      // Get icon SVG for the action
+      const iconSvg = getActionIcon(action);
+      iconContainer.innerHTML = iconSvg;
+
+      // Set icon color based on theme
+      const svgElement = iconContainer.querySelector("svg");
+      if (svgElement) {
+        svgElement.style.stroke =
+          styleSettings.theme === "dark"
+            ? colors.buttonTextDark
+            : colors.buttonTextLight;
+      }
+
+      // Add text label
+      const textLabel = createElement(
+        "span",
+        capitalizedAction,
+        "action-label",
+      );
+      textLabel.style.fontSize = "13px";
+      textLabel.style.fontWeight = "500";
+      textLabel.style.textAlign = "left";
+      textLabel.style.whiteSpace = "nowrap";
+
+      // Assemble button
+      buttonContainer.appendChild(textLabel);
+      buttonContainer.appendChild(iconContainer);
+
+      buttonContainer.addEventListener("click", () => {
         // Deselect all buttons
-        document.querySelectorAll(".action-button").forEach((btn) => {
+        document.querySelectorAll(".action-button-container").forEach((btn) => {
           (btn as HTMLElement).style.backgroundColor =
             styleSettings.theme === "dark"
               ? colors.buttonBgDark
@@ -276,19 +323,35 @@ export function createCategoryModal(
             styleSettings.theme === "dark"
               ? colors.buttonTextDark
               : colors.buttonTextLight;
+
+          // Reset icon color
+          const svg = (btn as HTMLElement).querySelector("svg");
+          if (svg) {
+            svg.style.stroke =
+              styleSettings.theme === "dark"
+                ? colors.buttonTextDark
+                : colors.buttonTextLight;
+          }
         });
 
         // Select this button
-        button.style.backgroundColor =
+        buttonContainer.style.backgroundColor =
           styleSettings.theme === "dark"
             ? colors.selectedButtonBgDark
             : colors.selectedButtonBgLight;
-        button.style.color = colors.selectedButtonText;
+        buttonContainer.style.color = colors.selectedButtonText;
+
+        // Update icon color
+        const svg = buttonContainer.querySelector("svg");
+        if (svg) {
+          svg.style.stroke = colors.selectedButtonText;
+        }
+
         selectedAction = action;
         updateConfirmButtonState();
       });
 
-      actionButtons.appendChild(button);
+      actionButtons.appendChild(buttonContainer);
     });
 
     // Update confirm button state based on selections

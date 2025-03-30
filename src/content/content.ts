@@ -7,7 +7,7 @@ import { updateButtonState } from "./watchlist/WatchlistButtonUpdate";
 
 import { StyleSettings, Tags, TargetHandle } from "./types";
 import { CollapsedIndicator } from "./actions/hide/CollapsedIndicator";
-import { OverlayWithRemoveButton } from "./utils/styleTweetUtils";
+import { OverlayWithRemoveButton } from "./utils/styleBlurredTweetsUtils";
 import { extractHandleFromTweet } from "./utils/tweetUtils";
 import { createCategoryModal } from "./components/modals/createCategoryModal";
 
