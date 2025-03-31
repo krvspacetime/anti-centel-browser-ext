@@ -66,7 +66,6 @@ export const CollapsedTweet = ({
           tweetImgSrc={SAMPLE_IMG}
           username="Hidden Tweet"
           userhandle="hiddentweet"
-          withBlurReset
         />
       )}
     </div>
