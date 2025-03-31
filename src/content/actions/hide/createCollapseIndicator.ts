@@ -3,6 +3,7 @@ import { StyleSettings } from "../../types/settings";
 import { Tags } from "../../types/targets";
 import { getTagIcon } from "../../utils/iconUtils";
 import { createSettingsDialog } from "./createSettingsDialog";
+import { colors as _colors } from "./colors";
 
 interface CollapsedIndicatorProps {
   action: "hide" | "blur";
@@ -19,37 +20,12 @@ export const createCollapseIndicator = ({
   tag,
   styleSettings,
 }: CollapsedIndicatorProps) => {
+  const colors = Object.assign({}, _colors);
+  colors["usernameDark"] = styleSettings.hide.collapsedTweetUsernameColor;
+
   if (action === "hide") {
     // Determine if we're in dark or light theme
     const isDarkTheme = styleSettings.theme === "dark";
-
-    // Define theme colors
-    const colors = {
-      // Background colors
-      bgDark: "#15181c",
-      bgLight: "#f7f9f9",
-
-      // Text colors
-      textDark: "#71767b",
-      textLight: "#536471",
-
-      // Accent colors
-      accentDark: "#1d9bf0",
-      accentLight: "#1d9bf0",
-
-      // Username colors
-      usernameDark: styleSettings.hide.collapsedTweetUsernameColor || "#ffffff",
-      usernameLight: "#000000",
-
-      // Border colors
-      borderDark: "#2f3336",
-      borderLight: "#eff3f4",
-
-      // Hover colors
-      hoverBgDark: "#1e2732",
-      hoverBgLight: "#e6e7e8",
-    };
-
     // Create collapse indicator
     const collapseIndicator = document.createElement("div");
     collapseIndicator.className = "collapse-indicator";

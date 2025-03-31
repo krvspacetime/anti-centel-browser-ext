@@ -2,6 +2,7 @@ import { TargetHandle, Tags } from "../../types/targets";
 import { StyleSettings } from "../../types/settings";
 import { getTagIcon } from "../../utils/iconUtils";
 import { eyeOffSvg } from "../../../icons/icons";
+import { colors } from "./colors";
 
 export const updateWatchlistButtonState = (
   button: HTMLElement,
@@ -16,32 +17,6 @@ export const updateWatchlistButtonState = (
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
-
-  // Define theme colors
-  const colors = {
-    // Text colors
-    textDark: "#e0e0e0",
-    textLight: "#333333",
-
-    // Button colors (unselected)
-    buttonBgDark: "#2d2d2d",
-    buttonBgLight: "#f0f0f0",
-    buttonTextDark: "#e0e0e0",
-    buttonTextLight: "#333333",
-    buttonBorderDark: "#404040",
-    buttonBorderLight: "#cccccc",
-
-    // Button colors (selected/hover)
-    selectedButtonBgDark: "#0d47a1",
-    selectedButtonBgLight: "#1976d2",
-    selectedButtonText: "#ffffff",
-
-    // Tooltip colors
-    tooltipBgDark: "#2d2d2d",
-    tooltipBgLight: "#ffffff",
-    tooltipTextDark: "#e0e0e0",
-    tooltipTextLight: "#333333",
-  };
 
   // Set initial transparent background immediately
   button.style.cssText = `
