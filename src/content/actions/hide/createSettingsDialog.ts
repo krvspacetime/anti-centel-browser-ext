@@ -1,5 +1,5 @@
 // Add dialog element
-export const SettingsDialog = (handle: string, tag: string) => {
+export const createSettingsDialog = (handle: string, tag: string) => {
   const dialog = document.createElement("dialog");
   dialog.className = "options-dialog";
   dialog.style.cssText = `

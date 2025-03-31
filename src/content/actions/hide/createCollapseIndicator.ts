@@ -2,7 +2,7 @@ import { settings } from "../../../icons/icons";
 import { StyleSettings } from "../../types/settings";
 import { Tags } from "../../types/targets";
 import { getTagIcon } from "../../utils/iconUtils";
-import { SettingsDialog } from "./settingsDialog";
+import { createSettingsDialog } from "./createSettingsDialog";
 
 interface CollapsedIndicatorProps {
   action: "hide" | "blur";
@@ -12,7 +12,7 @@ interface CollapsedIndicatorProps {
   styleSettings: StyleSettings;
 }
 
-export const CollapsedIndicator = ({
+export const createCollapseIndicator = ({
   tweet,
   handle,
   action,
@@ -186,7 +186,7 @@ export const CollapsedIndicator = ({
       optionsButton.style.backgroundColor = "transparent";
     });
 
-    const dialog = SettingsDialog(handle, tag);
+    const dialog = createSettingsDialog(handle, tag);
 
     // Modify options button click handler
     optionsButton.addEventListener("click", (e) => {
