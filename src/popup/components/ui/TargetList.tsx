@@ -3,7 +3,7 @@ import { Button, TextInput, Badge, ActionIcon, Tooltip } from "@mantine/core";
 import { TargetInput } from "./TargetInput";
 import { TargetCategorySelect } from "./TargetCategorySelect";
 import { DEFAULT_STYLE_CONFIGS } from "../../../options_ui/components/options/styleConfig";
-import { TargetHandle } from "../../../content/types";
+import { TargetHandle } from "../../../content/types/targets";
 import { POPUP_HEIGHT } from "../layout/AppLayout";
 import { Actions, Tags } from "../../types/targets";
 import { TargetActionSelect } from "./TargetActionSelect";

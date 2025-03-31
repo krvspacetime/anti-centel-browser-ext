@@ -1,5 +1,6 @@
 import { settings } from "../../../icons/icons";
-import { StyleSettings, Tags } from "../../types";
+import { StyleSettings } from "../../types/settings";
+import { Tags } from "../../types/targets";
 import { getTagIcon } from "../../utils/iconUtils";
 import { SettingsDialog } from "./settingsDialog";
 

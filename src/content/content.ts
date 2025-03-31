@@ -5,7 +5,7 @@ import {
 
 import { updateWatchlistButtonState } from "./components/watchlist/updateWatchlistButtonState";
 
-import { Tags, TargetHandle } from "./types";
+import { Tags, TargetHandle } from "./types/targets";
 import { CollapsedIndicator } from "./actions/hide/collapseIndicator";
 import { createBlurEffect } from "./actions/blur/createBlurEffect";
 import { createHighlightEffect } from "./actions/highlight/createHighlightEffect";

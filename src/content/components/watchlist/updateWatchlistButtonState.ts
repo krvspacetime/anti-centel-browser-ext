@@ -1,4 +1,5 @@
-import { TargetHandle, StyleSettings, Tags } from "../../types";
+import { TargetHandle, Tags } from "../../types/targets";
+import { StyleSettings } from "../../types/settings";
 import { getTagIcon } from "../../utils/iconUtils";
 import { eyeOffSvg } from "../../../icons/icons";
 

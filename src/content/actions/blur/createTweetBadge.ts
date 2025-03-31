@@ -1,5 +1,5 @@
-import { StyleSettings } from "../../types";
-import { Tags } from "../../types";
+import { StyleSettings } from "../../types/settings";
+import { Tags } from "../../types/targets";
 import { getTagIcon } from "../../utils/iconUtils";
 
 export const createTweetBadge = (

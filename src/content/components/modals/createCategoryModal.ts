@@ -2,7 +2,7 @@
  * Modal for selecting category and action for watchlist
  */
 
-import { StyleSettings } from "../../types";
+import { StyleSettings } from "../../types/settings";
 import { Tags, Actions, Action } from "../../types/targets";
 import { createElement } from "../../utils/domUtils";
 import { getActionIcon, getTagIcon } from "../../utils/iconUtils";

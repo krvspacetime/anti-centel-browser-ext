@@ -1,4 +1,4 @@
-import { TargetHandle } from "../../types";
+import { TargetHandle } from "../../types/targets";
 import { updateWatchlistButtonState } from "./updateWatchlistButtonState";
 
 export function createWatchlistButton({

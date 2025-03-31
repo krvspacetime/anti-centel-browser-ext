@@ -1,4 +1,4 @@
-import { StyleSettings } from "../../types";
+import { StyleSettings } from "../../types/settings";
 import { createShowTweetButton } from "./createShowTweetButton";
 import { createHideTweetButton } from "./createHideTweetButton";
 import { createTweetOverlay } from "./createTweetOverlay";

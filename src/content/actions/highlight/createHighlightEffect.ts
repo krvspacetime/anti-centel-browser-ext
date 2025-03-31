@@ -1,4 +1,4 @@
-import { StyleSettings } from "../../types";
+import { StyleSettings } from "../../types/settings";
 
 export function createHighlightEffect(
   tweet: HTMLElement,
