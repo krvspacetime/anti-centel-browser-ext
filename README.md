@@ -4,6 +4,8 @@
 
 A Chrome/Firefox extension for monitoring and managing Twitter accounts with content moderation capabilities. Works adding Twitter/X accounts to a watchlist and setting actions and tags for them for monitoring, hiding, blurring, or highlighting tweets.
 
+https://github.com/user-attachments/assets/2eef8313-53f2-4599-9fc2-010b4594ba8c
+
 ## Tech Stack
 
 - React + Vite
